@@ -121,6 +121,7 @@ async function beginSession(event) {
   stepIndex = 0;
   nodes.startScreen.classList.add("hidden");
   nodes.captureScreen.classList.remove("hidden");
+  document.body.classList.add("camera-locked");
   updateCaptureUI();
   await openCamera();
 }
@@ -175,18 +176,19 @@ async function loadCameraDevices() {
 
   const devices = await navigator.mediaDevices.enumerateDevices().catch(() => []);
   const cameras = devices.filter((device) => device.kind === "videoinput");
-  if (cameras.length <= 1) {
+  const choices = getDriverCameraChoices(cameras);
+  if (choices.length <= 1) {
     nodes.cameraPickerControl?.classList.add("hidden");
     return;
   }
 
   const activeId = cameraTrack?.getSettings?.().deviceId || selectedCameraId;
-  nodes.cameraPicker.innerHTML = cameras.map((camera, index) => {
-    const label = camera.label || `${t("cameraLens")} ${index + 1}`;
-    const friendly = getFriendlyCameraLabel(label, index);
-    return `<option value="${escapeHtml(camera.deviceId)}">${escapeHtml(friendly)}</option>`;
+  nodes.cameraPicker.innerHTML = choices.map((camera) => {
+    return `<option value="${escapeHtml(camera.deviceId)}">${escapeHtml(camera.friendlyLabel)}</option>`;
   }).join("");
-  nodes.cameraPicker.value = activeId;
+  nodes.cameraPicker.value = choices.some((camera) => camera.deviceId === activeId)
+    ? activeId
+    : choices[0].deviceId;
   nodes.cameraPickerControl.classList.remove("hidden");
 }
 
@@ -196,18 +198,51 @@ async function changeCamera() {
   await openCamera();
 }
 
-function getFriendlyCameraLabel(label, index) {
-  const lower = label.toLowerCase();
-  if (lower.includes("ultra") || lower.includes("wide") || lower.includes("0.5")) {
-    return `${t("wideCamera")} (${label})`;
+function getDriverCameraChoices(cameras) {
+  const usable = cameras
+    .map((camera, index) => {
+      const label = camera.label || `${t("cameraLens")} ${index + 1}`;
+      const lower = label.toLowerCase();
+      return { ...camera, label, lower, index };
+    })
+    .filter((camera) => !isFrontCamera(camera.lower) && !isTeleOrMacroCamera(camera.lower));
+
+  const source = usable.length ? usable : cameras.map((camera, index) => ({
+    ...camera,
+    label: camera.label || `${t("cameraLens")} ${index + 1}`,
+    lower: String(camera.label || "").toLowerCase(),
+    index,
+  }));
+
+  const wide = source.find((camera) => isWideCamera(camera.lower));
+  const normal = source.find((camera) => !isWideCamera(camera.lower)) || source[0];
+  const choices = [];
+
+  if (normal) {
+    choices.push({ ...normal, friendlyLabel: t("rearCamera") });
   }
-  if (lower.includes("back") || lower.includes("rear") || lower.includes("environment")) {
-    return `${t("rearCamera")} (${label})`;
+  if (wide && wide.deviceId !== normal?.deviceId) {
+    choices.push({ ...wide, friendlyLabel: t("wideCamera") });
   }
-  if (lower.includes("front") || lower.includes("user")) {
-    return `${t("frontCamera")} (${label})`;
+
+  if (choices.length < 2 && source.length > 1) {
+    const extra = source.find((camera) => !choices.some((choice) => choice.deviceId === camera.deviceId));
+    if (extra) choices.push({ ...extra, friendlyLabel: t("wideCamera") });
   }
-  return `${t("cameraLens")} ${index + 1}`;
+
+  return choices.slice(0, 2);
+}
+
+function isWideCamera(label) {
+  return label.includes("ultra") || label.includes("wide") || label.includes("0.5") || label.includes("0,5");
+}
+
+function isFrontCamera(label) {
+  return label.includes("front") || label.includes("user") || label.includes("face") || label.includes("selfie");
+}
+
+function isTeleOrMacroCamera(label) {
+  return label.includes("tele") || label.includes("macro") || label.includes("zoom");
 }
 
 function setupCameraZoom() {
@@ -434,6 +469,7 @@ async function finishInspection() {
 function resetSession() {
   stopCamera();
   closePhotoZoom();
+  document.body.classList.remove("camera-locked");
   session = null;
   stepIndex = 0;
   nodes.startForm.reset();

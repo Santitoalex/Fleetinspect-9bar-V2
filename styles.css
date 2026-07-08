@@ -3581,3 +3581,76 @@ body.driver-pro {
     max-height: none;
   }
 }
+
+body.camera-locked {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body.camera-locked .driver-photo-screen {
+  height: calc(100dvh - 76px);
+  overflow: hidden;
+}
+
+body.camera-locked .driver-photo-app {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+body.camera-locked .photo-workspace {
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+body.camera-locked .photo-stage,
+body.camera-locked .photo-control-panel {
+  min-height: 0;
+}
+
+body.camera-locked .photo-stage {
+  align-self: stretch;
+}
+
+body.camera-locked .photo-camera-frame {
+  min-height: 0;
+  height: min(68dvh, 720px);
+}
+
+@media (max-width: 920px) {
+  body.camera-locked .driver-photo-screen {
+    height: calc(100dvh - 76px);
+  }
+
+  body.camera-locked .photo-workspace {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+
+  body.camera-locked .photo-stage {
+    min-height: 0;
+  }
+
+  body.camera-locked .photo-camera-frame {
+    height: calc(100dvh - 250px);
+    min-height: 300px;
+  }
+
+  body.camera-locked .photo-control-panel {
+    max-height: 30dvh;
+    overflow: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (max-width: 520px) {
+  body.camera-locked .photo-camera-frame {
+    height: calc(100dvh - 270px);
+    min-height: 280px;
+  }
+}
