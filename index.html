@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>9Bar FleetInspect</title>
     <link rel="manifest" href="/manifest.webmanifest" />
-    <link rel="stylesheet" href="/styles.css?v=15" />
+    <link rel="stylesheet" href="/styles.css?v=16" />
   </head>
   <body class="driver-body driver-pro">
     <header class="app-header driver-app-header">
@@ -91,53 +91,58 @@
         </div>
       </section>
 
-      <section id="captureScreen" class="capture-screen hidden">
-        <div class="capture-shell driver-capture-shell">
-          <div class="capture-top driver-capture-top">
+      <section id="captureScreen" class="capture-screen driver-photo-screen hidden">
+        <div class="driver-photo-app">
+          <header class="photo-command-bar">
             <div>
               <span class="capture-kicker" data-i18n="captureStep">Capture step</span>
               <h2 id="stepTitle">Front</h2>
               <p id="sessionMeta"></p>
             </div>
             <button id="resetSession" class="ghost" type="button" data-i18n="newReport">New report</button>
-          </div>
+          </header>
 
-          <div class="driver-inspection-grid">
-            <section class="driver-camera-card">
-              <div class="camera-frame">
+          <div class="photo-workspace">
+            <section class="photo-stage">
+              <div class="camera-frame photo-camera-frame">
                 <video id="cameraVideo" playsinline autoplay muted></video>
                 <img id="capturedPreview" alt="Captured photo" data-i18n-aria="capturedPhoto" />
                 <div id="cameraEmpty" class="camera-empty">
                   <strong data-i18n="cameraPending">Camera pending</strong>
                   <span data-i18n="allowCamera">Allow camera access to start the inspection.</span>
                 </div>
+                <div class="camera-corners" aria-hidden="true"></div>
               </div>
 
-              <div class="camera-actions driver-camera-actions">
-                <button id="previousPhoto" class="secondary" type="button" data-i18n="previousPhoto">Back</button>
-                <button id="capturePhoto" type="button" data-i18n="capture">Capture</button>
-                <button id="retakePhoto" class="secondary hidden" type="button" data-i18n="retakePhoto">Retake</button>
-                <button id="zoomPhoto" class="secondary hidden" type="button" data-i18n="zoomPhoto">Zoom</button>
+              <div class="photo-action-dock">
+                <button id="previousPhoto" class="secondary photo-small-action" type="button" data-i18n="previousPhoto">Back</button>
+                <button id="capturePhoto" class="photo-main-action" type="button" data-i18n="capture">Capture</button>
+                <button id="retakePhoto" class="secondary photo-small-action hidden" type="button" data-i18n="retakePhoto">Retake</button>
+                <button id="zoomPhoto" class="secondary photo-small-action hidden" type="button" data-i18n="zoomPhoto">Zoom</button>
               </div>
             </section>
 
-            <aside class="inspection-panel driver-side-panel">
-              <div class="driver-panel-header">
+            <aside class="photo-control-panel">
+              <div class="photo-panel-card photo-status-card">
                 <strong data-i18n="inspectionStatus">Inspection status</strong>
-                <span data-i18n="dailyInspection">Daily vehicle inspection</span>
+                <p id="aiStatus" data-i18n="aiInitial">Capture all views to save and review the inspection.</p>
               </div>
-              <div id="progressList" class="progress-list"></div>
-              <label class="notes-field">
+
+              <div class="photo-panel-card">
+                <div class="driver-panel-header">
+                  <strong data-i18n="guidedViews">Guided views</strong>
+                  <span data-i18n="dailyInspection">Daily vehicle inspection</span>
+                </div>
+                <div id="progressList" class="progress-list photo-step-list"></div>
+              </div>
+
+              <label class="photo-panel-card notes-field photo-notes-card">
                 <span data-i18n="driverNotes">Driver notes</span>
                 <textarea id="driverNotes" placeholder="Visible damage, incidents, mileage..." data-i18n-placeholder="notesPlaceholder"></textarea>
               </label>
-              <div class="ai-box">
-                <strong data-i18n="aiAnalysis">AI analysis</strong>
-                <p id="aiStatus" data-i18n="aiInitial">Capture all views to save and review the inspection.</p>
-              </div>
             </aside>
           </div>
-            </div>
+        </div>
       </section>
 
     </main>
@@ -152,6 +157,6 @@
 
     <script src="/i18n.js?v=7"></script>
     <script src="/vehicles.js?v=1"></script>
-    <script src="/app.js?v=16"></script>
+    <script src="/app.js?v=17"></script>
   </body>
 </html>
