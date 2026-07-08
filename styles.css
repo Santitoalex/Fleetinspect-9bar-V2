@@ -288,6 +288,7 @@ button:disabled {
 
 .camera-frame.has-photo #capturedPreview {
   display: block;
+  cursor: zoom-in;
 }
 
 .camera-empty {
@@ -312,7 +313,7 @@ button:disabled {
 
 .camera-actions {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 0.72fr 1.2fr 0.82fr 0.82fr;
   gap: 12px;
   padding: 16px 0;
 }
@@ -320,6 +321,57 @@ button:disabled {
 #capturePhoto {
   min-height: 62px;
   font-size: 20px;
+}
+
+#previousPhoto,
+#retakePhoto,
+#zoomPhoto {
+  min-height: 62px;
+}
+
+.photo-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  background: rgba(5, 12, 22, 0.94);
+  padding: max(18px, env(safe-area-inset-top)) 18px max(18px, env(safe-area-inset-bottom));
+}
+
+.photo-modal-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #fff;
+  padding-bottom: 12px;
+}
+
+.photo-modal-bar strong {
+  font-size: 20px;
+}
+
+.photo-modal-bar button {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--ink);
+  padding: 0;
+  font-size: 28px;
+  line-height: 1;
+}
+
+#zoomPreview {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+body.modal-open {
+  overflow: hidden;
 }
 
 .file-button input {
@@ -1007,8 +1059,13 @@ button:disabled {
   }
 
   .camera-actions {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1.3fr;
     padding: 14px;
+  }
+
+  #retakePhoto,
+  #zoomPhoto {
+    min-height: 52px;
   }
 
   .file-button span,

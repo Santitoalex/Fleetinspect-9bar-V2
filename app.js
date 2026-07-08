@@ -27,6 +27,13 @@ const nodes = {
   cameraEmpty: document.querySelector("#cameraEmpty"),
   cameraFrame: document.querySelector(".camera-frame"),
   capturePhoto: document.querySelector("#capturePhoto"),
+  previousPhoto: document.querySelector("#previousPhoto"),
+  retakePhoto: document.querySelector("#retakePhoto"),
+  zoomPhoto: document.querySelector("#zoomPhoto"),
+  photoModal: document.querySelector("#photoModal"),
+  photoModalTitle: document.querySelector("#photoModalTitle"),
+  closePhotoModal: document.querySelector("#closePhotoModal"),
+  zoomPreview: document.querySelector("#zoomPreview"),
   progressList: document.querySelector("#progressList"),
   driverNotes: document.querySelector("#driverNotes"),
   aiStatus: document.querySelector("#aiStatus"),
@@ -58,6 +65,15 @@ function loadVehicleOptions() {
 function bindEvents() {
   nodes.startForm.addEventListener("submit", beginSession);
   nodes.capturePhoto.addEventListener("click", primaryCaptureAction);
+  nodes.previousPhoto.addEventListener("click", previousStep);
+  nodes.retakePhoto.addEventListener("click", retakeCurrentPhoto);
+  nodes.zoomPhoto.addEventListener("click", openPhotoZoom);
+  nodes.capturedPreview.addEventListener("click", openPhotoZoom);
+  nodes.closePhotoModal.addEventListener("click", closePhotoZoom);
+  nodes.photoModal.addEventListener("click", (event) => {
+    if (event.target === nodes.photoModal) closePhotoZoom();
+  });
+  nodes.progressList.addEventListener("click", handleProgressClick);
   nodes.resetSession.addEventListener("click", resetSession);
 }
 
@@ -179,6 +195,40 @@ function nextStep() {
   }
 }
 
+function previousStep() {
+  if (!session || stepIndex === 0) return;
+  stepIndex -= 1;
+  updateCaptureUI();
+  openCamera();
+}
+
+function retakeCurrentPhoto() {
+  if (!session) return;
+
+  const step = STEPS[stepIndex];
+  delete session.photos[step.id];
+  nodes.capturedPreview.removeAttribute("src");
+  nodes.cameraFrame.classList.remove("has-photo");
+  updateCaptureUI();
+  openCamera();
+}
+
+function handleProgressClick(event) {
+  const button = event.target.closest("[data-step-index]");
+  if (!button || !session) return;
+
+  const targetIndex = Number(button.dataset.stepIndex);
+  const targetStep = STEPS[targetIndex];
+  const currentFirstMissing = STEPS.findIndex((step) => !session.photos[step.id]);
+  const canOpen = targetIndex <= stepIndex || Boolean(session.photos[targetStep.id]) || targetIndex === currentFirstMissing;
+
+  if (!canOpen) return;
+
+  stepIndex = targetIndex;
+  updateCaptureUI();
+  openCamera();
+}
+
 async function finishInspection() {
   if (!session) return;
 
@@ -224,6 +274,7 @@ async function finishInspection() {
 
 function resetSession() {
   stopCamera();
+  closePhotoZoom();
   session = null;
   stepIndex = 0;
   nodes.startForm.reset();
@@ -259,6 +310,10 @@ function updateButtons() {
   const hasCurrent = Boolean(session.photos[STEPS[stepIndex].id]);
   const complete = STEPS.every((step) => session.photos[step.id]);
 
+  nodes.previousPhoto.disabled = stepIndex === 0;
+  nodes.retakePhoto.classList.toggle("hidden", !hasCurrent);
+  nodes.zoomPhoto.classList.toggle("hidden", !hasCurrent);
+
   if (complete) {
     nodes.capturePhoto.textContent = t("saveInspection");
   } else if (hasCurrent) {
@@ -279,12 +334,31 @@ function renderProgress() {
     const done = Boolean(session?.photos?.[step.id]);
     const active = index === stepIndex;
     return `
-      <button type="button" class="progress-item ${active ? "active" : ""} ${done ? "done" : ""}">
+      <button type="button" class="progress-item ${active ? "active" : ""} ${done ? "done" : ""}" data-step-index="${index}">
         <strong>${escapeHtml(getStepLabel(step))}</strong>
         <span>${done ? t("done") : active ? t("current") : t("pending")}</span>
       </button>
     `;
   }).join("");
+}
+
+function openPhotoZoom() {
+  if (!session) return;
+
+  const step = STEPS[stepIndex];
+  const photo = session.photos[step.id];
+  if (!photo?.url) return;
+
+  nodes.photoModalTitle.textContent = getStepLabel(step);
+  nodes.zoomPreview.src = photo.url;
+  nodes.photoModal.classList.remove("hidden");
+  document.body.classList.add("modal-open");
+}
+
+function closePhotoZoom() {
+  nodes.photoModal.classList.add("hidden");
+  nodes.zoomPreview.removeAttribute("src");
+  document.body.classList.remove("modal-open");
 }
 
 function compressCanvas(sourceCanvas, maxSize, quality) {
