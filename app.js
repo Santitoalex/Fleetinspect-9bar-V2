@@ -15,6 +15,7 @@ let stepIndex = 0;
 let stream = null;
 let cameraTrack = null;
 let selectedCameraId = localStorage.getItem("fleetinspect_camera_id") || "";
+let cameraZoomState = { min: 1, max: 1, step: 0.1, value: 1, dragging: false };
 
 const nodes = {
   startScreen: document.querySelector("#startScreen"),
@@ -32,6 +33,8 @@ const nodes = {
   cameraPicker: document.querySelector("#cameraPicker"),
   cameraZoomControl: document.querySelector("#cameraZoomControl"),
   cameraZoom: document.querySelector("#cameraZoom"),
+  cameraZoomFill: document.querySelector("#cameraZoomFill"),
+  cameraZoomThumb: document.querySelector("#cameraZoomThumb"),
   cameraZoomValue: document.querySelector("#cameraZoomValue"),
   capturePhoto: document.querySelector("#capturePhoto"),
   previousPhoto: document.querySelector("#previousPhoto"),
@@ -92,7 +95,7 @@ function bindEvents() {
   nodes.progressList.addEventListener("click", handleProgressClick);
   nodes.retryPending.addEventListener("click", processPendingInspections);
   nodes.cameraPicker.addEventListener("change", changeCamera);
-  nodes.cameraZoom.addEventListener("input", applyCameraZoom);
+  nodes.cameraZoom.addEventListener("pointerdown", startCameraZoomDrag);
   nodes.resetSession.addEventListener("click", resetSession);
 }
 
@@ -222,18 +225,16 @@ function setupCameraZoom() {
   const step = Number(zoom.step || 0.1);
   const current = Number(settings.zoom || min);
 
-  nodes.cameraZoom.min = String(min);
-  nodes.cameraZoom.max = String(max);
-  nodes.cameraZoom.step = String(step);
-  nodes.cameraZoom.value = String(current);
-  nodes.cameraZoomValue.textContent = `${current.toFixed(1)}x`;
+  cameraZoomState = { min, max, step, value: current, dragging: false };
+  renderCameraZoomSlider();
   nodes.cameraZoomControl.classList.toggle("hidden", max <= min);
 }
 
-async function applyCameraZoom() {
+async function applyCameraZoom(value = cameraZoomState.value) {
   if (!cameraTrack) return;
-  const zoom = Number(nodes.cameraZoom.value);
-  nodes.cameraZoomValue.textContent = `${zoom.toFixed(1)}x`;
+  const zoom = clampZoom(value);
+  cameraZoomState.value = zoom;
+  renderCameraZoomSlider();
 
   try {
     await cameraTrack.applyConstraints({
@@ -242,6 +243,47 @@ async function applyCameraZoom() {
   } catch {
     nodes.cameraZoomControl?.classList.add("hidden");
   }
+}
+
+function startCameraZoomDrag(event) {
+  event.preventDefault();
+  cameraZoomState.dragging = true;
+  nodes.cameraZoom.setPointerCapture?.(event.pointerId);
+  updateCameraZoomFromPointer(event);
+  nodes.cameraZoom.addEventListener("pointermove", updateCameraZoomFromPointer);
+  nodes.cameraZoom.addEventListener("pointerup", stopCameraZoomDrag, { once: true });
+  nodes.cameraZoom.addEventListener("pointercancel", stopCameraZoomDrag, { once: true });
+}
+
+function updateCameraZoomFromPointer(event) {
+  if (!cameraZoomState.dragging && event.type === "pointermove") return;
+  const rect = nodes.cameraZoom.getBoundingClientRect();
+  const ratio = rect.width ? (event.clientX - rect.left) / rect.width : 0;
+  const rawValue = cameraZoomState.min + clamp(ratio, 0, 1) * (cameraZoomState.max - cameraZoomState.min);
+  applyCameraZoom(rawValue);
+}
+
+function stopCameraZoomDrag() {
+  cameraZoomState.dragging = false;
+  nodes.cameraZoom.removeEventListener("pointermove", updateCameraZoomFromPointer);
+}
+
+function renderCameraZoomSlider() {
+  const range = cameraZoomState.max - cameraZoomState.min;
+  const ratio = range ? (cameraZoomState.value - cameraZoomState.min) / range : 0;
+  const percent = clamp(ratio, 0, 1) * 100;
+  nodes.cameraZoomFill.style.width = `${percent}%`;
+  nodes.cameraZoomThumb.style.left = `${percent}%`;
+  nodes.cameraZoomValue.textContent = `${cameraZoomState.value.toFixed(1)}x`;
+}
+
+function clampZoom(value) {
+  const stepped = Math.round(Number(value) / cameraZoomState.step) * cameraZoomState.step;
+  return clamp(stepped, cameraZoomState.min, cameraZoomState.max);
+}
+
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
 }
 
 function captureFromCamera() {
