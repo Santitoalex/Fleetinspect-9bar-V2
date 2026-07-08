@@ -128,6 +128,17 @@
                 <p id="aiStatus" data-i18n="aiInitial">Capture all views to save and review the inspection.</p>
               </div>
 
+              <div class="photo-panel-card photo-quality-card">
+                <strong data-i18n="photoQuality">Photo quality</strong>
+                <p id="qualityStatus" data-i18n="qualityWaiting">Waiting for the first photo.</p>
+              </div>
+
+              <div class="photo-panel-card photo-sync-card">
+                <strong data-i18n="syncStatus">Sync status</strong>
+                <p id="syncStatus" data-i18n="syncReady">Ready to save online.</p>
+                <button id="retryPending" class="secondary hidden" type="button" data-i18n="retryPending">Retry pending uploads</button>
+              </div>
+
               <div class="photo-panel-card">
                 <div class="driver-panel-header">
                   <strong data-i18n="guidedViews">Guided views</strong>
@@ -155,8 +166,10 @@
       <img id="zoomPreview" alt="Large inspection photo" />
     </div>
 
-    <script src="/i18n.js?v=7"></script>
+    <div id="saveToast" class="save-toast hidden" role="status" aria-live="polite"></div>
+
+    <script src="/i18n.js?v=8"></script>
     <script src="/vehicles.js?v=1"></script>
-    <script src="/app.js?v=17"></script>
+    <script src="/app.js?v=18"></script>
   </body>
 </html>

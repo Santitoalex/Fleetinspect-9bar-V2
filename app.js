@@ -37,6 +37,10 @@ const nodes = {
   progressList: document.querySelector("#progressList"),
   driverNotes: document.querySelector("#driverNotes"),
   aiStatus: document.querySelector("#aiStatus"),
+  qualityStatus: document.querySelector("#qualityStatus"),
+  syncStatus: document.querySelector("#syncStatus"),
+  retryPending: document.querySelector("#retryPending"),
+  saveToast: document.querySelector("#saveToast"),
   resetSession: document.querySelector("#resetSession"),
 };
 
@@ -51,7 +55,12 @@ document.addEventListener("DOMContentLoaded", () => {
   bindEvents();
   renderProgress();
   processPendingInspections();
-  window.addEventListener("online", processPendingInspections);
+  updateSyncStatus();
+  window.addEventListener("online", () => {
+    updateSyncStatus();
+    processPendingInspections();
+  });
+  window.addEventListener("offline", updateSyncStatus);
 });
 
 function loadVehicleOptions() {
@@ -74,6 +83,7 @@ function bindEvents() {
     if (event.target === nodes.photoModal) closePhotoZoom();
   });
   nodes.progressList.addEventListener("click", handleProgressClick);
+  nodes.retryPending.addEventListener("click", processPendingInspections);
   nodes.resetSession.addEventListener("click", resetSession);
 }
 
@@ -144,15 +154,17 @@ function captureFromCamera() {
   canvas.width = nodes.cameraVideo.videoWidth;
   canvas.height = nodes.cameraVideo.videoHeight;
   canvas.getContext("2d").drawImage(nodes.cameraVideo, 0, 0);
-  saveCurrentPhoto(compressCanvas(canvas, 960, 0.55));
+  const quality = analyzePhotoQuality(canvas);
+  saveCurrentPhoto(compressCanvas(canvas, 1100, 0.62), quality);
 }
 
-function saveCurrentPhoto(dataUrl) {
+function saveCurrentPhoto(dataUrl, quality = null) {
   const step = STEPS[stepIndex];
   session.photos[step.id] = {
     id: step.id,
     label: getStepLabel(step),
     url: dataUrl,
+    quality,
     capturedAt: new Date().toISOString(),
   };
 
@@ -261,11 +273,13 @@ async function finishInspection() {
     }
 
     await deletePendingInspection(payload.id).catch(() => {});
-    alert(t("savedOk"));
+    await updateSyncStatus();
+    showSaveToast(t("savedOkWithId", { id: result.item?.id || payload.id }), "ok");
     resetSession();
   } catch (error) {
     const queued = await savePendingInspection(payload).then(() => true).catch(() => false);
-    alert(`${t("couldNotSave")}: ${getSaveErrorMessage(error)} ${queued ? t("savedPendingRetry") : t("retryWithoutClosing")}`);
+    await updateSyncStatus();
+    showSaveToast(`${t("couldNotSave")}: ${getSaveErrorMessage(error)} ${queued ? t("savedPendingRetry") : t("retryWithoutClosing")}`, queued ? "warn" : "error");
   } finally {
     nodes.capturePhoto.disabled = false;
     updateButtons();
@@ -282,6 +296,7 @@ function resetSession() {
   nodes.startScreen.classList.remove("hidden");
   nodes.captureScreen.classList.add("hidden");
   nodes.cameraFrame.classList.remove("is-live", "has-photo");
+  nodes.qualityStatus.textContent = t("qualityWaiting");
   renderProgress();
 }
 
@@ -327,6 +342,9 @@ function updateButtons() {
     : hasCurrent
       ? t("photoSaved")
       : t("placeVehicle");
+
+  const quality = session.photos[STEPS[stepIndex].id]?.quality;
+  renderQualityStatus(quality, hasCurrent);
 }
 
 function renderProgress() {
@@ -420,7 +438,11 @@ function sleep(ms) {
 }
 
 async function processPendingInspections() {
-  if (!navigator.onLine) return;
+  await updateSyncStatus("syncing");
+  if (!navigator.onLine) {
+    await updateSyncStatus();
+    return;
+  }
 
   const pending = await getPendingInspections();
   for (const entry of pending) {
@@ -434,6 +456,7 @@ async function processPendingInspections() {
       // Keep it queued for the next attempt.
     }
   }
+  await updateSyncStatus();
 }
 
 async function savePendingInspection(payload) {
@@ -443,6 +466,7 @@ async function savePendingInspection(payload) {
     payload,
     savedAt: new Date().toISOString(),
   }));
+  await updateSyncStatus();
 }
 
 async function getPendingInspections() {
@@ -453,6 +477,118 @@ async function getPendingInspections() {
 async function deletePendingInspection(id) {
   const db = await openQueueDb();
   await idbRequest(db.transaction("pending", "readwrite").objectStore("pending").delete(id));
+  await updateSyncStatus();
+}
+
+async function updateSyncStatus(mode = "") {
+  if (!nodes.syncStatus) return;
+  const pending = await getPendingInspections().catch(() => []);
+  nodes.retryPending.classList.toggle("hidden", pending.length === 0 || mode === "syncing");
+
+  if (!navigator.onLine) {
+    nodes.syncStatus.textContent = pending.length
+      ? t("offlineWithPending", { count: pending.length })
+      : t("offlineNoPending");
+    return;
+  }
+
+  if (mode === "syncing") {
+    nodes.syncStatus.textContent = t("syncingPending");
+    return;
+  }
+
+  nodes.syncStatus.textContent = pending.length
+    ? t("onlineWithPending", { count: pending.length })
+    : t("syncReady");
+}
+
+function renderQualityStatus(quality, hasPhoto) {
+  if (!nodes.qualityStatus) return;
+  if (!hasPhoto || !quality) {
+    nodes.qualityStatus.textContent = t("qualityWaiting");
+    nodes.qualityStatus.dataset.state = "neutral";
+    return;
+  }
+
+  nodes.qualityStatus.dataset.state = quality.score >= 80 ? "ok" : quality.score >= 55 ? "warn" : "bad";
+  nodes.qualityStatus.innerHTML = `
+    <span>${escapeHtml(quality.label)}</span>
+    <small>${quality.messages.map(escapeHtml).join(" · ")}</small>
+  `;
+}
+
+function analyzePhotoQuality(sourceCanvas) {
+  const sampleSize = 96;
+  const sampleCanvas = document.createElement("canvas");
+  sampleCanvas.width = sampleSize;
+  sampleCanvas.height = sampleSize;
+  const context = sampleCanvas.getContext("2d", { willReadFrequently: true });
+  context.drawImage(sourceCanvas, 0, 0, sampleSize, sampleSize);
+  const { data } = context.getImageData(0, 0, sampleSize, sampleSize);
+  let brightness = 0;
+  let contrastSum = 0;
+  const luminance = [];
+
+  for (let index = 0; index < data.length; index += 4) {
+    const value = data[index] * 0.2126 + data[index + 1] * 0.7152 + data[index + 2] * 0.0722;
+    luminance.push(value);
+    brightness += value;
+  }
+
+  brightness /= luminance.length;
+  for (const value of luminance) {
+    contrastSum += Math.abs(value - brightness);
+  }
+  const contrast = contrastSum / luminance.length;
+  const sharpness = estimateSharpness(luminance, sampleSize);
+  const messages = [];
+  let score = 100;
+
+  if (brightness < 48) {
+    score -= 30;
+    messages.push(t("qualityTooDark"));
+  }
+  if (brightness > 225) {
+    score -= 20;
+    messages.push(t("qualityTooBright"));
+  }
+  if (sharpness < 11) {
+    score -= 30;
+    messages.push(t("qualityBlurry"));
+  }
+  if (contrast < 20) {
+    score -= 20;
+    messages.push(t("qualityFarOrLowDetail"));
+  }
+
+  if (!messages.length) messages.push(t("qualityGoodDetail"));
+  const label = score >= 80 ? t("qualityGood") : score >= 55 ? t("qualityReview") : t("qualityRetakeRecommended");
+  return { score, label, messages, brightness: Math.round(brightness), sharpness: Math.round(sharpness), contrast: Math.round(contrast) };
+}
+
+function estimateSharpness(luminance, width) {
+  let total = 0;
+  let count = 0;
+  for (let y = 1; y < width - 1; y += 1) {
+    for (let x = 1; x < width - 1; x += 1) {
+      const index = y * width + x;
+      const edge = Math.abs(luminance[index] * 4 - luminance[index - 1] - luminance[index + 1] - luminance[index - width] - luminance[index + width]);
+      total += edge;
+      count += 1;
+    }
+  }
+  return count ? total / count : 0;
+}
+
+function showSaveToast(message, type = "ok") {
+  if (!nodes.saveToast) {
+    alert(message);
+    return;
+  }
+
+  nodes.saveToast.className = `save-toast ${type}`;
+  nodes.saveToast.textContent = message;
+  window.setTimeout(() => nodes.saveToast.classList.add("hidden"), 6500);
 }
 
 function openQueueDb() {

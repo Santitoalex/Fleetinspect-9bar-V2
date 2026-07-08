@@ -76,6 +76,7 @@
               </div>
               <div class="dashboard-actions">
                 <button id="exportCsv" type="button" class="ghost" data-i18n="exportCsv">Export CSV</button>
+                <button id="exportDay" type="button" class="ghost" data-i18n="exportDay">Export day</button>
                 <button id="printDashboard" type="button" class="ghost" data-i18n="print">Print</button>
               </div>
             </div>
@@ -92,6 +93,8 @@
                   <select id="statusFilter">
                     <option value="all" data-i18n="allInspections">All inspections</option>
                     <option value="alerts" data-i18n="aiAlertsOnly">AI alerts only</option>
+                    <option value="pending" data-i18n="aiQueued">AI queued</option>
+                    <option value="failed" data-i18n="aiFailed">AI failed</option>
                     <option value="clean" data-i18n="noNewDamage">No new damage</option>
                   </select>
                 </label>
@@ -188,11 +191,45 @@
                 <article class="dashboard-widget status-widget">
                   <header>
                     <div>
+                      <h3 data-i18n="aiDamageDetection">AI damage detection</h3>
+                      <span data-i18n="inspectionStatus">Inspection status</span>
+                    </div>
+                  </header>
+                  <div id="aiStatusSummary" class="status-list"></div>
+                </article>
+
+                <article class="dashboard-widget status-widget">
+                  <header>
+                    <div>
+                      <h3 data-i18n="driverPerformance">Drivers</h3>
+                      <span data-i18n="totalByDriver">Total by driver</span>
+                    </div>
+                  </header>
+                  <div id="driverSummary" class="driver-summary-list"></div>
+                </article>
+
+                <article class="dashboard-widget status-widget">
+                  <header>
+                    <div>
                       <h3 data-i18n="recentActivity">Recent activity</h3>
                       <span data-i18n="latestSubmissions">Latest driver submissions</span>
                     </div>
                   </header>
                   <div id="recentActivity" class="activity-list"></div>
+                </article>
+
+                <article class="dashboard-widget wide-widget">
+                  <header>
+                    <div>
+                      <h3 data-i18n="vehicleHistory">Vehicle history</h3>
+                      <span data-i18n="groupedRegistration">Grouped by registration</span>
+                    </div>
+                    <label class="history-selector">
+                      <span data-i18n="selectVehicle">Select vehicle</span>
+                      <select id="vehicleHistoryPlate"></select>
+                    </label>
+                  </header>
+                  <div id="vehicleHistoryList" class="vehicle-history-list"></div>
                 </article>
 
                 <article class="dashboard-widget wide-widget">
@@ -212,7 +249,7 @@
     </div>
 
     <script src="/vehicles.js?v=2"></script>
-    <script src="/i18n.js?v=7"></script>
-    <script src="/admin.js?v=15"></script>
+    <script src="/i18n.js?v=8"></script>
+    <script src="/admin.js?v=16"></script>
   </body>
 </html>

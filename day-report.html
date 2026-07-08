@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FleetInspect Daily Report</title>
+    <link rel="stylesheet" href="/styles.css?v=18" />
+  </head>
+  <body class="day-report-body">
+    <main id="dayReport" class="day-report-page">
+      <header class="day-report-header">
+        <div>
+          <p>9Bar Solutions GmbH</p>
+          <h1>FleetInspect Daily Control</h1>
+          <span id="dayReportDate"></span>
+        </div>
+        <button type="button" onclick="window.print()">Save PDF</button>
+      </header>
+
+      <section class="day-report-metrics">
+        <article><span>Vehicles</span><strong id="dayTotal">0</strong></article>
+        <article><span>Inspected</span><strong id="dayDone">0</strong></article>
+        <article><span>Missing</span><strong id="dayMissing">0</strong></article>
+        <article><span>AI alerts</span><strong id="dayAlerts">0</strong></article>
+      </section>
+
+      <section>
+        <h2>Inspected vehicles</h2>
+        <div id="dayDoneList" class="day-report-table"></div>
+      </section>
+
+      <section>
+        <h2>Missing vehicles</h2>
+        <div id="dayMissingList" class="day-report-table"></div>
+      </section>
+    </main>
+
+    <script src="/vehicles.js?v=2"></script>
+    <script src="/day-report.js?v=1"></script>
+  </body>
+</html>

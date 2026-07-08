@@ -12,11 +12,16 @@ Web app profesional para inspecciones diarias de vehiculos desde movil.
 Esta version esta preparada para empezar en Render Free + Supabase Free usando Web Service normal, sin Blueprint y sin Docker:
 
 - Fotos comprimidas para datos moviles.
+- Aviso de calidad de foto: posible foto oscura, borrosa o con poco detalle.
 - Reintento automatico si falla la subida.
-- Cola local en el movil: si falla internet, las fotos quedan pendientes y se reintentan.
+- Cola local visible en el movil: si falla internet, las fotos quedan pendientes y se reintentan.
+- Confirmacion final con numero de reporte.
 - Fotos separadas por matricula en Supabase Storage.
 - Datos de inspecciones en Supabase Database.
 - Dashboard administrador separado en `/admin`.
+- Control diario por fecha con vehiculos revisados y vehiculos pendientes.
+- Historial por matricula, resumen de conductores y estado claro de IA.
+- Exportacion CSV general y reporte diario imprimible en PDF con vehiculos hechos/faltantes.
 - IA con OpenAI opcional para comparar danos nuevos con inspecciones anteriores.
 - Guardado rapido: primero se guardan fotos y reporte; despues la IA analiza en segundo plano.
 
@@ -73,7 +78,7 @@ Para produccion con muchos conductores:
 - `admin.html`, `admin.js`: dashboard administrador.
 - `vehicles.js`: lista de matriculas.
 - `report.html`, `report.js`, `report.css`: reporte imprimible.
-- `render.yaml`: configuracion inicial para Render Free.
+- `day-report.html`, `day-report.js`: reporte diario imprimible para guardar como PDF.
 - `CONFIGURAR-SUPABASE.md`: pasos para crear bucket, tabla y variables.
 
 ## Render recomendado para esta version

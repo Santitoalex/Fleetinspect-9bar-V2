@@ -19,6 +19,7 @@ const nodes = {
   statusFilter: document.querySelector("#statusFilter"),
   dateFilter: document.querySelector("#dateFilter"),
   exportCsv: document.querySelector("#exportCsv"),
+  exportDay: document.querySelector("#exportDay"),
   printDashboard: document.querySelector("#printDashboard"),
   lastSync: document.querySelector("#lastSync"),
   activeFilterCount: document.querySelector("#activeFilterCount"),
@@ -32,6 +33,10 @@ const nodes = {
   controlInspectedVehicles: document.querySelector("#controlInspectedVehicles"),
   controlMissingVehicles: document.querySelector("#controlMissingVehicles"),
   controlAlertVehicles: document.querySelector("#controlAlertVehicles"),
+  aiStatusSummary: document.querySelector("#aiStatusSummary"),
+  driverSummary: document.querySelector("#driverSummary"),
+  vehicleHistoryPlate: document.querySelector("#vehicleHistoryPlate"),
+  vehicleHistoryList: document.querySelector("#vehicleHistoryList"),
   metricInspections: document.querySelector("#metricInspections"),
   metricVehicles: document.querySelector("#metricVehicles"),
   metricPhotos: document.querySelector("#metricPhotos"),
@@ -55,6 +60,8 @@ document.addEventListener("DOMContentLoaded", () => {
   nodes.vehicleControlSearch.addEventListener("input", renderDailyVehicleControl);
   nodes.vehicleControlView.addEventListener("change", renderDailyVehicleControl);
   nodes.exportCsv.addEventListener("click", exportCurrentCsv);
+  nodes.exportDay.addEventListener("click", openSelectedDayReport);
+  nodes.vehicleHistoryPlate.addEventListener("change", renderVehicleHistory);
   nodes.printDashboard.addEventListener("click", () => window.print());
   window.addEventListener("fleetinspect:language", renderDashboard);
 });
@@ -121,6 +128,10 @@ function renderDashboard() {
   renderAlerts(items.length ? items : dashboardItems);
   renderVehicleSummary(allGroups);
   renderDailyVehicleControl();
+  renderAiStatusSummary(dashboardItems);
+  renderDriverSummary(dashboardItems);
+  renderVehicleHistoryPicker();
+  renderVehicleHistory();
   renderSystemStatus(dashboardItems);
   renderRecentActivity(dashboardItems);
 
@@ -148,7 +159,7 @@ function renderDashboard() {
               <small>${item.photos?.length || 0} ${escapeHtml(t("photos").toLowerCase())}</small>
               ${renderPhotoStrip(item)}
               <p class="ai-result ${item.ai?.newDamageDetected ? "alert" : ""}">
-                ${escapeHtml(item.ai?.label || t("aiPending"))} - ${escapeHtml(item.ai?.summary || t("noAiSummary"))}
+                ${renderAiBadge(item)} ${escapeHtml(item.ai?.label || t("aiPending"))} - ${escapeHtml(item.ai?.summary || t("noAiSummary"))}
               </p>
               ${renderAiFindings(item)}
               ${item.drive?.folderUrl ? `<a href="${item.drive.folderUrl}" target="_blank" rel="noopener">${escapeHtml(t("openDrive"))}</a>` : ""}
@@ -323,6 +334,7 @@ function renderVehicleControlRow(vehicle, selectedDate) {
     const driver = vehicle.latest?.driverName || "-";
     const time = vehicle.latest ? formatTime(new Date(vehicle.latest.finishedAt || vehicle.latest.startedAt)) : "-";
     const photoCount = vehicle.latest?.photos?.length || 0;
+    const aiStatus = vehicle.latest ? getAiStatus(vehicle.latest) : { label: t("pending"), className: "queued" };
     return `
       <article class="vehicle-control-row ${statusClass}">
         <div>
@@ -345,11 +357,110 @@ function renderVehicleControlRow(vehicle, selectedDate) {
           <strong>${photoCount}</strong>
           <span>${escapeHtml(t("photos"))}</span>
         </div>
+        <div>
+          <strong>${escapeHtml(aiStatus.label)}</strong>
+          <span>${escapeHtml(t("aiDamageDetection"))}</span>
+        </div>
         <div class="vehicle-control-actions">
           ${vehicle.latest ? `<a href="/report.html?id=${encodeURIComponent(vehicle.latest.id)}" target="_blank" rel="noopener">${escapeHtml(t("viewPdf"))}</a>` : `<span>${escapeHtml(t("pending"))}</span>`}
         </div>
       </article>
     `;
+}
+
+function renderAiStatusSummary(items) {
+  const summary = items.reduce((result, item) => {
+    const status = getAiStatus(item).key;
+    result[status] = (result[status] || 0) + 1;
+    return result;
+  }, {});
+
+  nodes.aiStatusSummary.innerHTML = `
+    <article class="status-row ok">
+      <span>${escapeHtml(t("aiCompleted"))}</span>
+      <strong>${summary.completed || 0}</strong>
+    </article>
+    <article class="status-row warn">
+      <span>${escapeHtml(t("aiQueued"))}</span>
+      <strong>${summary.queued || 0}</strong>
+    </article>
+    <article class="status-row warn">
+      <span>${escapeHtml(t("aiFailed"))}</span>
+      <strong>${summary.failed || 0}</strong>
+    </article>
+  `;
+}
+
+function renderDriverSummary(items) {
+  const drivers = Object.entries(items.reduce((groups, item) => {
+    const name = item.driverName || t("noDriver");
+    if (!groups[name]) {
+      groups[name] = { name, inspections: 0, alerts: 0, photos: 0, latest: null };
+    }
+    groups[name].inspections += 1;
+    groups[name].alerts += item.ai?.newDamageDetected ? 1 : 0;
+    groups[name].photos += item.photos?.length || 0;
+    if (!groups[name].latest || new Date(item.finishedAt || item.startedAt) > new Date(groups[name].latest.finishedAt || groups[name].latest.startedAt)) {
+      groups[name].latest = item;
+    }
+    return groups;
+  }, {}))
+    .map(([, driver]) => driver)
+    .sort((a, b) => b.inspections - a.inspections || a.name.localeCompare(b.name))
+    .slice(0, 10);
+
+  nodes.driverSummary.innerHTML = drivers.length
+    ? drivers.map((driver) => `
+      <article class="driver-summary-row">
+        <div>
+          <strong>${escapeHtml(driver.name)}</strong>
+          <span>${driver.inspections} ${escapeHtml(t("inspections").toLowerCase())} · ${driver.photos} ${escapeHtml(t("photos").toLowerCase())}</span>
+        </div>
+        <em>${driver.alerts} ${escapeHtml(t(driver.alerts === 1 ? "alert" : "alerts"))}</em>
+      </article>
+    `).join("")
+    : `<article class="empty-state">${escapeHtml(t("noReports"))}</article>`;
+}
+
+function renderVehicleHistoryPicker() {
+  const selected = nodes.vehicleHistoryPlate.value;
+  const plates = [...new Set(dashboardItems.map((item) => normalizePlate(item.plate || "")).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b));
+  nodes.vehicleHistoryPlate.innerHTML = [
+    `<option value="">${escapeHtml(t("selectVehicle"))}</option>`,
+    ...plates.map((plate) => `<option value="${escapeHtml(plate)}">${escapeHtml(plate)}</option>`),
+  ].join("");
+  if (plates.includes(selected)) nodes.vehicleHistoryPlate.value = selected;
+}
+
+function renderVehicleHistory() {
+  const plate = nodes.vehicleHistoryPlate.value;
+  if (!plate) {
+    nodes.vehicleHistoryList.innerHTML = `<article class="empty-state">${escapeHtml(t("noVehicleSelected"))}</article>`;
+    return;
+  }
+
+  const items = dashboardItems
+    .filter((item) => normalizePlate(item.plate || "") === plate)
+    .sort((a, b) => new Date(b.finishedAt || b.startedAt) - new Date(a.finishedAt || a.startedAt));
+
+  nodes.vehicleHistoryList.innerHTML = items.map((item) => `
+    <article class="history-row ${item.ai?.newDamageDetected ? "alert" : ""}">
+      <div>
+        <strong>${formatDate(item.finishedAt || item.startedAt)}</strong>
+        <span>${escapeHtml(item.driverName || t("noDriver"))}</span>
+      </div>
+      <div>
+        ${renderAiBadge(item)}
+        <span>${escapeHtml(item.ai?.label || t("aiPending"))}</span>
+      </div>
+      <div>
+        <strong>${item.photos?.length || 0}</strong>
+        <span>${escapeHtml(t("photos"))}</span>
+      </div>
+      <a href="/report.html?id=${encodeURIComponent(item.id)}" target="_blank" rel="noopener">${escapeHtml(t("viewPdf"))}</a>
+    </article>
+  `).join("");
 }
 
 function renderSystemStatus(items) {
@@ -407,6 +518,8 @@ function getFilteredItems() {
     const matchesStatus =
       status === "all" ||
       (status === "alerts" && hasAlert) ||
+      (status === "pending" && getAiStatus(item).key === "queued") ||
+      (status === "failed" && getAiStatus(item).key === "failed") ||
       (status === "clean" && !hasAlert);
     const itemDate = new Date(item.finishedAt || item.startedAt || 0);
     const ageDays = (now - itemDate.getTime()) / 86400000;
@@ -453,6 +566,26 @@ function renderAiFindings(item) {
   `;
 }
 
+function renderAiBadge(item) {
+  const status = getAiStatus(item);
+  return `<span class="ai-status-badge ${status.className}">${escapeHtml(status.label)}</span>`;
+}
+
+function getAiStatus(item) {
+  const label = String(item.ai?.label || "").toLowerCase();
+  const summary = String(item.ai?.summary || "").toLowerCase();
+  if (item.ai?.status === "queued" || label.includes("cola") || label.includes("queued")) {
+    return { key: "queued", className: "queued", label: t("aiQueued") };
+  }
+  if (label.includes("failed") || label.includes("fall") || summary.includes("could not") || summary.includes("no se pudo")) {
+    return { key: "failed", className: "failed", label: t("aiFailed") };
+  }
+  if (item.ai?.newDamageDetected) {
+    return { key: "completed", className: "alert", label: t("aiAlerts") };
+  }
+  return { key: "completed", className: "completed", label: t("aiCompleted") };
+}
+
 function exportCurrentCsv() {
   const items = getFilteredItems();
   const rows = [
@@ -471,6 +604,21 @@ function exportCurrentCsv() {
   const link = document.createElement("a");
   link.href = url;
   link.download = `fleetinspect-${new Date().toISOString().slice(0, 10)}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function openSelectedDayReport() {
+  const selectedDate = nodes.vehicleControlDate.value || localDateKey(new Date());
+  window.open(`/day-report.html?date=${encodeURIComponent(selectedDate)}`, "_blank", "noopener");
+}
+
+function downloadCsv(filename, rows) {
+  const csv = rows.map((row) => row.map(csvCell).join(",")).join("\n");
+  const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
   link.click();
   URL.revokeObjectURL(url);
 }
