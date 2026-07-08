@@ -41,6 +41,8 @@ function renderReport(item) {
       <h2>AI analysis</h2>
       <p><strong>${escapeHtml(item.ai?.label || "Pending review")}</strong></p>
       <p>${escapeHtml(item.ai?.summary || "Pending review.")}</p>
+      ${item.ai?.recommendation ? `<p><strong>Recommendation:</strong> ${escapeHtml(item.ai.recommendation)}</p>` : ""}
+      ${item.ai?.comparedViews ? `<p class="muted">Compared views: ${escapeHtml(item.ai.comparedViews)}${item.ai?.model ? ` · Model: ${escapeHtml(item.ai.model)}` : ""}</p>` : ""}
       ${item.ai?.findings?.length ? `
         <ul>
           ${item.ai.findings.map((finding) => `

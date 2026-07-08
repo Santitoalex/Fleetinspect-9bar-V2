@@ -150,6 +150,7 @@ function renderDashboard() {
               <p class="ai-result ${item.ai?.newDamageDetected ? "alert" : ""}">
                 ${escapeHtml(item.ai?.label || t("aiPending"))} - ${escapeHtml(item.ai?.summary || t("noAiSummary"))}
               </p>
+              ${renderAiFindings(item)}
               ${item.drive?.folderUrl ? `<a href="${item.drive.folderUrl}" target="_blank" rel="noopener">${escapeHtml(t("openDrive"))}</a>` : ""}
             </div>
             <div class="report-actions">
@@ -432,6 +433,22 @@ function renderPhotoStrip(item) {
   return `
     <div class="report-photo-strip">
       ${photos.map((photo) => `<img src="${photo.url}" alt="${escapeHtml(photo.label || t("photos"))}" loading="lazy" />`).join("")}
+    </div>
+  `;
+}
+
+function renderAiFindings(item) {
+  const findings = Array.isArray(item.ai?.findings) ? item.ai.findings.slice(0, 3) : [];
+  if (!findings.length && !item.ai?.recommendation) return "";
+  return `
+    <div class="ai-findings">
+      ${findings.map((finding) => `
+        <span>
+          <strong>${escapeHtml(finding.view || t("vehicle"))}</strong>
+          ${escapeHtml(finding.description || "")}
+        </span>
+      `).join("")}
+      ${item.ai?.recommendation ? `<em>${escapeHtml(item.ai.recommendation)}</em>` : ""}
     </div>
   `;
 }

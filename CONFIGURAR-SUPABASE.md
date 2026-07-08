@@ -58,6 +58,8 @@ SUPABASE_BUCKET=fleetinspect-photos
 SUPABASE_TABLE=inspections
 OPENAI_API_KEY=tu clave OpenAI
 OPENAI_MODEL=gpt-4.1-mini
+OPENAI_MAX_PAIRS=9
+OPENAI_TIMEOUT_MS=60000
 ```
 
 ## 5. URLs
@@ -77,4 +79,3 @@ En el panel admin, Estado del sistema debe mostrar:
 - Configuracion Supabase: Configurado.
 - Almacenamiento cloud: Sincronizado cuando ya exista al menos una inspeccion guardada.
 - Servicio IA: Configurado si pusiste `OPENAI_API_KEY`.
-

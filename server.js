@@ -11,6 +11,8 @@ const DATA_DIR = process.env.DATA_DIR || "./data";
 const ADMIN_PIN = process.env.ADMIN_PIN || "1234";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4.1-mini";
+const OPENAI_MAX_PAIRS = Number(process.env.OPENAI_MAX_PAIRS || 9);
+const OPENAI_TIMEOUT_MS = Number(process.env.OPENAI_TIMEOUT_MS || 60000);
 const SUPABASE_URL = process.env.SUPABASE_URL || "";
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 const SUPABASE_BUCKET = process.env.SUPABASE_BUCKET || "fleetinspect-photos";
@@ -297,7 +299,7 @@ async function analyzeInspection(current, previous) {
     };
   }
 
-  const comparisons = buildPhotoComparisons(current, previous).slice(0, 6);
+  const comparisons = buildPhotoComparisons(current, previous).slice(0, OPENAI_MAX_PAIRS);
   if (!comparisons.length) {
     return {
       label: "No matching previous photos",
@@ -308,16 +310,22 @@ async function analyzeInspection(current, previous) {
   }
 
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), OPENAI_TIMEOUT_MS);
     const content = [
       {
         type: "input_text",
         text: [
-          "You are a vehicle damage inspection assistant.",
-          "Compare the previous inspection photos with the current inspection photos for the same vehicle.",
-          "Look for NEW visible damage only: dents, scratches, cracks, broken lights, missing parts, tyre/wheel damage, mirror damage, bumper damage, body panel deformation.",
-          "Do not report dirt, lighting changes, reflections, shadows, rain, camera angle differences, or existing damage visible in both photos.",
+          "Eres un asistente profesional de inspeccion de danos en vehiculos de flota.",
+          `Matricula: ${current.plate}.`,
+          `Inspeccion anterior: ${previous.finishedAt || previous.startedAt || "unknown"}. Inspeccion actual: ${current.finishedAt || current.startedAt || "unknown"}.`,
+          "Compara cada foto anterior con la foto actual de la misma vista.",
+          "Busca SOLO danos NUEVOS visibles: golpes, abolladuras, rayones profundos, grietas, luces rotas, piezas faltantes, danos en rueda/neumatico, espejo, parachoques o deformacion de panel.",
+          "No marques suciedad, reflejos, lluvia, sombras, cambios de luz, angulo de camara, desenfoque, o danos que ya aparecen en la foto anterior.",
+          "Si tienes duda, baja la confianza y no marques dano nuevo salvo que sea claro.",
+          "Responde en espanol.",
           "Return strict JSON only with this shape:",
-          "{\"newDamageDetected\":boolean,\"severity\":\"none|minor|moderate|severe|unknown\",\"label\":\"short label\",\"summary\":\"short plain-English summary\",\"findings\":[{\"view\":\"Front\",\"description\":\"...\",\"confidence\":\"low|medium|high\"}]}",
+          "{\"newDamageDetected\":boolean,\"severity\":\"none|minor|moderate|severe|unknown\",\"label\":\"short label in Spanish\",\"summary\":\"short Spanish summary\",\"findings\":[{\"view\":\"Front\",\"description\":\"...\",\"confidence\":\"low|medium|high\"}],\"recommendation\":\"short operational recommendation in Spanish\"}",
         ].join(" "),
       },
     ];
@@ -340,7 +348,8 @@ async function analyzeInspection(current, previous) {
         input: [{ role: "user", content }],
         temperature: 0,
       }),
-    });
+      signal: controller.signal,
+    }).finally(() => clearTimeout(timeout));
 
     const result = await response.json();
     if (!response.ok) {
@@ -355,9 +364,12 @@ async function analyzeInspection(current, previous) {
       severity: parsed.severity || "unknown",
       newDamageDetected: Boolean(parsed.newDamageDetected),
       summary: parsed.summary || "AI comparison completed.",
+      recommendation: parsed.recommendation || "",
       findings: Array.isArray(parsed.findings) ? parsed.findings : [],
       comparedWith: previous.id,
       comparedAt: new Date().toISOString(),
+      comparedViews: comparisons.length,
+      model: OPENAI_MODEL,
     };
   } catch (error) {
     return {
@@ -391,7 +403,16 @@ function extractResponseText(result) {
 }
 
 function parseAiJson(text) {
-  const cleaned = String(text || "").trim().replace(/^```json\s*/i, "").replace(/```$/i, "").trim();
+  const cleaned = String(text || "")
+    .trim()
+    .replace(/^```json\s*/i, "")
+    .replace(/^```\s*/i, "")
+    .replace(/```$/i, "")
+    .trim();
+  if (!cleaned.startsWith("{")) {
+    const match = cleaned.match(/\{[\s\S]*\}/);
+    if (match) return JSON.parse(match[0]);
+  }
   return JSON.parse(cleaned);
 }
 

@@ -33,6 +33,15 @@ IA:
 
 - `OPENAI_API_KEY`: clave de OpenAI para analisis IA.
 - `OPENAI_MODEL`: `gpt-4.1-mini`.
+- `OPENAI_MAX_PAIRS`: numero maximo de vistas comparadas por inspeccion. Recomendado: `9`.
+- `OPENAI_TIMEOUT_MS`: tiempo maximo para analisis IA. Recomendado: `60000`.
+
+Como funciona la IA:
+
+- La primera inspeccion de una matricula se guarda como referencia.
+- Desde la segunda inspeccion, la IA compara la foto anterior y la foto actual de la misma vista.
+- Marca solo danos nuevos visibles y los guarda en el reporte PDF y en el dashboard admin.
+- Si no hay `OPENAI_API_KEY`, la app guarda inspecciones sin deteccion automatica.
 
 ## Coste
 
