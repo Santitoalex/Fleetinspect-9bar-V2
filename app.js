@@ -121,7 +121,6 @@ async function beginSession(event) {
   stepIndex = 0;
   nodes.startScreen.classList.add("hidden");
   nodes.captureScreen.classList.remove("hidden");
-  document.body.classList.add("camera-locked");
   updateCaptureUI();
   await openCamera();
 }
@@ -469,7 +468,6 @@ async function finishInspection() {
 function resetSession() {
   stopCamera();
   closePhotoZoom();
-  document.body.classList.remove("camera-locked");
   session = null;
   stepIndex = 0;
   nodes.startForm.reset();
