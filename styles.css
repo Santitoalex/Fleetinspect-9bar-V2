@@ -1746,6 +1746,196 @@ body.modal-open {
   }
 }
 
+/* Admin color polish */
+.admin-body {
+  background:
+    linear-gradient(135deg, rgba(242, 140, 0, 0.08), transparent 28%),
+    linear-gradient(225deg, rgba(16, 117, 105, 0.09), transparent 32%),
+    #edf3f8;
+}
+
+.fleet-sidebar {
+  background:
+    linear-gradient(180deg, rgba(242, 140, 0, 0.18), transparent 24%),
+    linear-gradient(180deg, #082136 0%, #123a5d 54%, #0e2d48 100%);
+}
+
+.fleet-nav a {
+  border: 1px solid transparent;
+}
+
+.fleet-nav a:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.fleet-nav a.active {
+  background: linear-gradient(135deg, rgba(242, 140, 0, 0.24), rgba(16, 117, 105, 0.16));
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.fleet-topbar {
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+
+.admin-hero > div:first-child {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, #ffffff 0%, #f7fbff 58%, #fff7ed 100%);
+}
+
+.admin-hero > div:first-child::after {
+  content: "";
+  position: absolute;
+  right: -80px;
+  top: -120px;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: rgba(242, 140, 0, 0.14);
+}
+
+.admin-hero h1 {
+  color: #0f2740;
+}
+
+.hero-status-grid article:nth-child(1) {
+  border-left: 5px solid #107569;
+  background: linear-gradient(180deg, #ffffff, #effcf8);
+}
+
+.hero-status-grid article:nth-child(2) {
+  border-left: 5px solid #f28c00;
+  background: linear-gradient(180deg, #ffffff, #fff8ed);
+}
+
+.hero-dashboard {
+  border-color: #c7d6e5;
+}
+
+.admin-filter-panel label:nth-child(1) {
+  border-left: 4px solid #1849a9;
+}
+
+.admin-filter-panel label:nth-child(2) {
+  border-left: 4px solid #107569;
+}
+
+.admin-filter-panel article {
+  border-left: 4px solid #f28c00;
+}
+
+.hero-dashboard .metrics article:nth-child(1) {
+  border-left-color: #1849a9;
+  background: linear-gradient(180deg, #fff, #f4f7ff);
+}
+
+.hero-dashboard .metrics article:nth-child(2) {
+  border-left-color: #107569;
+  background: linear-gradient(180deg, #fff, #effcf8);
+}
+
+.hero-dashboard .metrics article:nth-child(3) {
+  border-left-color: #7c3aed;
+  background: linear-gradient(180deg, #fff, #f5f3ff);
+}
+
+.hero-dashboard .metrics article:nth-child(4) {
+  border-left-color: #d92d20;
+  background: linear-gradient(180deg, #fff, #fff5f4);
+}
+
+.hero-dashboard .metrics article:nth-child(5) {
+  border-left-color: #f28c00;
+  background: linear-gradient(180deg, #fff, #fff8ed);
+}
+
+.dashboard-widget {
+  border-color: #c8d7e6;
+  background: linear-gradient(180deg, #ffffff, #fbfdff);
+}
+
+.dashboard-widget > header {
+  border-bottom: 1px solid #e5edf5;
+  padding-bottom: 12px;
+}
+
+.primary-widget {
+  border-top: 4px solid #d92d20;
+}
+
+.vehicle-control-widget {
+  border-top: 4px solid #107569;
+}
+
+.status-widget:nth-of-type(4) {
+  border-top: 4px solid #f28c00;
+}
+
+.status-widget:nth-of-type(5) {
+  border-top: 4px solid #7c3aed;
+}
+
+.status-widget:nth-of-type(6) {
+  border-top: 4px solid #1849a9;
+}
+
+.vehicle-control-summary article:nth-child(1) {
+  border-left-color: #1849a9;
+}
+
+.vehicle-control-summary article:nth-child(2) {
+  border-left-color: #107569;
+}
+
+.vehicle-control-summary article:nth-child(3) {
+  border-left-color: #f28c00;
+}
+
+.vehicle-control-summary article:nth-child(4) {
+  border-left-color: #d92d20;
+}
+
+.alert-card {
+  background: linear-gradient(180deg, #fff, #fff8f7);
+}
+
+.alert-card.quiet {
+  background: linear-gradient(180deg, #fff, #f2fcf8);
+}
+
+.vehicle-tile.has-alert,
+.vehicle-control-row.alert,
+.history-row.alert {
+  background: linear-gradient(90deg, #fff5f4 0%, #ffffff 46%);
+}
+
+.vehicle-control-row.ok {
+  background: linear-gradient(90deg, #f2fcf8 0%, #ffffff 46%);
+}
+
+.vehicle-control-row.missing {
+  background: linear-gradient(90deg, #fff8ed 0%, #ffffff 46%);
+}
+
+.status-row.ok {
+  background: linear-gradient(90deg, #f2fcf8, #fff);
+}
+
+.status-row.warn {
+  background: linear-gradient(90deg, #fff8ed, #fff);
+}
+
+.driver-summary-row:hover,
+.history-row:hover,
+.report-card:hover,
+.vehicle-control-row:hover {
+  border-color: #9fb6ce;
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+}
+
 @media (max-width: 720px) {
   .app-header {
     align-items: flex-start;
