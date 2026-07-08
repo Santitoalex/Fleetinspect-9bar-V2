@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>9Bar Fleet Dashboard</title>
-    <link rel="stylesheet" href="/styles.css?v=1" />
+    <link rel="stylesheet" href="/styles.css?v=12" />
   </head>
   <body class="admin-body">
     <div class="admin-shell">
@@ -14,6 +14,7 @@
             <strong><span>9</span>BAR</strong>
             <small>SOLUTIONS GMBH</small>
           </div>
+          <p>FleetInspect Control</p>
         </div>
         <nav class="fleet-nav" aria-label="Admin navigation">
           <a class="active" href="/admin"><span>▦</span><b data-i18n="dashboard">Dashboard</b></a>
@@ -34,6 +35,7 @@
             </label>
           </div>
           <div class="topbar-actions">
+            <span id="lastSync" class="sync-chip">--</span>
             <select class="language-select admin-language" data-language-select aria-label="Language">
               <option value="en">EN</option>
               <option value="es">ES</option>
@@ -47,17 +49,34 @@
         </header>
 
         <main class="dashboard-main">
+          <section class="admin-hero">
+            <div>
+              <p class="eyebrow" data-i18n="fleetControl">Fleet control center</p>
+              <h1 data-i18n="inspectionDashboard">Inspection dashboard</h1>
+              <span data-i18n="controlRoom">Professional inspection control room for 9Bar Solutions GmbH.</span>
+            </div>
+            <div class="hero-status-grid">
+              <article>
+                <span data-i18n="cloudSync">Cloud sync</span>
+                <strong id="storagePill">--</strong>
+              </article>
+              <article>
+                <span data-i18n="aiDamageDetection">AI damage detection</span>
+                <strong id="aiPill">--</strong>
+              </article>
+            </div>
+          </section>
+
           <section class="dashboard hero-dashboard">
-            <div class="dashboard-header">
+            <div class="dashboard-header admin-command-header">
               <div>
-                <p class="eyebrow" data-i18n="fleetControl">Fleet control center</p>
-                <h2 data-i18n="inspectionDashboard">Inspection dashboard</h2>
+                <p class="eyebrow" data-i18n="operationsOverview">Operations overview</p>
+                <h2 data-i18n="reports">Reports</h2>
               </div>
-              <select id="statusFilter" class="dashboard-select">
-                <option value="all" data-i18n="allInspections">All inspections</option>
-                <option value="alerts" data-i18n="aiAlertsOnly">AI alerts only</option>
-                <option value="clean" data-i18n="noNewDamage">No new damage</option>
-              </select>
+              <div class="dashboard-actions">
+                <button id="exportCsv" type="button" class="ghost" data-i18n="exportCsv">Export CSV</button>
+                <button id="printDashboard" type="button" class="ghost" data-i18n="print">Print</button>
+              </div>
             </div>
 
             <div id="adminLock" class="admin-lock">
@@ -66,6 +85,30 @@
             </div>
 
             <div id="dashboardContent" class="hidden">
+              <section class="admin-filter-panel" aria-label="Dashboard filters">
+                <label>
+                  <span data-i18n="allInspections">All inspections</span>
+                  <select id="statusFilter">
+                    <option value="all" data-i18n="allInspections">All inspections</option>
+                    <option value="alerts" data-i18n="aiAlertsOnly">AI alerts only</option>
+                    <option value="clean" data-i18n="noNewDamage">No new damage</option>
+                  </select>
+                </label>
+                <label>
+                  <span data-i18n="dateRange">Date range</span>
+                  <select id="dateFilter">
+                    <option value="all" data-i18n="allDates">All dates</option>
+                    <option value="today" data-i18n="today">Today</option>
+                    <option value="7" data-i18n="last7Days">Last 7 days</option>
+                    <option value="30" data-i18n="last30Days">Last 30 days</option>
+                  </select>
+                </label>
+                <article>
+                  <span data-i18n="filtered">Filtered</span>
+                  <strong id="activeFilterCount">0</strong>
+                </article>
+              </section>
+
               <div class="metrics">
                 <article><span data-i18n="inspections">Inspections</span><strong id="metricInspections">0</strong></article>
                 <article><span data-i18n="vehicles">Vehicles</span><strong id="metricVehicles">0</strong></article>
@@ -78,8 +121,8 @@
                 <article class="dashboard-widget primary-widget">
                   <header>
                     <div>
-                      <h3 data-i18n="aiDamageDetection">AI damage detection</h3>
-                      <span data-i18n="latestDamage">Latest possible new damage</span>
+                      <h3 data-i18n="priorityQueue">Priority queue</h3>
+                      <span data-i18n="priorityQueueSubtitle">Inspections that need attention first</span>
                     </div>
                     <strong id="widgetAlertCount">0</strong>
                   </header>
@@ -89,7 +132,7 @@
                 <article class="dashboard-widget">
                   <header>
                     <div>
-                      <h3 data-i18n="vehicles">Vehicles</h3>
+                      <h3 data-i18n="fleetCoverage">Fleet coverage</h3>
                       <span data-i18n="groupedRegistration">Grouped by registration</span>
                     </div>
                   </header>
@@ -119,7 +162,7 @@
                 <article class="dashboard-widget wide-widget">
                   <header>
                     <div>
-                      <h3 data-i18n="inspectionHistory">Inspection history</h3>
+                      <h3 data-i18n="completionQueue">Completion queue</h3>
                       <span data-i18n="reportsPdfsDrive">Reports, PDFs and Drive folders</span>
                     </div>
                   </header>
@@ -132,7 +175,7 @@
       </div>
     </div>
 
-    <script src="/i18n.js?v=2"></script>
-    <script src="/admin.js?v=12"></script>
+    <script src="/i18n.js?v=5"></script>
+    <script src="/admin.js?v=13"></script>
   </body>
 </html>
