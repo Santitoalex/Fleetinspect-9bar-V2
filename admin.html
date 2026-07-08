@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>9Bar Fleet Dashboard</title>
-    <link rel="stylesheet" href="/styles.css?v=12" />
+    <link rel="stylesheet" href="/styles.css?v=13" />
   </head>
   <body class="admin-body">
     <div class="admin-shell">
@@ -20,6 +20,7 @@
           <a class="active" href="/admin"><span>▦</span><b data-i18n="dashboard">Dashboard</b></a>
           <a href="/driver"><span>▣</span><b data-i18n="captureApp">Capture app</b></a>
           <a href="#alertList"><span>△</span><b data-i18n="aiAlerts">AI alerts</b></a>
+          <a href="#dailyVehicleControl"><span>◫</span><b data-i18n="dailyVehicleControl">Daily control</b></a>
           <a href="#vehicleSummary"><span>▤</span><b data-i18n="vehicles">Vehicles</b></a>
           <a href="#reportList"><span>▧</span><b data-i18n="reports">Reports</b></a>
         </nav>
@@ -139,6 +140,32 @@
                   <div id="vehicleSummary" class="vehicle-summary"></div>
                 </article>
 
+                <article id="dailyVehicleControl" class="dashboard-widget wide-widget vehicle-control-widget">
+                  <header>
+                    <div>
+                      <h3 data-i18n="dailyVehicleControl">Daily vehicle control</h3>
+                      <span data-i18n="dailyVehicleControlSubtitle">Choose a date and verify every registration in the fleet</span>
+                    </div>
+                    <div class="vehicle-control-tools">
+                      <label>
+                        <span data-i18n="controlDate">Control date</span>
+                        <input id="vehicleControlDate" type="date" />
+                      </label>
+                      <label>
+                        <span data-i18n="registrationNumber">Registration number</span>
+                        <input id="vehicleControlSearch" type="search" placeholder="M AZ 1003" />
+                      </label>
+                    </div>
+                  </header>
+                  <div class="vehicle-control-summary">
+                    <article><span data-i18n="vehicles">Vehicles</span><strong id="controlTotalVehicles">0</strong></article>
+                    <article><span data-i18n="inspected">Inspected</span><strong id="controlInspectedVehicles">0</strong></article>
+                    <article><span data-i18n="missing">Missing</span><strong id="controlMissingVehicles">0</strong></article>
+                    <article><span data-i18n="aiAlerts">AI alerts</span><strong id="controlAlertVehicles">0</strong></article>
+                  </div>
+                  <div id="vehicleControlList" class="vehicle-control-list"></div>
+                </article>
+
                 <article class="dashboard-widget status-widget">
                   <header>
                     <div>
@@ -175,7 +202,8 @@
       </div>
     </div>
 
-    <script src="/i18n.js?v=5"></script>
-    <script src="/admin.js?v=13"></script>
+    <script src="/vehicles.js?v=2"></script>
+    <script src="/i18n.js?v=6"></script>
+    <script src="/admin.js?v=14"></script>
   </body>
 </html>

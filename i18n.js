@@ -135,6 +135,13 @@ window.FI18N = (() => {
       ,healthGood: "Inspection OK"
       ,ready: "Ready"
       ,needsSetup: "Needs setup"
+      ,dailyVehicleControl: "Daily vehicle control"
+      ,dailyVehicleControlSubtitle: "Choose a date and verify every registration in the fleet"
+      ,controlDate: "Control date"
+      ,inspected: "Inspected"
+      ,missing: "Missing"
+      ,status: "Status"
+      ,noVehiclesFound: "No vehicles found."
     },
     es: {
       dailyInspection: "Inspección diaria del vehículo",
@@ -271,6 +278,13 @@ window.FI18N = (() => {
       ,healthGood: "Inspección OK"
       ,ready: "Listo"
       ,needsSetup: "Falta configurar"
+      ,dailyVehicleControl: "Control diario de vehículos"
+      ,dailyVehicleControlSubtitle: "Elige una fecha y verifica cada matrícula de la flota"
+      ,controlDate: "Fecha de control"
+      ,inspected: "Revisado"
+      ,missing: "Faltante"
+      ,status: "Estado"
+      ,noVehiclesFound: "No se encontraron vehículos."
     },
     de: {
       dailyInspection: "Tägliche Fahrzeuginspektion",
@@ -407,6 +421,13 @@ window.FI18N = (() => {
       ,healthGood: "Inspektion OK"
       ,ready: "Bereit"
       ,needsSetup: "Einrichtung nötig"
+      ,dailyVehicleControl: "Tägliche Fahrzeugkontrolle"
+      ,dailyVehicleControlSubtitle: "Datum wählen und jedes Kennzeichen der Flotte prüfen"
+      ,controlDate: "Kontrolldatum"
+      ,inspected: "Geprüft"
+      ,missing: "Fehlt"
+      ,status: "Status"
+      ,noVehiclesFound: "Keine Fahrzeuge gefunden."
     },
     ro: {
       dailyInspection: "Inspecție zilnică vehicul",
@@ -543,6 +564,13 @@ window.FI18N = (() => {
       ,healthGood: "Inspecție OK"
       ,ready: "Pregătit"
       ,needsSetup: "Necesită configurare"
+      ,dailyVehicleControl: "Control zilnic vehicule"
+      ,dailyVehicleControlSubtitle: "Alege data și verifică fiecare număr din flotă"
+      ,controlDate: "Data controlului"
+      ,inspected: "Verificat"
+      ,missing: "Lipsește"
+      ,status: "Stare"
+      ,noVehiclesFound: "Nu s-au găsit vehicule."
     }
   };
 

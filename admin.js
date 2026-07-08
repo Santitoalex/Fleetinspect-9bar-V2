@@ -24,6 +24,13 @@ const nodes = {
   activeFilterCount: document.querySelector("#activeFilterCount"),
   storagePill: document.querySelector("#storagePill"),
   aiPill: document.querySelector("#aiPill"),
+  vehicleControlDate: document.querySelector("#vehicleControlDate"),
+  vehicleControlSearch: document.querySelector("#vehicleControlSearch"),
+  vehicleControlList: document.querySelector("#vehicleControlList"),
+  controlTotalVehicles: document.querySelector("#controlTotalVehicles"),
+  controlInspectedVehicles: document.querySelector("#controlInspectedVehicles"),
+  controlMissingVehicles: document.querySelector("#controlMissingVehicles"),
+  controlAlertVehicles: document.querySelector("#controlAlertVehicles"),
   metricInspections: document.querySelector("#metricInspections"),
   metricVehicles: document.querySelector("#metricVehicles"),
   metricPhotos: document.querySelector("#metricPhotos"),
@@ -42,6 +49,9 @@ document.addEventListener("DOMContentLoaded", () => {
   nodes.searchReports.addEventListener("input", renderDashboard);
   nodes.statusFilter.addEventListener("change", renderDashboard);
   nodes.dateFilter.addEventListener("change", renderDashboard);
+  nodes.vehicleControlDate.value = localDateKey(new Date());
+  nodes.vehicleControlDate.addEventListener("change", renderDashboard);
+  nodes.vehicleControlSearch.addEventListener("input", renderDailyVehicleControl);
   nodes.exportCsv.addEventListener("click", exportCurrentCsv);
   nodes.printDashboard.addEventListener("click", () => window.print());
   window.addEventListener("fleetinspect:language", renderDashboard);
@@ -108,6 +118,7 @@ function renderDashboard() {
 
   renderAlerts(items.length ? items : dashboardItems);
   renderVehicleSummary(allGroups);
+  renderDailyVehicleControl();
   renderSystemStatus(dashboardItems);
   renderRecentActivity(dashboardItems);
 
@@ -219,6 +230,85 @@ function renderVehicleSummary(groups) {
   `).join("");
 }
 
+function renderDailyVehicleControl() {
+  const fleetVehicles = Array.isArray(window.FLEET_VEHICLES) ? window.FLEET_VEHICLES : [];
+  const selectedDate = nodes.vehicleControlDate.value || localDateKey(new Date());
+  const search = nodes.vehicleControlSearch.value.trim().toLowerCase();
+  const inspectionsByPlate = dashboardItems.reduce((groups, item) => {
+    const plate = normalizePlate(item.plate || "");
+    const inspectionDate = localDateKey(new Date(item.finishedAt || item.startedAt || 0));
+    if (inspectionDate !== selectedDate || !plate) return groups;
+    if (!groups[plate]) groups[plate] = [];
+    groups[plate].push(item);
+    return groups;
+  }, {});
+
+  const vehicles = fleetVehicles
+    .map((plate) => {
+      const normalized = normalizePlate(plate);
+      const inspections = (inspectionsByPlate[normalized] || [])
+        .sort((a, b) => new Date(b.finishedAt || b.startedAt) - new Date(a.finishedAt || a.startedAt));
+      const latest = inspections[0];
+      const hasAlert = inspections.some((item) => item.ai?.newDamageDetected);
+      return {
+        plate,
+        normalized,
+        inspected: inspections.length > 0,
+        inspections,
+        latest,
+        hasAlert,
+      };
+    })
+    .filter((vehicle) => vehicle.normalized.toLowerCase().includes(search));
+
+  const inspectedCount = vehicles.filter((vehicle) => vehicle.inspected).length;
+  const alertCount = vehicles.filter((vehicle) => vehicle.hasAlert).length;
+  nodes.controlTotalVehicles.textContent = String(vehicles.length);
+  nodes.controlInspectedVehicles.textContent = String(inspectedCount);
+  nodes.controlMissingVehicles.textContent = String(vehicles.length - inspectedCount);
+  nodes.controlAlertVehicles.textContent = String(alertCount);
+
+  if (!vehicles.length) {
+    nodes.vehicleControlList.innerHTML = `<article class="empty-state">${escapeHtml(t("noVehiclesFound"))}</article>`;
+    return;
+  }
+
+  nodes.vehicleControlList.innerHTML = vehicles.map((vehicle) => {
+    const statusClass = vehicle.hasAlert ? "alert" : vehicle.inspected ? "ok" : "missing";
+    const statusLabel = vehicle.hasAlert ? t("alert") : vehicle.inspected ? t("inspected") : t("missing");
+    const driver = vehicle.latest?.driverName || "-";
+    const time = vehicle.latest ? formatTime(new Date(vehicle.latest.finishedAt || vehicle.latest.startedAt)) : "-";
+    const photoCount = vehicle.latest?.photos?.length || 0;
+    return `
+      <article class="vehicle-control-row ${statusClass}">
+        <div>
+          <strong>${escapeHtml(vehicle.plate)}</strong>
+          <span>${escapeHtml(t("registrationNumber"))}</span>
+        </div>
+        <div>
+          <strong>${escapeHtml(statusLabel)}</strong>
+          <span>${escapeHtml(t("status"))}</span>
+        </div>
+        <div>
+          <strong>${escapeHtml(driver)}</strong>
+          <span>${escapeHtml(t("driverName"))}</span>
+        </div>
+        <div>
+          <strong>${escapeHtml(time)}</strong>
+          <span>${escapeHtml(selectedDate)}</span>
+        </div>
+        <div>
+          <strong>${photoCount}</strong>
+          <span>${escapeHtml(t("photos"))}</span>
+        </div>
+        <div class="vehicle-control-actions">
+          ${vehicle.latest ? `<a href="/report.html?id=${encodeURIComponent(vehicle.latest.id)}" target="_blank" rel="noopener">${escapeHtml(t("viewPdf"))}</a>` : `<span>${escapeHtml(t("pending"))}</span>`}
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
 function renderSystemStatus(items) {
   const hasDriveLinks = items.some((item) => item.drive?.folderUrl);
   const driveReady = Boolean(systemConfig.supabaseConfigured || systemConfig.cloudStorageConfigured || systemConfig.driveConfigured);
@@ -279,7 +369,7 @@ function getFilteredItems() {
     const ageDays = (now - itemDate.getTime()) / 86400000;
     const matchesDate =
       dateRange === "all" ||
-      (dateRange === "today" && itemDate.toISOString().slice(0, 10) === new Date().toISOString().slice(0, 10)) ||
+      (dateRange === "today" && localDateKey(itemDate) === localDateKey(new Date())) ||
       (Number(dateRange) && ageDays <= Number(dateRange));
     return matchesQuery && matchesStatus && matchesDate;
   });
@@ -352,6 +442,19 @@ function formatTime(value) {
     hour: "2-digit",
     minute: "2-digit",
   }).format(value);
+}
+
+function localDateKey(value) {
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function normalizePlate(value) {
+  return String(value || "").trim().replace(/\s+/g, " ").toUpperCase();
 }
 
 function escapeHtml(value) {
