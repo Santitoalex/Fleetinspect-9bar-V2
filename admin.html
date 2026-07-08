@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>9Bar Fleet Dashboard</title>
+    <link rel="stylesheet" href="/styles.css?v=1" />
+  </head>
+  <body class="admin-body">
+    <div class="admin-shell">
+      <aside class="fleet-sidebar">
+        <div class="fleet-logo">
+          <img class="sidebar-logo" src="/9bar-logo.png" alt="9Bar Solutions GmbH" />
+        </div>
+        <nav class="fleet-nav" aria-label="Admin navigation">
+          <a class="active" href="/admin"><span>▦</span><b data-i18n="dashboard">Dashboard</b></a>
+          <a href="/driver"><span>▣</span><b data-i18n="captureApp">Capture app</b></a>
+          <a href="#alertList"><span>△</span><b data-i18n="aiAlerts">AI alerts</b></a>
+          <a href="#vehicleSummary"><span>▤</span><b data-i18n="vehicles">Vehicles</b></a>
+          <a href="#reportList"><span>▧</span><b data-i18n="reports">Reports</b></a>
+        </nav>
+      </aside>
+
+      <div class="admin-workspace">
+        <header class="fleet-topbar">
+          <div class="topbar-left">
+            <button class="menu-button" type="button" aria-label="Menu">☰</button>
+            <label class="global-search">
+              <span>⌕</span>
+              <input id="searchReports" placeholder="Search vehicle, driver or registration" data-i18n-placeholder="searchPlaceholder" />
+            </label>
+          </div>
+          <div class="topbar-actions">
+            <select class="language-select admin-language" data-language-select aria-label="Language">
+              <option value="en">EN</option>
+              <option value="es">ES</option>
+              <option value="de">DE</option>
+              <option value="ro">RO</option>
+            </select>
+            <button id="refreshDashboard" type="button" class="icon-button" aria-label="Refresh" data-i18n-aria="refresh">↻</button>
+            <a class="icon-button" href="/driver" aria-label="Capture app" data-i18n-aria="captureApp">＋</a>
+            <span class="user-chip">Admin</span>
+          </div>
+        </header>
+
+        <main class="dashboard-main">
+          <section class="dashboard hero-dashboard">
+            <div class="dashboard-header">
+              <div>
+                <p class="eyebrow" data-i18n="fleetControl">Fleet control center</p>
+                <h2 data-i18n="inspectionDashboard">Inspection dashboard</h2>
+              </div>
+              <select id="statusFilter" class="dashboard-select">
+                <option value="all" data-i18n="allInspections">All inspections</option>
+                <option value="alerts" data-i18n="aiAlertsOnly">AI alerts only</option>
+                <option value="clean" data-i18n="noNewDamage">No new damage</option>
+              </select>
+            </div>
+
+            <div id="adminLock" class="admin-lock">
+              <input id="adminPin" type="password" placeholder="Admin PIN" data-i18n-placeholder="adminPin" />
+              <button id="unlockAdmin" type="button" data-i18n="enter">Enter</button>
+            </div>
+
+            <div id="dashboardContent" class="hidden">
+              <div class="metrics">
+                <article><span data-i18n="inspections">Inspections</span><strong id="metricInspections">0</strong></article>
+                <article><span data-i18n="vehicles">Vehicles</span><strong id="metricVehicles">0</strong></article>
+                <article><span data-i18n="photos">Photos</span><strong id="metricPhotos">0</strong></article>
+                <article><span data-i18n="aiAlerts">AI alerts</span><strong id="metricAlerts">0</strong></article>
+                <article><span data-i18n="today">Today</span><strong id="metricToday">0</strong></article>
+              </div>
+
+              <section class="dashboard-card-grid">
+                <article class="dashboard-widget primary-widget">
+                  <header>
+                    <div>
+                      <h3 data-i18n="aiDamageDetection">AI damage detection</h3>
+                      <span data-i18n="latestDamage">Latest possible new damage</span>
+                    </div>
+                    <strong id="widgetAlertCount">0</strong>
+                  </header>
+                  <div id="alertList" class="alert-list"></div>
+                </article>
+
+                <article class="dashboard-widget">
+                  <header>
+                    <div>
+                      <h3 data-i18n="vehicles">Vehicles</h3>
+                      <span data-i18n="groupedRegistration">Grouped by registration</span>
+                    </div>
+                  </header>
+                  <div id="vehicleSummary" class="vehicle-summary"></div>
+                </article>
+
+                <article class="dashboard-widget status-widget">
+                  <header>
+                    <div>
+                      <h3 data-i18n="systemStatus">System status</h3>
+                      <span data-i18n="operationalHealth">Operational health</span>
+                    </div>
+                  </header>
+                  <div id="systemStatus" class="status-list"></div>
+                </article>
+
+                <article class="dashboard-widget status-widget">
+                  <header>
+                    <div>
+                      <h3 data-i18n="recentActivity">Recent activity</h3>
+                      <span data-i18n="latestSubmissions">Latest driver submissions</span>
+                    </div>
+                  </header>
+                  <div id="recentActivity" class="activity-list"></div>
+                </article>
+
+                <article class="dashboard-widget wide-widget">
+                  <header>
+                    <div>
+                      <h3 data-i18n="inspectionHistory">Inspection history</h3>
+                      <span data-i18n="reportsPdfsDrive">Reports, PDFs and Drive folders</span>
+                    </div>
+                  </header>
+                  <div id="reportList" class="report-list"></div>
+                </article>
+              </section>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <script src="/i18n.js?v=2"></script>
+    <script src="/admin.js?v=12"></script>
+  </body>
+</html>
