@@ -177,6 +177,7 @@ window.FI18N = (() => {
       ,noVehicleSelected: "Select a registration to see its history."
       ,inspectionsToday: "Inspections today"
       ,totalByDriver: "Total by driver"
+      ,cameraZoom: "Zoom"
     },
     es: {
       dailyInspection: "Inspección diaria del vehículo",
@@ -355,6 +356,7 @@ window.FI18N = (() => {
       ,noVehicleSelected: "Selecciona una matrícula para ver su historial."
       ,inspectionsToday: "Inspecciones de hoy"
       ,totalByDriver: "Total por conductor"
+      ,cameraZoom: "Zoom"
     },
     de: {
       dailyInspection: "Tägliche Fahrzeuginspektion",

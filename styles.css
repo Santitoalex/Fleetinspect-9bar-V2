@@ -2184,6 +2184,36 @@ body.modal-open {
   background: #030712;
 }
 
+.camera-zoom-control {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 18px;
+  z-index: 8;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(6, 17, 31, 0.78);
+  padding: 10px 12px;
+  color: #fff;
+  backdrop-filter: blur(12px);
+}
+
+.camera-zoom-control span,
+.camera-zoom-control strong {
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.camera-zoom-control input {
+  min-height: auto;
+  accent-color: #f28c00;
+  padding: 0;
+}
+
 .driver-v17 .photo-camera-frame::before {
   inset: 16px;
   border: 2px solid rgba(255, 255, 255, 0.8);

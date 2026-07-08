@@ -13,6 +13,7 @@ const STEPS = [
 let session = null;
 let stepIndex = 0;
 let stream = null;
+let cameraTrack = null;
 
 const nodes = {
   startScreen: document.querySelector("#startScreen"),
@@ -26,6 +27,9 @@ const nodes = {
   capturedPreview: document.querySelector("#capturedPreview"),
   cameraEmpty: document.querySelector("#cameraEmpty"),
   cameraFrame: document.querySelector(".camera-frame"),
+  cameraZoomControl: document.querySelector("#cameraZoomControl"),
+  cameraZoom: document.querySelector("#cameraZoom"),
+  cameraZoomValue: document.querySelector("#cameraZoomValue"),
   capturePhoto: document.querySelector("#capturePhoto"),
   previousPhoto: document.querySelector("#previousPhoto"),
   retakePhoto: document.querySelector("#retakePhoto"),
@@ -84,6 +88,7 @@ function bindEvents() {
   });
   nodes.progressList.addEventListener("click", handleProgressClick);
   nodes.retryPending.addEventListener("click", processPendingInspections);
+  nodes.cameraZoom.addEventListener("input", applyCameraZoom);
   nodes.resetSession.addEventListener("click", resetSession);
 }
 
@@ -132,12 +137,51 @@ async function openCamera() {
     });
 
     nodes.cameraVideo.srcObject = stream;
+    cameraTrack = stream.getVideoTracks()[0] || null;
     nodes.cameraVideo.setAttribute("playsinline", "");
     await nodes.cameraVideo.play();
     nodes.cameraFrame.classList.add("is-live");
     nodes.cameraEmpty.classList.add("hidden");
+    setupCameraZoom();
   } catch {
     showCameraMessage(t("cameraNoAccess"));
+  }
+}
+
+function setupCameraZoom() {
+  const capabilities = cameraTrack?.getCapabilities?.() || {};
+  const settings = cameraTrack?.getSettings?.() || {};
+  const zoom = capabilities.zoom;
+
+  if (!zoom || !nodes.cameraZoomControl) {
+    nodes.cameraZoomControl?.classList.add("hidden");
+    return;
+  }
+
+  const min = Number(zoom.min || 1);
+  const max = Number(zoom.max || Math.max(min, 1));
+  const step = Number(zoom.step || 0.1);
+  const current = Number(settings.zoom || min);
+
+  nodes.cameraZoom.min = String(min);
+  nodes.cameraZoom.max = String(max);
+  nodes.cameraZoom.step = String(step);
+  nodes.cameraZoom.value = String(current);
+  nodes.cameraZoomValue.textContent = `${current.toFixed(1)}x`;
+  nodes.cameraZoomControl.classList.toggle("hidden", max <= min);
+}
+
+async function applyCameraZoom() {
+  if (!cameraTrack) return;
+  const zoom = Number(nodes.cameraZoom.value);
+  nodes.cameraZoomValue.textContent = `${zoom.toFixed(1)}x`;
+
+  try {
+    await cameraTrack.applyConstraints({
+      advanced: [{ zoom }],
+    });
+  } catch {
+    nodes.cameraZoomControl?.classList.add("hidden");
   }
 }
 
@@ -620,6 +664,8 @@ function stopCamera() {
     stream.getTracks().forEach((track) => track.stop());
     stream = null;
   }
+  cameraTrack = null;
+  nodes.cameraZoomControl?.classList.add("hidden");
 }
 
 function normalizePlate(value) {
