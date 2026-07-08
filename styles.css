@@ -1760,3 +1760,483 @@ body.modal-open {
     grid-column: auto;
   }
 }
+
+body.driver-pro {
+  --driver-bg: #eef3f7;
+  --driver-surface: #ffffff;
+  --driver-border: #cbd8e6;
+  --driver-navy: #0b2239;
+  --driver-blue: #123c69;
+  --driver-orange: #f28c00;
+  --driver-teal: #0f766e;
+  background:
+    linear-gradient(180deg, #dfeaf3 0, #f5f8fb 320px, #eef3f7 100%);
+}
+
+.driver-pro .driver-app-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  min-height: 70px;
+  padding: 10px 18px;
+  background: #0b2239;
+  border-bottom: 4px solid var(--driver-orange);
+  box-shadow: 0 12px 34px rgba(11, 34, 57, 0.18);
+}
+
+.driver-pro .company-logo {
+  width: 142px;
+  height: 44px;
+  max-width: 34vw;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.driver-pro .app-header h1 {
+  font-size: 20px;
+  line-height: 1.05;
+}
+
+.driver-pro .app-header p {
+  color: #b9c8d8;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.driver-pro .language-select,
+.driver-pro .admin-link {
+  min-height: 40px;
+  border-color: rgba(255, 255, 255, 0.26);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.driver-pro .driver-main {
+  max-width: 1160px;
+  padding: 22px 18px 58px;
+}
+
+.driver-start-pro {
+  display: grid;
+  gap: 18px;
+}
+
+.driver-hero-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.82fr);
+  gap: 18px;
+  align-items: stretch;
+}
+
+.driver-hero-copy,
+.driver-status-strip article,
+.driver-entry-card,
+.driver-process-card,
+.driver-camera-card,
+.driver-side-panel {
+  border: 1px solid var(--driver-border);
+  border-radius: 8px;
+  background: var(--driver-surface);
+  box-shadow: 0 16px 42px rgba(15, 23, 42, 0.08);
+}
+
+.driver-hero-copy {
+  min-height: 230px;
+  padding: 26px;
+  border-left: 6px solid var(--driver-orange);
+}
+
+.driver-kicker,
+.driver-pro .capture-kicker {
+  color: var(--driver-teal);
+  font-size: 12px;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.driver-hero-copy h2 {
+  max-width: 720px;
+  margin: 8px 0 10px;
+  color: var(--ink);
+  font-size: clamp(30px, 4vw, 48px);
+  line-height: 1.04;
+}
+
+.driver-hero-copy p {
+  max-width: 620px;
+  margin: 0;
+  color: #58708a;
+  font-size: 17px;
+  line-height: 1.45;
+}
+
+.driver-status-strip {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.driver-status-strip article {
+  display: grid;
+  grid-template-columns: 70px 1fr;
+  gap: 12px;
+  align-items: center;
+  min-height: 70px;
+  padding: 14px;
+}
+
+.driver-status-strip strong {
+  display: grid;
+  min-height: 44px;
+  place-items: center;
+  border-radius: 8px;
+  background: #eef6f5;
+  color: var(--driver-teal);
+  font-size: 20px;
+}
+
+.driver-status-strip span {
+  color: #425a74;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.driver-entry-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 0.46fr);
+  gap: 18px;
+  align-items: stretch;
+}
+
+.driver-entry-card {
+  display: grid;
+  gap: 16px;
+  padding: 22px;
+}
+
+.driver-pro .form-heading {
+  grid-template-columns: 1fr;
+  gap: 4px;
+  padding: 0 0 8px;
+  border-bottom: 1px solid #e1e8f0;
+}
+
+.driver-pro .form-heading span {
+  color: var(--driver-teal);
+}
+
+.driver-pro .form-heading strong {
+  font-size: 24px;
+}
+
+.driver-form-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 0.74fr);
+  gap: 14px;
+}
+
+.driver-pro label {
+  gap: 8px;
+  color: #52697f;
+  font-size: 13px;
+}
+
+.driver-pro input,
+.driver-pro select,
+.driver-pro textarea {
+  min-height: 48px;
+  border-color: #c8d6e4;
+  background: #fbfdff;
+  font-size: 15px;
+}
+
+.driver-primary-action {
+  min-height: 52px;
+  background: var(--driver-blue);
+  font-size: 16px;
+}
+
+.driver-process-card {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+  background: #0f2c49;
+  color: #fff;
+}
+
+.driver-process-card div {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  padding: 13px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.driver-process-card strong {
+  display: block;
+  font-size: 15px;
+}
+
+.driver-process-card span {
+  display: block;
+  margin-top: 5px;
+  color: #c7d7e7;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.driver-capture-shell {
+  max-width: 1180px;
+}
+
+.driver-capture-top {
+  position: sticky;
+  top: 78px;
+  z-index: 20;
+  margin-bottom: 14px;
+  border: 1px solid var(--driver-border);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.94);
+  padding: 13px 14px;
+  backdrop-filter: blur(12px);
+}
+
+.driver-capture-top h2 {
+  margin: 2px 0;
+  font-size: 28px;
+}
+
+.driver-capture-top p {
+  color: #52697f;
+  font-size: 13px;
+}
+
+.driver-capture-top .ghost {
+  color: var(--driver-blue);
+  background: #f6f9fc;
+}
+
+.driver-inspection-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 16px;
+  align-items: start;
+}
+
+.driver-camera-card {
+  padding: 12px;
+}
+
+.driver-pro .camera-frame {
+  min-height: min(66vh, 680px);
+  border-color: #9fb2c5;
+  background: #060b12;
+  box-shadow: none;
+}
+
+.driver-pro .camera-frame::before {
+  content: "";
+  position: absolute;
+  inset: 14px;
+  z-index: 3;
+  border: 2px solid rgba(255, 255, 255, 0.72);
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+.driver-pro .camera-frame::after {
+  content: "";
+  position: absolute;
+  inset: 26px;
+  z-index: 3;
+  border: 1px dashed rgba(255, 255, 255, 0.32);
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+.driver-camera-actions {
+  display: grid;
+  grid-template-columns: 0.8fr 1.5fr 0.9fr 0.9fr;
+  gap: 8px;
+  padding: 12px 0 0;
+}
+
+.driver-camera-actions button {
+  min-height: 52px;
+}
+
+.driver-camera-actions #capturePhoto {
+  background: var(--driver-blue);
+  font-size: 17px;
+}
+
+.driver-camera-actions .secondary {
+  border: 1px solid #d4e0eb;
+  background: #f3f7fa;
+}
+
+.driver-side-panel {
+  position: sticky;
+  top: 154px;
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+}
+
+.driver-panel-header {
+  border-bottom: 1px solid #e1e8f0;
+  padding-bottom: 10px;
+}
+
+.driver-panel-header strong {
+  display: block;
+  color: var(--ink);
+  font-size: 18px;
+}
+
+.driver-panel-header span {
+  display: block;
+  margin-top: 3px;
+  color: #667085;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.driver-pro .progress-list {
+  gap: 7px;
+}
+
+.driver-pro .progress-item {
+  min-height: 42px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.driver-pro .progress-item.active {
+  border-color: var(--driver-teal);
+  background: #eefaf8;
+  box-shadow: inset 4px 0 0 var(--driver-teal);
+}
+
+.driver-pro .progress-item.done {
+  border-color: #b9dfc4;
+  background: #effaf2;
+}
+
+.driver-pro .notes-field textarea {
+  min-height: 84px;
+}
+
+.driver-pro .ai-box {
+  border-left-color: var(--driver-orange);
+  background: #fffaf2;
+}
+
+@media (max-width: 860px) {
+  .driver-pro .driver-app-header {
+    padding: 9px 10px;
+  }
+
+  .driver-pro .company-logo {
+    width: 118px;
+    height: 40px;
+    max-width: 38vw;
+  }
+
+  .driver-pro .app-header h1 {
+    font-size: 18px;
+  }
+
+  .driver-pro .app-header p {
+    font-size: 11px;
+  }
+
+  .driver-pro .driver-main {
+    padding: 12px 10px 44px;
+  }
+
+  .driver-hero-card,
+  .driver-entry-grid,
+  .driver-inspection-grid,
+  .driver-form-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .driver-hero-copy {
+    min-height: auto;
+    padding: 18px;
+  }
+
+  .driver-hero-copy h2 {
+    font-size: 29px;
+  }
+
+  .driver-status-strip {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .driver-status-strip article {
+    grid-template-columns: 1fr;
+    gap: 7px;
+    min-height: 94px;
+    padding: 10px;
+  }
+
+  .driver-status-strip strong {
+    min-height: 34px;
+    font-size: 16px;
+  }
+
+  .driver-status-strip span {
+    font-size: 11px;
+  }
+
+  .driver-process-card {
+    display: none;
+  }
+
+  .driver-entry-card {
+    padding: 16px;
+  }
+
+  .driver-capture-top {
+    top: 68px;
+    margin: 0 -10px 10px;
+    border-left: 0;
+    border-right: 0;
+    border-radius: 0;
+  }
+
+  .driver-capture-top h2 {
+    font-size: 22px;
+  }
+
+  .driver-camera-card {
+    margin: 0 -10px;
+    border-left: 0;
+    border-right: 0;
+    border-radius: 0;
+    padding: 0;
+  }
+
+  .driver-pro .camera-frame {
+    min-height: 50vh;
+    border-left: 0;
+    border-right: 0;
+    border-radius: 0;
+  }
+
+  .driver-camera-actions {
+    grid-template-columns: 1fr 1.35fr;
+    padding: 10px;
+  }
+
+  .driver-side-panel {
+    position: static;
+    margin: 0 -10px;
+    border-left: 0;
+    border-right: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
