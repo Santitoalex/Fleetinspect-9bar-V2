@@ -15,10 +15,27 @@
   box-sizing: border-box;
 }
 
+html {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 body {
   margin: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  touch-action: pan-y;
   background: var(--bg);
   color: var(--ink);
+}
+
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
 }
 
 .driver-body {
@@ -150,9 +167,11 @@ body {
 }
 
 main {
+  width: 100%;
   max-width: 980px;
   margin: 0 auto;
   padding: 18px 16px 48px;
+  overflow-x: hidden;
 }
 
 .driver-start-layout {
@@ -284,12 +303,14 @@ textarea,
 button,
 .file-button span {
   font: inherit;
+  max-width: 100%;
 }
 
 input,
 select,
 textarea {
   width: 100%;
+  max-width: 100%;
   border: 1px solid #cfd8e3;
   border-radius: 8px;
   padding: 11px 12px;
@@ -3199,7 +3220,7 @@ body.driver-pro {
 
   .driver-capture-top {
     top: 68px;
-    margin: 0 -10px 10px;
+    margin: 0 0 10px;
     border-left: 0;
     border-right: 0;
     border-radius: 0;
@@ -3210,7 +3231,7 @@ body.driver-pro {
   }
 
   .driver-camera-card {
-    margin: 0 -10px;
+    margin: 0;
     border-left: 0;
     border-right: 0;
     border-radius: 0;
@@ -3231,7 +3252,7 @@ body.driver-pro {
 
   .driver-side-panel {
     position: static;
-    margin: 0 -10px;
+    margin: 0;
     border-left: 0;
     border-right: 0;
     border-radius: 0;
@@ -3522,7 +3543,7 @@ body.driver-pro {
 
 @media (max-width: 920px) {
   .driver-pro .driver-photo-screen {
-    margin: 0 -10px;
+    margin: 0;
   }
 
   .photo-command-bar {
@@ -3652,5 +3673,31 @@ body.camera-locked .photo-camera-frame {
   body.camera-locked .photo-camera-frame {
     height: calc(100dvh - 270px);
     min-height: 280px;
+  }
+}
+
+.app-header,
+.driver-main,
+.driver-start-pro,
+.driver-hero-card,
+.driver-entry-grid,
+.driver-card,
+.driver-photo-screen,
+.driver-photo-app,
+.photo-command-bar,
+.photo-workspace,
+.photo-stage,
+.photo-action-dock,
+.photo-control-panel,
+.photo-panel-card {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+@media (max-width: 920px) {
+  .photo-action-dock {
+    left: 0;
+    right: 0;
+    width: 100%;
   }
 }
