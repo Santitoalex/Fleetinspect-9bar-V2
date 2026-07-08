@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>9Bar FleetInspect</title>
     <link rel="manifest" href="/manifest.webmanifest" />
-    <link rel="stylesheet" href="/styles.css?v=16" />
+    <link rel="stylesheet" href="/styles.css?v=20" />
   </head>
-  <body class="driver-body driver-pro">
+  <body class="driver-body driver-pro driver-v17">
     <header class="app-header driver-app-header">
       <div class="header-brand">
         <div class="company-logo brand-logo" aria-label="9Bar Solutions GmbH">
@@ -39,7 +39,7 @@
             <p data-i18n="enterDetails">Enter the details before opening the camera.</p>
           </div>
 
-          <div class="driver-status-strip">
+          <div class="driver-status-strip driver-start-metrics">
             <article>
               <strong>01</strong>
               <span data-i18n="checkIn">Driver check-in</span>
@@ -56,7 +56,7 @@
         </div>
 
         <div class="driver-entry-grid">
-          <form id="startForm" class="start-card driver-card driver-entry-card">
+          <form id="startForm" class="start-card driver-card driver-entry-card driver-login-card">
             <div class="form-heading">
               <span data-i18n="dailyInspection">Daily vehicle inspection</span>
               <strong data-i18n="checkIn">Driver check-in</strong>
@@ -78,7 +78,7 @@
             <button type="submit" class="driver-primary-action" data-i18n="startPhotos">Start photos</button>
           </form>
 
-          <aside class="driver-process-card" aria-label="Inspection process">
+          <aside class="driver-process-card driver-help-card" aria-label="Inspection process">
             <div>
               <strong data-i18n="captureStep">Capture step</strong>
               <span data-i18n="placeVehicle">Place the vehicle in frame and press Capture.</span>

@@ -1936,6 +1936,442 @@ body.modal-open {
   box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
 }
 
+/* Driver app redesign */
+.driver-v17 {
+  --driver-bg: #eef4f8;
+  --driver-ink: #0c1828;
+  --driver-muted: #607287;
+  --driver-panel: rgba(255, 255, 255, 0.92);
+  --driver-line: #c9d7e6;
+  --driver-primary: #103b62;
+  --driver-primary-2: #174f80;
+  --driver-success: #107569;
+  --driver-warning: #f28c00;
+  background:
+    radial-gradient(circle at 10% 0%, rgba(242, 140, 0, 0.15), transparent 30%),
+    radial-gradient(circle at 95% 8%, rgba(16, 117, 105, 0.13), transparent 28%),
+    linear-gradient(180deg, #e7eef5 0%, #f7fafc 42%, #eef4f8 100%);
+  color: var(--driver-ink);
+}
+
+.driver-v17 .driver-app-header {
+  min-height: 76px;
+  background:
+    linear-gradient(135deg, rgba(242, 140, 0, 0.16), transparent 34%),
+    linear-gradient(135deg, #061b2f 0%, #11395d 58%, #0e2f4c 100%);
+  border-bottom: 0;
+  box-shadow: 0 18px 48px rgba(8, 27, 47, 0.24);
+}
+
+.driver-v17 .driver-app-header::after {
+  content: "";
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 0;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--driver-warning), var(--driver-success), #66a3ff);
+}
+
+.driver-v17 .company-logo {
+  width: 150px;
+  height: 48px;
+  border-radius: 7px;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.16);
+}
+
+.driver-v17 .header-brand {
+  gap: 14px;
+}
+
+.driver-v17 .app-header h1 {
+  font-size: 22px;
+  letter-spacing: 0;
+}
+
+.driver-v17 .app-header p {
+  margin-top: 3px;
+  color: #d5e2ef;
+}
+
+.driver-v17 .language-select,
+.driver-v17 .admin-link {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.driver-v17 .driver-main {
+  width: min(1180px, 100%);
+  padding: 20px 18px 72px;
+}
+
+.driver-v17 .driver-start-pro {
+  gap: 14px;
+}
+
+.driver-v17 .driver-hero-card {
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 14px;
+}
+
+.driver-v17 .driver-hero-copy,
+.driver-v17 .driver-status-strip article,
+.driver-v17 .driver-entry-card,
+.driver-v17 .driver-process-card,
+.driver-v17 .photo-panel-card,
+.driver-v17 .photo-stage,
+.driver-v17 .photo-command-bar {
+  border-color: rgba(159, 182, 206, 0.72);
+  background: var(--driver-panel);
+  box-shadow: 0 16px 42px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(14px);
+}
+
+.driver-v17 .driver-hero-copy {
+  min-height: 190px;
+  border-left: 0;
+  border-top: 5px solid var(--driver-warning);
+  padding: 24px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(246, 250, 253, 0.92)),
+    linear-gradient(135deg, rgba(242, 140, 0, 0.1), transparent);
+}
+
+.driver-v17 .driver-hero-copy h2 {
+  max-width: 680px;
+  margin: 8px 0;
+  font-size: clamp(28px, 3.6vw, 42px);
+}
+
+.driver-v17 .driver-hero-copy p {
+  font-size: 16px;
+}
+
+.driver-v17 .driver-start-metrics {
+  gap: 8px;
+}
+
+.driver-v17 .driver-start-metrics article {
+  min-height: 62px;
+  grid-template-columns: 58px 1fr;
+  padding: 12px;
+}
+
+.driver-v17 .driver-start-metrics article:nth-child(1) strong {
+  background: #eef4ff;
+  color: #1849a9;
+}
+
+.driver-v17 .driver-start-metrics article:nth-child(2) strong {
+  background: #ecfdf3;
+  color: #107569;
+}
+
+.driver-v17 .driver-start-metrics article:nth-child(3) strong {
+  background: #fff7ed;
+  color: #b54708;
+}
+
+.driver-v17 .driver-entry-grid {
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 14px;
+}
+
+.driver-v17 .driver-login-card {
+  position: relative;
+  overflow: hidden;
+  padding: 20px;
+}
+
+.driver-v17 .driver-login-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: linear-gradient(90deg, var(--driver-primary), var(--driver-success), var(--driver-warning));
+}
+
+.driver-v17 .driver-form-fields {
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 0.78fr);
+  gap: 12px;
+}
+
+.driver-v17 input,
+.driver-v17 select,
+.driver-v17 textarea {
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: inset 0 1px 0 rgba(15, 23, 42, 0.03);
+}
+
+.driver-v17 input:focus,
+.driver-v17 select:focus,
+.driver-v17 textarea:focus {
+  border-color: var(--driver-primary-2);
+  box-shadow: 0 0 0 3px rgba(23, 79, 128, 0.12);
+}
+
+.driver-v17 .driver-primary-action {
+  background: linear-gradient(135deg, var(--driver-primary), var(--driver-primary-2));
+  box-shadow: 0 12px 26px rgba(16, 59, 98, 0.22);
+}
+
+.driver-v17 .driver-help-card {
+  background:
+    linear-gradient(180deg, rgba(16, 59, 98, 0.96), rgba(8, 31, 52, 0.98));
+}
+
+.driver-v17 .driver-help-card div:first-child {
+  border-left: 4px solid var(--driver-warning);
+}
+
+.driver-v17 .driver-help-card div:last-child {
+  border-left: 4px solid var(--driver-success);
+}
+
+.driver-v17 .driver-photo-app {
+  display: grid;
+  gap: 12px;
+}
+
+.driver-v17 .photo-command-bar {
+  position: sticky;
+  top: 88px;
+  z-index: 16;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  border-radius: 8px;
+  padding: 13px 14px;
+}
+
+.driver-v17 .photo-command-bar h2 {
+  margin: 3px 0;
+  font-size: 26px;
+}
+
+.driver-v17 .photo-command-bar p {
+  color: var(--driver-muted);
+  font-weight: 800;
+}
+
+.driver-v17 .photo-command-bar .ghost {
+  width: auto;
+  min-height: 40px;
+  border: 1px solid #cbd8e6;
+  background: #ffffff;
+  color: var(--driver-primary);
+  padding: 0 14px;
+}
+
+.driver-v17 .photo-workspace {
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 12px;
+}
+
+.driver-v17 .photo-stage {
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(6, 17, 31, 0.98), rgba(10, 28, 48, 0.98));
+  padding: 10px;
+}
+
+.driver-v17 .photo-camera-frame {
+  min-height: min(65vh, 680px);
+  border-radius: 8px;
+  background: #030712;
+}
+
+.driver-v17 .photo-camera-frame::before {
+  inset: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+}
+
+.driver-v17 .photo-camera-frame::after {
+  inset: 30px;
+  border-color: rgba(255, 255, 255, 0.24);
+}
+
+.driver-v17 .camera-corners::before,
+.driver-v17 .camera-corners::after {
+  border-color: rgba(242, 140, 0, 0.98);
+}
+
+.driver-v17 .photo-action-dock {
+  grid-template-columns: 0.78fr 1.62fr 0.92fr 0.92fr;
+  gap: 8px;
+  padding-top: 10px;
+}
+
+.driver-v17 .photo-action-dock button {
+  min-height: 52px;
+  border-radius: 8px;
+}
+
+.driver-v17 .photo-main-action {
+  background: linear-gradient(135deg, #f28c00, #ffb020);
+  color: #111827;
+  font-weight: 950;
+  box-shadow: 0 12px 28px rgba(242, 140, 0, 0.26);
+}
+
+.driver-v17 .photo-small-action {
+  border-color: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.driver-v17 .photo-control-panel {
+  top: 160px;
+  gap: 9px;
+}
+
+.driver-v17 .photo-panel-card {
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.driver-v17 .photo-status-card {
+  border-left-color: var(--driver-warning);
+  background: linear-gradient(90deg, #fff8ed, #fff);
+}
+
+.driver-v17 .photo-quality-card {
+  border-left-color: #1849a9;
+  background: linear-gradient(90deg, #f4f7ff, #fff);
+}
+
+.driver-v17 .photo-sync-card {
+  border-left-color: var(--driver-success);
+  background: linear-gradient(90deg, #ecfdf3, #fff);
+}
+
+.driver-v17 .photo-step-list {
+  max-height: 330px;
+}
+
+.driver-v17 .photo-step-list .progress-item {
+  border-radius: 8px;
+  background: #f8fbfe;
+}
+
+.driver-v17 .photo-step-list .progress-item.active {
+  border-color: var(--driver-primary-2);
+  background: #eef4ff;
+}
+
+.driver-v17 .photo-step-list .progress-item.done {
+  border-color: #9fd7c8;
+  background: #ecfdf3;
+}
+
+.driver-v17 .photo-notes-card textarea {
+  min-height: 92px;
+}
+
+.driver-v17 .save-toast {
+  border-radius: 8px;
+}
+
+@media (max-width: 860px) {
+  .driver-v17 .driver-main {
+    padding: 14px 10px 64px;
+  }
+
+  .driver-v17 .driver-hero-card,
+  .driver-v17 .driver-entry-grid,
+  .driver-v17 .driver-form-fields,
+  .driver-v17 .photo-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .driver-v17 .driver-start-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .driver-v17 .driver-start-metrics article {
+    grid-template-columns: 1fr;
+    min-height: 82px;
+  }
+
+  .driver-v17 .driver-start-metrics strong {
+    min-height: 34px;
+  }
+
+  .driver-v17 .photo-command-bar {
+    top: 76px;
+    align-items: stretch;
+  }
+
+  .driver-v17 .photo-control-panel {
+    position: static;
+  }
+
+  .driver-v17 .photo-action-dock {
+    position: sticky;
+    bottom: max(8px, env(safe-area-inset-bottom));
+    z-index: 18;
+    border-radius: 8px;
+    background: rgba(6, 17, 31, 0.88);
+    padding: 8px;
+    backdrop-filter: blur(12px);
+  }
+
+  .driver-v17 .photo-action-dock {
+    grid-template-columns: 0.7fr 1.5fr 0.8fr 0.8fr;
+  }
+
+  .driver-v17 .photo-camera-frame {
+    min-height: 54vh;
+  }
+}
+
+@media (max-width: 520px) {
+  .driver-v17 .driver-app-header {
+    padding: 9px 10px;
+  }
+
+  .driver-v17 .company-logo {
+    width: 116px;
+  }
+
+  .driver-v17 .app-header h1 {
+    font-size: 18px;
+  }
+
+  .driver-v17 .header-actions {
+    justify-content: space-between;
+  }
+
+  .driver-v17 .driver-hero-copy {
+    min-height: 0;
+    padding: 18px;
+  }
+
+  .driver-v17 .driver-hero-copy h2 {
+    font-size: 28px;
+  }
+
+  .driver-v17 .driver-login-card {
+    padding: 16px;
+  }
+
+  .driver-v17 .photo-command-bar {
+    flex-direction: column;
+    top: 0;
+  }
+
+  .driver-v17 .photo-action-dock {
+    grid-template-columns: 1fr 1.4fr;
+  }
+
+  .driver-v17 .photo-action-dock button {
+    min-height: 48px;
+    font-size: 13px;
+  }
+}
+
 @media (max-width: 720px) {
   .app-header {
     align-items: flex-start;
