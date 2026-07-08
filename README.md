@@ -18,6 +18,7 @@ Esta version esta preparada para empezar en Render Free + Supabase Free usando W
 - Datos de inspecciones en Supabase Database.
 - Dashboard administrador separado en `/admin`.
 - IA con OpenAI opcional para comparar danos nuevos con inspecciones anteriores.
+- Guardado rapido: primero se guardan fotos y reporte; despues la IA analiza en segundo plano.
 
 ## Variables en Render
 
@@ -40,8 +41,15 @@ Como funciona la IA:
 
 - La primera inspeccion de una matricula se guarda como referencia.
 - Desde la segunda inspeccion, la IA compara la foto anterior y la foto actual de la misma vista.
+- La app no espera a la IA para guardar: el conductor termina antes y el analisis aparece despues en admin.
 - Marca solo danos nuevos visibles y los guarda en el reporte PDF y en el dashboard admin.
 - Si no hay `OPENAI_API_KEY`, la app guarda inspecciones sin deteccion automatica.
+
+Compresion de fotos:
+
+- Las fotos se reducen antes de subir para ahorrar datos moviles y evitar fallos con muchos conductores.
+- La IA sigue pudiendo detectar danos visibles como golpes, abolladuras, roturas y rayones claros.
+- Los aranazos muy pequenos pueden verse peor si la foto esta lejos, borrosa o con poca luz.
 
 ## Coste
 

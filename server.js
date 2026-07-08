@@ -109,7 +109,14 @@ app.post("/api/inspections", async (request, response) => {
     startedAt: payload.startedAt || new Date().toISOString(),
     finishedAt: payload.finishedAt || new Date().toISOString(),
     notes: payload.notes || "",
-    ai: payload.ai || { label: "Pending", summary: "Pending review." },
+    ai: {
+      status: "queued",
+      label: "Analisis IA en cola",
+      severity: "unknown",
+      newDamageDetected: false,
+      summary: "La inspeccion ya esta guardada. La comparacion de danos se ejecuta en segundo plano.",
+      queuedAt: new Date().toISOString(),
+    },
     photos: Array.isArray(payload.photos) ? payload.photos : [],
     drive: null,
   };
@@ -117,11 +124,6 @@ app.post("/api/inspections", async (request, response) => {
   if (!item.driverName || !item.plate || item.photos.length === 0) {
     return response.status(400).json({ ok: false, error: "Missing details or photos." });
   }
-
-  let previousInspection = supabaseEnabled
-    ? await findPreviousSupabaseInspection(item.plate, item.id).catch(() => null)
-    : await findPreviousInspection(item.plate, item.id);
-  item.ai = await analyzeInspection(item, previousInspection);
 
   if (supabaseEnabled) {
     try {
@@ -132,8 +134,46 @@ app.post("/api/inspections", async (request, response) => {
   }
 
   await fs.writeFile(path.join(inspectionsDir, `${id}.json`), JSON.stringify(item, null, 2));
+  queueAiAnalysis(item);
   response.json({ ok: true, item });
 });
+
+function queueAiAnalysis(item) {
+  setTimeout(() => {
+    runAiAnalysis(item).catch((error) => {
+      console.error(`AI background analysis failed for ${item.id}:`, error);
+    });
+  }, 0);
+}
+
+async function runAiAnalysis(item) {
+  const current = supabaseEnabled ? await readSupabaseInspection(item.id) : await readInspection(item.id);
+  if (!current) return;
+
+  const previousInspection = supabaseEnabled
+    ? await findPreviousSupabaseInspection(current.plate, current.id).catch(() => null)
+    : await findPreviousInspection(current.plate, current.id);
+
+  current.ai = {
+    ...(await analyzeInspection(current, previousInspection)),
+    status: "completed",
+  };
+
+  await persistInspectionRecord(current);
+}
+
+async function persistInspectionRecord(item) {
+  if (supabaseEnabled) {
+    const { error } = await supabase
+      .from(SUPABASE_TABLE)
+      .upsert(item, { onConflict: "id" });
+
+    if (error) throw new Error(`Supabase Database: ${error.message}`);
+    return;
+  }
+
+  await fs.writeFile(path.join(inspectionsDir, `${safeName(item.id)}.json`), JSON.stringify(item, null, 2));
+}
 
 async function saveToSupabase(item, dateKey) {
   if (!supabase) throw new Error("Supabase is not configured.");

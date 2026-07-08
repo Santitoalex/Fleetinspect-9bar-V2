@@ -79,3 +79,5 @@ En el panel admin, Estado del sistema debe mostrar:
 - Configuracion Supabase: Configurado.
 - Almacenamiento cloud: Sincronizado cuando ya exista al menos una inspeccion guardada.
 - Servicio IA: Configurado si pusiste `OPENAI_API_KEY`.
+- La inspeccion se guarda primero en Supabase y la IA se ejecuta despues en segundo plano.
+- Mientras analiza, el panel puede mostrar `Analisis IA en cola`; refresca unos segundos despues para ver el resultado.
