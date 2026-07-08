@@ -178,6 +178,10 @@ window.FI18N = (() => {
       ,inspectionsToday: "Inspections today"
       ,totalByDriver: "Total by driver"
       ,cameraZoom: "Zoom"
+      ,cameraLens: "Camera"
+      ,wideCamera: "Wide camera"
+      ,rearCamera: "Rear camera"
+      ,frontCamera: "Front camera"
     },
     es: {
       dailyInspection: "Inspección diaria del vehículo",
@@ -357,6 +361,10 @@ window.FI18N = (() => {
       ,inspectionsToday: "Inspecciones de hoy"
       ,totalByDriver: "Total por conductor"
       ,cameraZoom: "Zoom"
+      ,cameraLens: "Cámara"
+      ,wideCamera: "Gran angular"
+      ,rearCamera: "Cámara trasera"
+      ,frontCamera: "Cámara frontal"
     },
     de: {
       dailyInspection: "Tägliche Fahrzeuginspektion",

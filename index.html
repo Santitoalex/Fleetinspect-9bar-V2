@@ -104,6 +104,10 @@
 
           <div class="photo-workspace">
             <section class="photo-stage">
+              <div id="cameraPickerControl" class="camera-picker-control hidden">
+                <span data-i18n="cameraLens">Camera</span>
+                <select id="cameraPicker" aria-label="Camera lens"></select>
+              </div>
               <div class="camera-frame photo-camera-frame">
                 <video id="cameraVideo" playsinline autoplay muted></video>
                 <img id="capturedPreview" alt="Captured photo" data-i18n-aria="capturedPhoto" />
@@ -175,6 +179,6 @@
 
     <script src="/i18n.js?v=8"></script>
     <script src="/vehicles.js?v=1"></script>
-    <script src="/app.js?v=19"></script>
+    <script src="/app.js?v=20"></script>
   </body>
 </html>

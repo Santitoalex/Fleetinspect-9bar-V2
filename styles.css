@@ -2178,6 +2178,34 @@ body.modal-open {
   padding: 10px;
 }
 
+.camera-picker-control {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 9px 10px;
+}
+
+.camera-picker-control span {
+  color: #fff;
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.camera-picker-control select {
+  min-height: 38px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.94);
+  color: #0c1828;
+  padding: 0 10px;
+  font-size: 14px;
+  font-weight: 900;
+}
+
 .driver-v17 .photo-camera-frame {
   min-height: min(65vh, 680px);
   border-radius: 8px;

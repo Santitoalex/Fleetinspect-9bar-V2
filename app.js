@@ -14,6 +14,7 @@ let session = null;
 let stepIndex = 0;
 let stream = null;
 let cameraTrack = null;
+let selectedCameraId = localStorage.getItem("fleetinspect_camera_id") || "";
 
 const nodes = {
   startScreen: document.querySelector("#startScreen"),
@@ -27,6 +28,8 @@ const nodes = {
   capturedPreview: document.querySelector("#capturedPreview"),
   cameraEmpty: document.querySelector("#cameraEmpty"),
   cameraFrame: document.querySelector(".camera-frame"),
+  cameraPickerControl: document.querySelector("#cameraPickerControl"),
+  cameraPicker: document.querySelector("#cameraPicker"),
   cameraZoomControl: document.querySelector("#cameraZoomControl"),
   cameraZoom: document.querySelector("#cameraZoom"),
   cameraZoomValue: document.querySelector("#cameraZoomValue"),
@@ -88,6 +91,7 @@ function bindEvents() {
   });
   nodes.progressList.addEventListener("click", handleProgressClick);
   nodes.retryPending.addEventListener("click", processPendingInspections);
+  nodes.cameraPicker.addEventListener("change", changeCamera);
   nodes.cameraZoom.addEventListener("input", applyCameraZoom);
   nodes.resetSession.addEventListener("click", resetSession);
 }
@@ -127,12 +131,20 @@ async function openCamera() {
   }
 
   try {
+    const video = selectedCameraId
+      ? {
+          deviceId: { exact: selectedCameraId },
+          width: { ideal: 1600 },
+          height: { ideal: 1200 },
+        }
+      : {
+          facingMode: { ideal: "environment" },
+          width: { ideal: 1600 },
+          height: { ideal: 1200 },
+        };
+
     stream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: { ideal: "environment" },
-        width: { ideal: 1600 },
-        height: { ideal: 1200 },
-      },
+      video,
       audio: false,
     });
 
@@ -142,10 +154,57 @@ async function openCamera() {
     await nodes.cameraVideo.play();
     nodes.cameraFrame.classList.add("is-live");
     nodes.cameraEmpty.classList.add("hidden");
+    await loadCameraDevices();
     setupCameraZoom();
   } catch {
+    if (selectedCameraId) {
+      selectedCameraId = "";
+      localStorage.removeItem("fleetinspect_camera_id");
+      await openCamera();
+      return;
+    }
     showCameraMessage(t("cameraNoAccess"));
   }
+}
+
+async function loadCameraDevices() {
+  if (!navigator.mediaDevices?.enumerateDevices) return;
+
+  const devices = await navigator.mediaDevices.enumerateDevices().catch(() => []);
+  const cameras = devices.filter((device) => device.kind === "videoinput");
+  if (cameras.length <= 1) {
+    nodes.cameraPickerControl?.classList.add("hidden");
+    return;
+  }
+
+  const activeId = cameraTrack?.getSettings?.().deviceId || selectedCameraId;
+  nodes.cameraPicker.innerHTML = cameras.map((camera, index) => {
+    const label = camera.label || `${t("cameraLens")} ${index + 1}`;
+    const friendly = getFriendlyCameraLabel(label, index);
+    return `<option value="${escapeHtml(camera.deviceId)}">${escapeHtml(friendly)}</option>`;
+  }).join("");
+  nodes.cameraPicker.value = activeId;
+  nodes.cameraPickerControl.classList.remove("hidden");
+}
+
+async function changeCamera() {
+  selectedCameraId = nodes.cameraPicker.value;
+  localStorage.setItem("fleetinspect_camera_id", selectedCameraId);
+  await openCamera();
+}
+
+function getFriendlyCameraLabel(label, index) {
+  const lower = label.toLowerCase();
+  if (lower.includes("ultra") || lower.includes("wide") || lower.includes("0.5")) {
+    return `${t("wideCamera")} (${label})`;
+  }
+  if (lower.includes("back") || lower.includes("rear") || lower.includes("environment")) {
+    return `${t("rearCamera")} (${label})`;
+  }
+  if (lower.includes("front") || lower.includes("user")) {
+    return `${t("frontCamera")} (${label})`;
+  }
+  return `${t("cameraLens")} ${index + 1}`;
 }
 
 function setupCameraZoom() {
