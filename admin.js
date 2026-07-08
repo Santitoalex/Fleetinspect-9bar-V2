@@ -26,6 +26,7 @@ const nodes = {
   aiPill: document.querySelector("#aiPill"),
   vehicleControlDate: document.querySelector("#vehicleControlDate"),
   vehicleControlSearch: document.querySelector("#vehicleControlSearch"),
+  vehicleControlView: document.querySelector("#vehicleControlView"),
   vehicleControlList: document.querySelector("#vehicleControlList"),
   controlTotalVehicles: document.querySelector("#controlTotalVehicles"),
   controlInspectedVehicles: document.querySelector("#controlInspectedVehicles"),
@@ -52,6 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
   nodes.vehicleControlDate.value = localDateKey(new Date());
   nodes.vehicleControlDate.addEventListener("change", renderDashboard);
   nodes.vehicleControlSearch.addEventListener("input", renderDailyVehicleControl);
+  nodes.vehicleControlView.addEventListener("change", renderDailyVehicleControl);
   nodes.exportCsv.addEventListener("click", exportCurrentCsv);
   nodes.printDashboard.addEventListener("click", () => window.print());
   window.addEventListener("fleetinspect:language", renderDashboard);
@@ -260,8 +262,12 @@ function renderDailyVehicleControl() {
       };
     })
     .filter((vehicle) => vehicle.normalized.toLowerCase().includes(search));
+  const viewMode = nodes.vehicleControlView.value;
+  const missingVehicles = vehicles.filter((vehicle) => !vehicle.inspected);
+  const doneVehicles = vehicles.filter((vehicle) => vehicle.inspected);
+  const allVehicles = [...missingVehicles, ...doneVehicles];
 
-  const inspectedCount = vehicles.filter((vehicle) => vehicle.inspected).length;
+  const inspectedCount = doneVehicles.length;
   const alertCount = vehicles.filter((vehicle) => vehicle.hasAlert).length;
   nodes.controlTotalVehicles.textContent = String(vehicles.length);
   nodes.controlInspectedVehicles.textContent = String(inspectedCount);
@@ -273,7 +279,44 @@ function renderDailyVehicleControl() {
     return;
   }
 
-  nodes.vehicleControlList.innerHTML = vehicles.map((vehicle) => {
+  if (viewMode === "missing") {
+    nodes.vehicleControlList.innerHTML = renderVehicleControlSection(t("missingVehicles"), missingVehicles, selectedDate);
+    return;
+  }
+
+  if (viewMode === "done") {
+    nodes.vehicleControlList.innerHTML = renderVehicleControlSection(t("inspectedVehicles"), doneVehicles, selectedDate);
+    return;
+  }
+
+  if (viewMode === "all") {
+    nodes.vehicleControlList.innerHTML = renderVehicleControlSection(t("allVehicles"), allVehicles, selectedDate);
+    return;
+  }
+
+  nodes.vehicleControlList.innerHTML = [
+    renderVehicleControlSection(t("missingVehicles"), missingVehicles, selectedDate, "priority"),
+    renderVehicleControlSection(t("inspectedVehicles"), doneVehicles, selectedDate),
+  ].join("");
+}
+
+function renderVehicleControlSection(title, vehicles, selectedDate, variant = "") {
+  return `
+    <section class="vehicle-control-section ${variant}">
+      <header>
+        <div>
+          <strong>${escapeHtml(title)}</strong>
+          <span>${vehicles.length} ${escapeHtml(t("vehicles").toLowerCase())}</span>
+        </div>
+      </header>
+      <div class="vehicle-control-table">
+        ${vehicles.length ? vehicles.map((vehicle) => renderVehicleControlRow(vehicle, selectedDate)).join("") : `<article class="empty-state">${escapeHtml(t("noVehiclesFound"))}</article>`}
+      </div>
+    </section>
+  `;
+}
+
+function renderVehicleControlRow(vehicle, selectedDate) {
     const statusClass = vehicle.hasAlert ? "alert" : vehicle.inspected ? "ok" : "missing";
     const statusLabel = vehicle.hasAlert ? t("alert") : vehicle.inspected ? t("inspected") : t("missing");
     const driver = vehicle.latest?.driverName || "-";
@@ -306,7 +349,6 @@ function renderDailyVehicleControl() {
         </div>
       </article>
     `;
-  }).join("");
 }
 
 function renderSystemStatus(items) {

@@ -1271,9 +1271,9 @@ body.modal-open {
 
 .vehicle-control-tools {
   display: grid;
-  grid-template-columns: 170px 220px;
+  grid-template-columns: 170px 220px 180px;
   gap: 10px;
-  min-width: 400px;
+  min-width: 590px;
 }
 
 .vehicle-control-tools label {
@@ -1292,7 +1292,8 @@ body.modal-open {
   text-transform: uppercase;
 }
 
-.vehicle-control-tools input {
+.vehicle-control-tools input,
+.vehicle-control-tools select {
   border: 0;
   background: transparent;
   padding: 0;
@@ -1300,7 +1301,8 @@ body.modal-open {
   font-weight: 900;
 }
 
-.vehicle-control-tools input:focus {
+.vehicle-control-tools input:focus,
+.vehicle-control-tools select:focus {
   outline: 0;
 }
 
@@ -1337,10 +1339,49 @@ body.modal-open {
 
 .vehicle-control-list {
   display: grid;
-  gap: 8px;
+  gap: 16px;
   max-height: 620px;
   overflow: auto;
   padding-right: 4px;
+}
+
+.vehicle-control-section {
+  display: grid;
+  gap: 8px;
+}
+
+.vehicle-control-section > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid #d4e0eb;
+  border-radius: 8px;
+  background: #f8fbfe;
+  padding: 11px 12px;
+}
+
+.vehicle-control-section.priority > header {
+  border-left: 5px solid #d97706;
+}
+
+.vehicle-control-section > header strong {
+  display: block;
+  color: var(--ink);
+  font-size: 17px;
+}
+
+.vehicle-control-section > header span {
+  display: block;
+  margin-top: 3px;
+  color: #667085;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.vehicle-control-table {
+  display: grid;
+  gap: 8px;
 }
 
 .vehicle-control-row {

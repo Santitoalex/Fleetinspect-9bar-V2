@@ -142,6 +142,13 @@ window.FI18N = (() => {
       ,missing: "Missing"
       ,status: "Status"
       ,noVehiclesFound: "No vehicles found."
+      ,viewMode: "View"
+      ,splitDoneMissing: "Done / missing"
+      ,onlyMissing: "Only missing"
+      ,onlyDone: "Only done"
+      ,allVehicles: "All vehicles"
+      ,missingVehicles: "Vehicles without inspection"
+      ,inspectedVehicles: "Inspected vehicles"
     },
     es: {
       dailyInspection: "Inspección diaria del vehículo",
@@ -285,6 +292,13 @@ window.FI18N = (() => {
       ,missing: "Faltante"
       ,status: "Estado"
       ,noVehiclesFound: "No se encontraron vehículos."
+      ,viewMode: "Vista"
+      ,splitDoneMissing: "Revisados / faltantes"
+      ,onlyMissing: "Solo faltantes"
+      ,onlyDone: "Solo revisados"
+      ,allVehicles: "Todos los vehículos"
+      ,missingVehicles: "Vehículos sin inspección"
+      ,inspectedVehicles: "Vehículos revisados"
     },
     de: {
       dailyInspection: "Tägliche Fahrzeuginspektion",
@@ -428,6 +442,13 @@ window.FI18N = (() => {
       ,missing: "Fehlt"
       ,status: "Status"
       ,noVehiclesFound: "Keine Fahrzeuge gefunden."
+      ,viewMode: "Ansicht"
+      ,splitDoneMissing: "Geprüft / fehlt"
+      ,onlyMissing: "Nur fehlende"
+      ,onlyDone: "Nur geprüfte"
+      ,allVehicles: "Alle Fahrzeuge"
+      ,missingVehicles: "Fahrzeuge ohne Inspektion"
+      ,inspectedVehicles: "Geprüfte Fahrzeuge"
     },
     ro: {
       dailyInspection: "Inspecție zilnică vehicul",
@@ -571,6 +592,13 @@ window.FI18N = (() => {
       ,missing: "Lipsește"
       ,status: "Stare"
       ,noVehiclesFound: "Nu s-au găsit vehicule."
+      ,viewMode: "Vizualizare"
+      ,splitDoneMissing: "Verificate / lipsă"
+      ,onlyMissing: "Doar lipsă"
+      ,onlyDone: "Doar verificate"
+      ,allVehicles: "Toate vehiculele"
+      ,missingVehicles: "Vehicule fără inspecție"
+      ,inspectedVehicles: "Vehicule verificate"
     }
   };
 

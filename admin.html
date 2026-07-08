@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>9Bar Fleet Dashboard</title>
-    <link rel="stylesheet" href="/styles.css?v=13" />
+    <link rel="stylesheet" href="/styles.css?v=14" />
   </head>
   <body class="admin-body">
     <div class="admin-shell">
@@ -155,6 +155,15 @@
                         <span data-i18n="registrationNumber">Registration number</span>
                         <input id="vehicleControlSearch" type="search" placeholder="M AZ 1003" />
                       </label>
+                      <label>
+                        <span data-i18n="viewMode">View</span>
+                        <select id="vehicleControlView">
+                          <option value="split" data-i18n="splitDoneMissing">Done / missing</option>
+                          <option value="missing" data-i18n="onlyMissing">Only missing</option>
+                          <option value="done" data-i18n="onlyDone">Only done</option>
+                          <option value="all" data-i18n="allVehicles">All vehicles</option>
+                        </select>
+                      </label>
                     </div>
                   </header>
                   <div class="vehicle-control-summary">
@@ -203,7 +212,7 @@
     </div>
 
     <script src="/vehicles.js?v=2"></script>
-    <script src="/i18n.js?v=6"></script>
-    <script src="/admin.js?v=14"></script>
+    <script src="/i18n.js?v=7"></script>
+    <script src="/admin.js?v=15"></script>
   </body>
 </html>
