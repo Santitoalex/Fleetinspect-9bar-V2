@@ -2,6 +2,7 @@ import express from "express";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { createClient } from "@supabase/supabase-js";
+import WebSocket from "ws";
 
 const app = express();
 const PORT = Number(process.env.PORT || 5173);
@@ -21,6 +22,7 @@ const supabaseEnabled = Boolean(SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY && SUP
 const supabase = supabaseEnabled
   ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
       auth: { persistSession: false, autoRefreshToken: false },
+      realtime: { transport: WebSocket },
     })
   : null;
 
