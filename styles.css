@@ -21,6 +21,11 @@ body {
   color: var(--ink);
 }
 
+.driver-body {
+  background:
+    linear-gradient(180deg, #eaf1f7 0, #f6f9fc 340px, #eef4f8 100%);
+}
+
 .hidden {
   display: none !important;
 }
@@ -31,30 +36,44 @@ body {
   z-index: 10;
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 18px 22px;
+  gap: 10px;
+  padding: 10px 16px;
   background: linear-gradient(90deg, #0b2239, #123c69);
   color: #fff;
+  box-shadow: 0 12px 30px rgba(11, 34, 57, 0.14);
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
 }
 
 .admin-link {
-  margin-left: auto;
   border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 8px;
   color: #fff;
-  padding: 10px 12px;
+  padding: 8px 11px;
   text-decoration: none;
   font-weight: 800;
 }
 
 .language-select {
   width: auto;
-  min-width: 78px;
+  min-width: 70px;
   border: 1px solid rgba(255, 255, 255, 0.24);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.08);
   color: #fff;
-  padding: 10px 12px;
+  padding: 8px 10px;
   font-weight: 900;
 }
 
@@ -63,7 +82,7 @@ body {
 }
 
 .app-header .language-select {
-  margin-left: auto;
+  margin-left: 0;
 }
 
 .app-header .language-select + .admin-link {
@@ -71,12 +90,12 @@ body {
 }
 
 .company-logo {
-  width: 230px;
+  width: 154px;
   max-width: 34vw;
-  height: 56px;
+  height: 42px;
   border-radius: 8px;
   background: #fff;
-  padding: 5px 12px;
+  padding: 5px 10px;
 }
 
 .brand-logo {
@@ -89,7 +108,7 @@ body {
 
 .brand-logo strong {
   display: block;
-  font-size: 25px;
+  font-size: 19px;
   font-weight: 950;
   letter-spacing: 0;
 }
@@ -103,7 +122,7 @@ body {
   display: block;
   margin-top: 3px;
   color: #f28c00;
-  font-size: 10px;
+  font-size: 7px;
   font-weight: 800;
   letter-spacing: 0;
 }
@@ -121,22 +140,30 @@ body {
 
 .app-header h1 {
   margin: 0;
-  font-size: 26px;
+  font-size: 19px;
 }
 
 .app-header p {
-  margin: 4px 0 0;
+  margin: 2px 0 0;
   color: #cbd5e1;
+  font-size: 13px;
 }
 
 main {
   max-width: 980px;
   margin: 0 auto;
-  padding: 28px 16px 70px;
+  padding: 18px 16px 48px;
+}
+
+.driver-start-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(310px, 390px);
+  gap: 18px;
+  align-items: stretch;
 }
 
 .intro {
-  padding: 28px 0 80px;
+  padding: 18px 0;
 }
 
 .intro span {
@@ -148,17 +175,56 @@ main {
 
 .intro h2 {
   max-width: 760px;
-  margin: 8px 0 18px;
-  font-size: clamp(32px, 5vw, 48px);
-  line-height: 1.04;
+  margin: 8px 0 12px;
+  font-size: clamp(26px, 3.4vw, 38px);
+  line-height: 1.08;
 }
 
 .intro p {
   max-width: 780px;
   margin: 0;
   color: var(--muted);
-  font-size: 21px;
+  font-size: 16px;
   line-height: 1.35;
+}
+
+.driver-intro {
+  min-height: 310px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.driver-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  max-width: 650px;
+  margin-top: 16px;
+}
+
+.driver-summary article {
+  border: 1px solid #d4e0eb;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.72);
+  padding: 10px;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
+}
+
+.driver-summary strong {
+  display: block;
+  color: var(--brand);
+  font-size: 17px;
+  line-height: 1;
+}
+
+.driver-summary span {
+  display: block;
+  margin-top: 6px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: none;
 }
 
 .start-card,
@@ -174,17 +240,41 @@ main {
 
 .start-card {
   display: grid;
-  gap: 20px;
-  padding: 28px;
-  max-width: 680px;
-  margin: 0 auto;
+  gap: 13px;
+  padding: 18px;
+  margin: 0;
+}
+
+.driver-card {
+  align-self: center;
+  border: 1px solid #cfdae6;
+  box-shadow: 0 22px 55px rgba(15, 23, 42, 0.11);
+}
+
+.form-heading {
+  display: grid;
+  gap: 5px;
+  padding-bottom: 4px;
+}
+
+.form-heading span {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.form-heading strong {
+  color: var(--ink);
+  font-size: 18px;
+  line-height: 1.1;
 }
 
 label {
   display: grid;
-  gap: 10px;
+  gap: 7px;
   color: #64748b;
-  font-size: 17px;
+  font-size: 13px;
   font-weight: 800;
 }
 
@@ -202,14 +292,21 @@ textarea {
   width: 100%;
   border: 1px solid #cfd8e3;
   border-radius: 8px;
-  padding: 17px 18px;
+  padding: 11px 12px;
   color: var(--ink);
-  font-size: 18px;
+  font-size: 15px;
   background: #fff;
 }
 
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 3px solid rgba(0, 166, 166, 0.18);
+  border-color: var(--accent);
+}
+
 textarea {
-  min-height: 120px;
+  min-height: 76px;
   resize: vertical;
 }
 
@@ -219,7 +316,7 @@ button,
   border-radius: 8px;
   background: var(--brand);
   color: #fff;
-  padding: 16px 18px;
+  padding: 11px 13px;
   font-weight: 900;
   cursor: pointer;
   text-align: center;
@@ -250,26 +347,40 @@ button:disabled {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 14px;
+  margin-bottom: 10px;
+}
+
+.capture-shell {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.capture-kicker {
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 950;
+  text-transform: uppercase;
 }
 
 .capture-top p {
-  margin: 0;
+  margin: 3px 0 0;
   color: var(--muted);
   font-weight: 800;
 }
 
 .capture-top h2 {
-  margin: 4px 0 0;
-  font-size: 32px;
+  margin: 2px 0 0;
+  font-size: 23px;
 }
 
 .camera-frame {
   position: relative;
-  min-height: 52vh;
+  min-height: 48vh;
   overflow: hidden;
+  border: 1px solid #cbd8e6;
   border-radius: 8px;
   background: #08111f;
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.16);
 }
 
 .camera-frame video,
@@ -300,11 +411,11 @@ button:disabled {
   gap: 10px;
   color: #fff;
   text-align: center;
-  padding: 24px;
+  padding: 18px;
 }
 
 .camera-empty strong {
-  font-size: 24px;
+  font-size: 18px;
 }
 
 .camera-empty span {
@@ -314,19 +425,20 @@ button:disabled {
 .camera-actions {
   display: grid;
   grid-template-columns: 0.72fr 1.2fr 0.82fr 0.82fr;
-  gap: 12px;
-  padding: 16px 0;
+  gap: 8px;
+  padding: 10px 0 12px;
 }
 
 #capturePhoto {
-  min-height: 62px;
-  font-size: 20px;
+  min-height: 48px;
+  font-size: 16px;
+  background: #0b4a82;
 }
 
 #previousPhoto,
 #retakePhoto,
 #zoomPhoto {
-  min-height: 62px;
+  min-height: 48px;
 }
 
 .photo-modal {
@@ -384,13 +496,14 @@ body.modal-open {
 
 .inspection-panel {
   display: grid;
-  gap: 16px;
-  padding: 18px;
+  gap: 12px;
+  padding: 14px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.07);
 }
 
 .progress-list {
   display: grid;
-  gap: 10px;
+  gap: 7px;
 }
 
 .progress-item {
@@ -402,15 +515,19 @@ body.modal-open {
   background: #fff;
   color: var(--ink);
   text-align: left;
+  padding: 11px 13px;
+  font-size: 15px;
 }
 
 .progress-item.active {
   border-color: var(--accent);
-  background: #ecfeff;
+  background: #effefe;
+  box-shadow: inset 5px 0 0 var(--accent);
 }
 
 .progress-item.done {
   background: #effaf2;
+  border-color: #bfe5ca;
 }
 
 .progress-item span {
@@ -421,11 +538,11 @@ body.modal-open {
   border-left: 5px solid var(--accent);
   border-radius: 8px;
   background: #f8fafc;
-  padding: 16px;
+  padding: 12px;
 }
 
 .ai-box p {
-  margin: 8px 0 0;
+  margin: 5px 0 0;
   color: var(--muted);
 }
 
@@ -1001,82 +1118,198 @@ body.modal-open {
 
 @media (max-width: 720px) {
   .app-header {
-    gap: 10px;
-    padding: 14px 12px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px 10px;
+  }
+
+  .header-brand {
+    flex: 1 1 100%;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: flex-end;
+    gap: 7px;
   }
 
   .company-logo {
-    width: 158px;
+    width: 118px;
     max-width: 36vw;
-    height: 54px;
-    padding: 6px 9px;
+    height: 40px;
+    padding: 5px 8px;
   }
 
   .company-logo strong {
-    font-size: 21px;
+    font-size: 17px;
   }
 
   .company-logo small {
-    font-size: 8px;
+    font-size: 6px;
   }
 
   .app-header h1 {
-    font-size: 22px;
+    font-size: 18px;
+  }
+
+  .app-header p {
+    font-size: 12px;
+  }
+
+  .language-select,
+  .admin-link {
+    min-height: 38px;
+    padding: 8px 10px;
+    font-size: 13px;
   }
 
   main {
-    padding: 0 0 70px;
+    padding: 0 0 54px;
   }
 
   .start-screen,
   .dashboard {
-    padding: 0 18px;
+    padding: 0 14px;
+  }
+
+  .driver-start-layout {
+    display: block;
   }
 
   .intro {
-    padding: 90px 0 170px;
+    padding: 22px 0 12px;
   }
 
   .intro h2 {
-    font-size: 38px;
+    font-size: 28px;
+    margin-bottom: 8px;
   }
 
   .intro p {
-    font-size: 21px;
+    font-size: 15px;
+  }
+
+  .driver-intro {
+    min-height: auto;
+  }
+
+  .driver-summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+    margin-top: 14px;
+  }
+
+  .driver-summary article {
+    padding: 8px;
+  }
+
+  .driver-summary strong {
+    font-size: 15px;
+  }
+
+  .driver-summary span {
+    margin-top: 5px;
+    font-size: 10px;
   }
 
   .start-card {
-    padding: 20px;
+    margin: 12px 0 20px;
+    padding: 16px;
+  }
+
+  .form-heading strong {
+    font-size: 18px;
+  }
+
+  label {
+    gap: 6px;
+    font-size: 13px;
+  }
+
+  input,
+  select,
+  textarea {
+    padding: 11px 12px;
+    font-size: 15px;
+  }
+
+  button,
+  .file-button span {
+    padding: 11px 12px;
+    font-size: 14px;
   }
 
   .capture-top {
-    padding: 16px 18px 0;
+    padding: 12px 14px 0;
+    align-items: flex-start;
+    margin-bottom: 8px;
+  }
+
+  .capture-top h2 {
+    font-size: 21px;
+  }
+
+  .capture-top p {
+    font-size: 13px;
   }
 
   .camera-frame {
     border-radius: 0;
-    min-height: 54vh;
+    min-height: 44vh;
+    border-left: 0;
+    border-right: 0;
   }
 
   .camera-actions {
     grid-template-columns: 1fr 1.3fr;
-    padding: 14px;
+    gap: 8px;
+    padding: 10px 14px;
   }
 
   #retakePhoto,
   #zoomPhoto {
-    min-height: 52px;
+    min-height: 46px;
   }
 
   .file-button span,
   .camera-actions button {
-    min-height: 56px;
+    min-height: 46px;
   }
 
   .inspection-panel {
     border-radius: 0;
     border-left: 0;
     border-right: 0;
+    box-shadow: none;
+    padding: 12px 14px;
+    gap: 10px;
+  }
+
+  .progress-list {
+    gap: 8px;
+  }
+
+  .progress-item {
+    padding: 10px 12px;
+    min-height: 46px;
+    font-size: 14px;
+  }
+
+  .progress-item span {
+    font-size: 12px;
+  }
+
+  .ai-card {
+    padding: 12px;
+  }
+
+  .ai-card h3 {
+    font-size: 15px;
+  }
+
+  .ai-card p {
+    font-size: 13px;
   }
 
   .metrics {

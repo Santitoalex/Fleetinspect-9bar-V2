@@ -5,84 +5,111 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>9Bar FleetInspect</title>
     <link rel="manifest" href="/manifest.webmanifest" />
-    <link rel="stylesheet" href="/styles.css?v=9" />
+    <link rel="stylesheet" href="/styles.css?v=11" />
   </head>
-  <body>
+  <body class="driver-body">
     <header class="app-header">
-      <div class="company-logo brand-logo" aria-label="9Bar Solutions GmbH">
-        <strong><span>9</span>BAR</strong>
-        <small>SOLUTIONS GMBH</small>
+      <div class="header-brand">
+        <div class="company-logo brand-logo" aria-label="9Bar Solutions GmbH">
+          <strong><span>9</span>BAR</strong>
+          <small>SOLUTIONS GMBH</small>
+        </div>
+        <div>
+          <h1>9Bar FleetInspect</h1>
+          <p data-i18n="vehicleInspectionPortal">Vehicle inspection portal</p>
+        </div>
       </div>
-      <div>
-        <h1>9Bar FleetInspect</h1>
-        <p data-i18n="dailyInspection">Daily vehicle inspection</p>
+      <div class="header-actions">
+        <select class="language-select" data-language-select aria-label="Language">
+          <option value="en">EN</option>
+          <option value="es">ES</option>
+          <option value="de">DE</option>
+          <option value="ro">RO</option>
+        </select>
+        <a class="admin-link" href="/admin" target="_blank" rel="noopener" data-i18n="admin">Admin</a>
       </div>
-      <select class="language-select" data-language-select aria-label="Language">
-        <option value="en">EN</option>
-        <option value="es">ES</option>
-        <option value="de">DE</option>
-        <option value="ro">RO</option>
-      </select>
-      <a class="admin-link" href="/admin" target="_blank" rel="noopener" data-i18n="admin">Admin</a>
     </header>
 
     <main>
       <section id="startScreen" class="start-screen">
-        <div class="intro">
-          <span data-i18n="dailyReport">Daily report</span>
-          <h2 data-i18n="driverVehicleId">Driver and vehicle identification</h2>
-          <p data-i18n="enterDetails">Enter the details before opening the camera.</p>
-        </div>
+        <div class="driver-start-layout">
+          <div class="intro driver-intro">
+            <span data-i18n="dailyReport">Daily report</span>
+            <h2 data-i18n="driverVehicleId">Driver and vehicle identification</h2>
+            <p data-i18n="enterDetails">Enter the details before opening the camera.</p>
+            <div class="driver-summary">
+              <article>
+                <strong>9</strong>
+                <span data-i18n="guidedViews">Guided views</span>
+              </article>
+              <article>
+                <strong>PDF</strong>
+                <span data-i18n="reportReady">Report ready</span>
+              </article>
+              <article>
+                <strong>SYNC</strong>
+                <span data-i18n="cloudSync">Cloud sync</span>
+              </article>
+            </div>
+          </div>
 
-        <form id="startForm" class="start-card">
-          <label>
-            <span data-i18n="driverName">Driver name</span>
-            <input id="driverName" name="driverName" autocomplete="name" placeholder="Example: John Smith" data-i18n-placeholder="driverPlaceholder" required />
-          </label>
-          <label>
-            <span data-i18n="registrationNumber">Registration number</span>
-            <select id="vehiclePlate" name="vehiclePlate" required>
-              <option value="" data-i18n="selectRegistration">Select registration</option>
-            </select>
-          </label>
-          <button type="submit" data-i18n="startPhotos">Start photos</button>
-        </form>
+          <form id="startForm" class="start-card driver-card">
+            <div class="form-heading">
+              <span data-i18n="checkIn">Driver check-in</span>
+              <strong data-i18n="dailyInspection">Daily vehicle inspection</strong>
+            </div>
+            <label>
+              <span data-i18n="driverName">Driver name</span>
+              <input id="driverName" name="driverName" autocomplete="name" placeholder="Example: John Smith" data-i18n-placeholder="driverPlaceholder" required />
+            </label>
+            <label>
+              <span data-i18n="registrationNumber">Registration number</span>
+              <select id="vehiclePlate" name="vehiclePlate" required>
+                <option value="" data-i18n="selectRegistration">Select registration</option>
+              </select>
+            </label>
+            <button type="submit" data-i18n="startPhotos">Start photos</button>
+          </form>
+        </div>
       </section>
 
       <section id="captureScreen" class="capture-screen hidden">
-        <div class="capture-top">
-          <div>
+        <div class="capture-shell">
+          <div class="capture-top">
+            <div>
+            <span class="capture-kicker" data-i18n="captureStep">Capture step</span>
             <p id="sessionMeta"></p>
             <h2 id="stepTitle">Front</h2>
+            </div>
+            <button id="resetSession" class="ghost" type="button" data-i18n="newReport">New report</button>
           </div>
-          <button id="resetSession" class="ghost" type="button" data-i18n="newReport">New report</button>
-        </div>
 
-        <div class="camera-frame">
-          <video id="cameraVideo" playsinline autoplay muted></video>
-          <img id="capturedPreview" alt="Captured photo" data-i18n-aria="capturedPhoto" />
-          <div id="cameraEmpty" class="camera-empty">
-            <strong data-i18n="cameraPending">Camera pending</strong>
-            <span data-i18n="allowCamera">Allow camera access to start the inspection.</span>
+          <div class="camera-frame">
+            <video id="cameraVideo" playsinline autoplay muted></video>
+            <img id="capturedPreview" alt="Captured photo" data-i18n-aria="capturedPhoto" />
+            <div id="cameraEmpty" class="camera-empty">
+              <strong data-i18n="cameraPending">Camera pending</strong>
+              <span data-i18n="allowCamera">Allow camera access to start the inspection.</span>
+            </div>
           </div>
-        </div>
 
-        <div class="camera-actions">
-          <button id="previousPhoto" class="secondary" type="button" data-i18n="previousPhoto">Back</button>
-          <button id="capturePhoto" type="button" data-i18n="capture">Capture</button>
-          <button id="retakePhoto" class="secondary hidden" type="button" data-i18n="retakePhoto">Retake</button>
-          <button id="zoomPhoto" class="secondary hidden" type="button" data-i18n="zoomPhoto">Zoom</button>
-        </div>
+          <div class="camera-actions">
+            <button id="previousPhoto" class="secondary" type="button" data-i18n="previousPhoto">Back</button>
+            <button id="capturePhoto" type="button" data-i18n="capture">Capture</button>
+            <button id="retakePhoto" class="secondary hidden" type="button" data-i18n="retakePhoto">Retake</button>
+            <button id="zoomPhoto" class="secondary hidden" type="button" data-i18n="zoomPhoto">Zoom</button>
+          </div>
 
-        <div class="inspection-panel">
-          <div id="progressList" class="progress-list"></div>
-          <label class="notes-field">
-            <span data-i18n="driverNotes">Driver notes</span>
-            <textarea id="driverNotes" placeholder="Visible damage, incidents, mileage..." data-i18n-placeholder="notesPlaceholder"></textarea>
-          </label>
-          <div class="ai-box">
-            <strong data-i18n="aiAnalysis">AI analysis</strong>
-            <p id="aiStatus" data-i18n="aiInitial">Capture all views to save and review the inspection.</p>
+          <div class="inspection-panel">
+            <div id="progressList" class="progress-list"></div>
+            <label class="notes-field">
+              <span data-i18n="driverNotes">Driver notes</span>
+              <textarea id="driverNotes" placeholder="Visible damage, incidents, mileage..." data-i18n-placeholder="notesPlaceholder"></textarea>
+            </label>
+            <div class="ai-box">
+              <strong data-i18n="inspectionStatus">Inspection status</strong>
+              <p id="aiStatus" data-i18n="aiInitial">Capture all views to save and review the inspection.</p>
+            </div>
           </div>
         </div>
       </section>
@@ -97,8 +124,8 @@
       <img id="zoomPreview" alt="Large inspection photo" />
     </div>
 
-    <script src="/i18n.js?v=3"></script>
+    <script src="/i18n.js?v=4"></script>
     <script src="/vehicles.js?v=1"></script>
-    <script src="/app.js?v=13"></script>
+    <script src="/app.js?v=14"></script>
   </body>
 </html>
