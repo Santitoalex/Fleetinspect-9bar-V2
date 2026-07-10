@@ -8,8 +8,16 @@ const nodes = {
   refreshDashboard: document.querySelector("#refreshDashboard"),
   adminLock: document.querySelector("#adminLock"),
   dashboardContent: document.querySelector("#dashboardContent"),
-  adminPin: document.querySelector("#adminPin"),
+  dispatcherEmail: document.querySelector("#dispatcherEmail"),
+  dispatcherPassword: document.querySelector("#dispatcherPassword"),
+  signupName: document.querySelector("#signupName"),
+  signupEmail: document.querySelector("#signupEmail"),
+  signupPassword: document.querySelector("#signupPassword"),
+  signupCode: document.querySelector("#signupCode"),
+  createDispatcherAccount: document.querySelector("#createDispatcherAccount"),
   unlockAdmin: document.querySelector("#unlockAdmin"),
+  logoutAdmin: document.querySelector("#logoutAdmin"),
+  currentUserChip: document.querySelector("#currentUserChip"),
   reportList: document.querySelector("#reportList"),
   alertList: document.querySelector("#alertList"),
   vehicleSummary: document.querySelector("#vehicleSummary"),
@@ -49,8 +57,18 @@ document.addEventListener("DOMContentLoaded", () => {
   window.FI18N.bindLanguageSelectors();
   nodes.refreshDashboard.addEventListener("click", loadDashboard);
   nodes.unlockAdmin.addEventListener("click", unlockAdmin);
-  nodes.adminPin.addEventListener("keydown", (event) => {
+  nodes.createDispatcherAccount.addEventListener("click", createDispatcherAccount);
+  nodes.logoutAdmin.addEventListener("click", logoutAdmin);
+  nodes.dispatcherEmail.addEventListener("keydown", (event) => {
     if (event.key === "Enter") unlockAdmin();
+  });
+  nodes.dispatcherPassword.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") unlockAdmin();
+  });
+  [nodes.signupName, nodes.signupEmail, nodes.signupPassword, nodes.signupCode].forEach((node) => {
+    node.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") createDispatcherAccount();
+    });
   });
   nodes.searchReports.addEventListener("input", renderDashboard);
   nodes.statusFilter.addEventListener("change", renderDashboard);
@@ -64,33 +82,108 @@ document.addEventListener("DOMContentLoaded", () => {
   nodes.vehicleHistoryPlate.addEventListener("change", renderVehicleHistory);
   nodes.printDashboard.addEventListener("click", () => window.print());
   window.addEventListener("fleetinspect:language", renderDashboard);
+  checkAdminSession();
 });
 
 async function unlockAdmin() {
-  const pin = nodes.adminPin.value.trim();
-  if (!pin) {
-    alert(t("adminPin"));
+  const email = nodes.dispatcherEmail.value.trim();
+  const password = nodes.dispatcherPassword.value;
+  if (!email || !password) {
+    alert(t("missingDispatcherLogin"));
     return;
   }
 
   try {
-    const response = await fetch("/api/admin/unlock", {
+    const response = await fetch("/api/admin/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ pin }),
+      body: JSON.stringify({ email, password }),
     });
     const result = await response.json();
 
     if (!response.ok || result.ok === false) {
-      throw new Error(result.error || "Incorrect PIN.");
+      throw new Error(result.error || t("invalidDispatcherLogin"));
     }
 
-    nodes.adminLock.classList.add("hidden");
-    nodes.dashboardContent.classList.remove("hidden");
+    showAdminDashboard(result.user);
     await loadDashboard();
   } catch (error) {
     alert(error.message);
   }
+}
+
+async function createDispatcherAccount() {
+  const name = nodes.signupName.value.trim();
+  const email = nodes.signupEmail.value.trim();
+  const password = nodes.signupPassword.value;
+  const signupCode = nodes.signupCode.value.trim();
+
+  if (!name || !email || !password) {
+    alert(t("missingSignupDetails"));
+    return;
+  }
+
+  if (password.length < 8) {
+    alert(t("signupPasswordTooShort"));
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/admin/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, password, signupCode }),
+    });
+    const result = await response.json();
+
+    if (!response.ok || result.ok === false) {
+      throw new Error(result.error || t("invalidDispatcherLogin"));
+    }
+
+    alert(t("accountCreated"));
+    showAdminDashboard(result.user);
+    await loadDashboard();
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+async function checkAdminSession() {
+  try {
+    const response = await fetch("/api/admin/session");
+    const result = await response.json();
+    if (!response.ok || result.ok === false) return;
+    showAdminDashboard(result.user);
+    await loadDashboard();
+  } catch {
+    // Keep the login form visible.
+  }
+}
+
+function showAdminDashboard(user = {}) {
+  nodes.adminLock.classList.add("hidden");
+  nodes.dashboardContent.classList.remove("hidden");
+  nodes.logoutAdmin.classList.remove("hidden");
+  nodes.currentUserChip.textContent = user.name || user.email || user.username || "Dispatcher";
+  nodes.dispatcherPassword.value = "";
+  nodes.signupPassword.value = "";
+  nodes.signupCode.value = "";
+}
+
+async function logoutAdmin() {
+  await fetch("/api/admin/logout", { method: "POST" }).catch(() => {});
+  showAdminLogin();
+}
+
+function showAdminLogin() {
+  nodes.dashboardContent.classList.add("hidden");
+  nodes.adminLock.classList.remove("hidden");
+  nodes.logoutAdmin.classList.add("hidden");
+  nodes.currentUserChip.textContent = "Admin";
+  nodes.dispatcherPassword.value = "";
+  nodes.signupPassword.value = "";
+  nodes.signupCode.value = "";
+  dashboardItems = [];
 }
 
 async function loadDashboard() {
@@ -101,6 +194,10 @@ async function loadDashboard() {
       fetch("/api/status"),
       fetch("/api/inspections"),
     ]);
+    if (inspectionsResponse.status === 401) {
+      showAdminLogin();
+      return;
+    }
     systemConfig = await statusResponse.json();
     dashboardItems = await inspectionsResponse.json();
     nodes.lastSync.textContent = `${t("lastSync")}: ${formatTime(new Date())}`;

@@ -249,7 +249,6 @@ main {
 .start-card,
 .inspection-panel,
 .dashboard,
-.admin-lock,
 .metrics article,
 .report-card {
   background: var(--panel);
@@ -600,11 +599,39 @@ body.modal-open {
   align-items: center;
 }
 
+.admin-auth {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 14px;
+}
+
+.admin-auth-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  padding: 16px;
+}
+
+.admin-auth-card h3 {
+  margin: 0 0 12px;
+  color: var(--ink);
+  font-size: 21px;
+}
+
 .admin-lock {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: minmax(180px, 1fr) minmax(180px, 1fr) auto;
   gap: 10px;
-  padding: 16px;
+}
+
+.admin-signup {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.admin-signup button {
+  grid-column: 1 / -1;
 }
 
 .metrics {
@@ -1029,11 +1056,12 @@ body.modal-open {
 
 .user-chip {
   display: grid;
-  width: 40px;
+  min-width: 40px;
   height: 40px;
+  padding: 0 12px;
   place-items: center;
   border: 1px solid #c7d6e5;
-  border-radius: 50%;
+  border-radius: 999px;
   background: #fff;
   color: #23415f;
   font-weight: 900;
@@ -2740,6 +2768,9 @@ body.modal-open {
   }
 
   .admin-hero,
+  .admin-auth,
+  .admin-lock,
+  .admin-signup,
   .hero-status-grid,
   .admin-filter-panel,
   .vehicle-control-tools,

@@ -19,6 +19,8 @@ Esta version esta preparada para empezar en Render Free + Supabase Free usando W
 - Fotos separadas por matricula en Supabase Storage.
 - Datos de inspecciones en Supabase Database.
 - Dashboard administrador separado en `/admin`.
+- Acceso admin con email y contrasena.
+- Registro de dispatchers/trabajadores desde `/admin` con codigo interno de empresa.
 - Control diario por fecha con vehiculos revisados y vehiculos pendientes.
 - Historial por matricula, resumen de conductores y estado claro de IA.
 - Exportacion CSV general y reporte diario imprimible en PDF con vehiculos hechos/faltantes.
@@ -29,11 +31,31 @@ Esta version esta preparada para empezar en Render Free + Supabase Free usando W
 
 Obligatorias:
 
-- `ADMIN_PIN`: PIN para entrar al panel admin.
+- `SESSION_SECRET`: palabra secreta larga para proteger las sesiones.
+- `DISPATCHER_SIGNUP_CODE`: codigo interno para que cada dispatcher cree su cuenta.
+- `DISPATCHER_TABLE`: `dispatchers`.
 - `SUPABASE_URL`: URL del proyecto Supabase.
 - `SUPABASE_SERVICE_ROLE_KEY`: clave secreta `service_role` de Supabase.
 - `SUPABASE_BUCKET`: `fleetinspect-photos`.
 - `SUPABASE_TABLE`: `inspections`.
+
+Opcional:
+
+- `DISPATCHER_ACCOUNTS`: cuentas creadas manualmente desde Render.
+
+Ejemplo opcional de `DISPATCHER_ACCOUNTS`:
+
+```text
+alex@empresa.com:ClaveSegura123:Alex:Admin,maria@empresa.com:OtraClave456:Maria:Dispatcher
+```
+
+Formato:
+
+```text
+email:contrasena:nombre:rol
+```
+
+Si no pones `DISPATCHER_ACCOUNTS`, tus dispatchers pueden crear su propia cuenta desde `/admin` usando el `DISPATCHER_SIGNUP_CODE`.
 
 IA:
 

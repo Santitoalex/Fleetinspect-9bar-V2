@@ -9,7 +9,9 @@
    - Build Command: `npm install`.
    - Start Command: `npm start`.
 6. Pon estas variables en Render:
-   - `ADMIN_PIN`
+   - `SESSION_SECRET`
+   - `DISPATCHER_SIGNUP_CODE`
+   - `DISPATCHER_TABLE`
    - `SUPABASE_URL`
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `SUPABASE_BUCKET`
@@ -17,6 +19,9 @@
    - `OPENAI_API_KEY`
    - `OPENAI_MODEL`
 7. Haz Manual Deploy.
+8. Entra a `/admin` y crea la primera cuenta con email, contrasena y el codigo de empresa.
+
+`DISPATCHER_ACCOUNTS` es opcional si quieres crear cuentas manualmente desde Render.
 
 La app para conductores sera:
 

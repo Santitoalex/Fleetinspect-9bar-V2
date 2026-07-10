@@ -44,14 +44,34 @@ create table if not exists public.inspections (
 
 create index if not exists inspections_plate_finished_idx
 on public.inspections (plate, "finishedAt" desc);
+
+alter table public.inspections enable row level security;
 ```
 
-## 4. Variables en Render
+## 4. Crear tabla de dispatchers
+
+Esta tabla guarda las cuentas del panel admin con email y contrasena cifrada:
+
+```sql
+create table if not exists public.dispatchers (
+  email text primary key,
+  name text,
+  role text,
+  password_hash text not null,
+  created_at timestamptz default now()
+);
+
+alter table public.dispatchers enable row level security;
+```
+
+## 5. Variables en Render
 
 En Render > tu servicio > Environment, pon:
 
 ```text
-ADMIN_PIN=tu pin
+SESSION_SECRET=pon-una-frase-larga-y-secreta
+DISPATCHER_SIGNUP_CODE=pon-un-codigo-interno-de-tu-empresa
+DISPATCHER_TABLE=dispatchers
 SUPABASE_URL=tu Project URL
 SUPABASE_SERVICE_ROLE_KEY=tu service_role key
 SUPABASE_BUCKET=fleetinspect-photos
@@ -62,7 +82,15 @@ OPENAI_MAX_PAIRS=9
 OPENAI_TIMEOUT_MS=60000
 ```
 
-## 5. URLs
+`DISPATCHER_SIGNUP_CODE` es el codigo que tendran que poner tus dispatchers/trabajadores para crear su cuenta en `/admin`.
+
+Opcional: si quieres crear cuentas manuales desde Render, tambien puedes usar:
+
+```text
+DISPATCHER_ACCOUNTS=alex@empresa.com:ClaveSegura123:Alex:Admin,maria@empresa.com:OtraClave456:Maria:Dispatcher
+```
+
+## 6. URLs
 
 Cuando Render termine de desplegar:
 
@@ -72,7 +100,7 @@ Panel admin: https://TU-APP.onrender.com/admin
 Estado sistema: https://TU-APP.onrender.com/api/status
 ```
 
-## 6. Que debe salir en el panel
+## 7. Que debe salir en el panel
 
 En el panel admin, Estado del sistema debe mostrar:
 

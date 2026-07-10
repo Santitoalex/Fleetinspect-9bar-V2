@@ -1,4 +1,5 @@
 import express from "express";
+import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { createClient } from "@supabase/supabase-js";
@@ -9,6 +10,10 @@ const PORT = Number(process.env.PORT || 5173);
 const HOST = process.env.HOST || "0.0.0.0";
 const DATA_DIR = process.env.DATA_DIR || "./data";
 const ADMIN_PIN = process.env.ADMIN_PIN || "1234";
+const DISPATCHER_ACCOUNTS = process.env.DISPATCHER_ACCOUNTS || "";
+const DISPATCHER_SIGNUP_CODE = process.env.DISPATCHER_SIGNUP_CODE || "";
+const DISPATCHER_TABLE = process.env.DISPATCHER_TABLE || "dispatchers";
+const SESSION_SECRET = process.env.SESSION_SECRET || process.env.COOKIE_SECRET || ADMIN_PIN || "fleetinspect-session";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4.1-mini";
 const OPENAI_MAX_PAIRS = Number(process.env.OPENAI_MAX_PAIRS || 9);
@@ -20,6 +25,8 @@ const SUPABASE_TABLE = process.env.SUPABASE_TABLE || "inspections";
 const SIGNED_URL_SECONDS = 60 * 60 * 24 * 7;
 
 const inspectionsDir = path.join(DATA_DIR, "inspections");
+const dispatchersDir = path.join(DATA_DIR, "dispatchers");
+const dispatchersFile = path.join(dispatchersDir, "accounts.json");
 const supabaseEnabled = Boolean(SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY && SUPABASE_BUCKET);
 const supabase = supabaseEnabled
   ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
@@ -38,6 +45,239 @@ app.use(express.static(process.cwd(), {
 }));
 
 await fs.mkdir(inspectionsDir, { recursive: true });
+await fs.mkdir(dispatchersDir, { recursive: true });
+
+function parseDispatcherAccounts() {
+  if (!DISPATCHER_ACCOUNTS.trim()) {
+    return [{
+      username: "admin",
+      password: ADMIN_PIN,
+      name: "Admin",
+      role: "Admin",
+    }];
+  }
+
+  try {
+    const parsed = JSON.parse(DISPATCHER_ACCOUNTS);
+    if (Array.isArray(parsed)) {
+      return parsed
+        .map((account) => ({
+          username: String(account.username || account.user || account.email || "").trim(),
+          email: normalizeEmail(account.email || account.username || account.user || ""),
+          password: String(account.password || ""),
+          name: String(account.name || account.username || account.user || account.email || "Dispatcher").trim(),
+          role: String(account.role || "Dispatcher").trim(),
+        }))
+        .filter((account) => account.username && account.password);
+    }
+  } catch {
+    // Fall back to the compact format: user:password:name:role,user2:password2:name2:role2
+  }
+
+  return DISPATCHER_ACCOUNTS
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+    .map((entry) => {
+      const [username, password, name, role] = entry.split(":").map((part) => String(part || "").trim());
+      return {
+        username,
+        password,
+        name: name || username,
+        role: role || "Dispatcher",
+      };
+    })
+    .filter((account) => account.username && account.password);
+}
+
+async function findDispatcherAccount(username) {
+  const normalized = normalizeEmail(username);
+  const configured = parseDispatcherAccounts().find((account) => {
+    return [account.username, account.email].filter(Boolean).some((value) => normalizeEmail(value) === normalized);
+  });
+  if (configured) return configured;
+  return findStoredDispatcher(normalized);
+}
+
+function publicDispatcher(account) {
+  return {
+    username: account.username || account.email,
+    email: account.email || account.username,
+    name: account.name,
+    role: account.role,
+  };
+}
+
+async function findStoredDispatcher(email) {
+  const normalized = normalizeEmail(email);
+  if (!normalized) return null;
+
+  if (supabase) {
+    const { data, error } = await supabase
+      .from(DISPATCHER_TABLE)
+      .select("*")
+      .eq("email", normalized)
+      .maybeSingle();
+
+    if (error) throw new Error(`Dispatcher database: ${error.message}`);
+    return data ? mapStoredDispatcher(data) : null;
+  }
+
+  const accounts = await readLocalDispatchers();
+  return accounts.find((account) => normalizeEmail(account.email) === normalized) || null;
+}
+
+async function saveStoredDispatcher(account) {
+  const stored = {
+    email: normalizeEmail(account.email),
+    name: account.name,
+    role: account.role || "Dispatcher",
+    password_hash: account.passwordHash,
+    created_at: account.createdAt || new Date().toISOString(),
+  };
+
+  if (supabase) {
+    const { error } = await supabase
+      .from(DISPATCHER_TABLE)
+      .insert(stored);
+
+    if (error) throw new Error(`Dispatcher database: ${error.message}`);
+    return;
+  }
+
+  const accounts = await readLocalDispatchers();
+  accounts.push(mapStoredDispatcher(stored));
+  await fs.writeFile(dispatchersFile, JSON.stringify(accounts, null, 2));
+}
+
+async function readLocalDispatchers() {
+  try {
+    const raw = await fs.readFile(dispatchersFile, "utf8");
+    const accounts = JSON.parse(raw);
+    return Array.isArray(accounts) ? accounts : [];
+  } catch {
+    return [];
+  }
+}
+
+function mapStoredDispatcher(row) {
+  return {
+    username: row.email,
+    email: row.email,
+    name: row.name || row.email,
+    role: row.role || "Dispatcher",
+    passwordHash: row.password_hash || row.passwordHash,
+    createdAt: row.created_at || row.createdAt,
+  };
+}
+
+function normalizeEmail(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function isValidEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || ""));
+}
+
+function hashPassword(password) {
+  const salt = crypto.randomBytes(16).toString("base64url");
+  const hash = crypto.scryptSync(String(password), salt, 64).toString("base64url");
+  return `scrypt:${salt}:${hash}`;
+}
+
+function verifyPassword(account, password) {
+  if (account.passwordHash) {
+    const [, salt, expected] = String(account.passwordHash).split(":");
+    if (!salt || !expected) return false;
+    const actual = crypto.scryptSync(String(password), salt, 64).toString("base64url");
+    if (Buffer.byteLength(actual) !== Buffer.byteLength(expected)) return false;
+    return crypto.timingSafeEqual(Buffer.from(actual), Buffer.from(expected));
+  }
+
+  return account.password === password;
+}
+
+function setAdminSessionCookie(request, response, user) {
+  const maxAge = 60 * 60 * 12;
+  const payload = {
+    ...user,
+    exp: Math.floor(Date.now() / 1000) + maxAge,
+  };
+  const token = signSession(payload);
+  response.setHeader("Set-Cookie", adminCookie(token, {
+    maxAge,
+    httpOnly: true,
+    sameSite: "Lax",
+    secure: isSecureRequest(request),
+    path: "/",
+  }));
+}
+
+function getAdminSession(request) {
+  const token = parseCookies(request.headers.cookie || "").fleetinspect_admin;
+  if (!token) return null;
+  const payload = verifySession(token);
+  if (!payload || Number(payload.exp || 0) < Math.floor(Date.now() / 1000)) return null;
+  return {
+    username: String(payload.username || ""),
+    email: String(payload.email || payload.username || ""),
+    name: String(payload.name || payload.username || "Dispatcher"),
+    role: String(payload.role || "Dispatcher"),
+  };
+}
+
+function requireAdmin(request, response, next) {
+  const user = getAdminSession(request);
+  if (!user) return response.status(401).json({ ok: false, error: "Admin login required." });
+  request.adminUser = user;
+  next();
+}
+
+function signSession(payload) {
+  const body = Buffer.from(JSON.stringify(payload)).toString("base64url");
+  const signature = crypto.createHmac("sha256", SESSION_SECRET).update(body).digest("base64url");
+  return `${body}.${signature}`;
+}
+
+function verifySession(token) {
+  const [body, signature] = String(token || "").split(".");
+  if (!body || !signature) return null;
+  const expected = crypto.createHmac("sha256", SESSION_SECRET).update(body).digest("base64url");
+  if (Buffer.byteLength(signature) !== Buffer.byteLength(expected)) return null;
+  if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) return null;
+  try {
+    return JSON.parse(Buffer.from(body, "base64url").toString("utf8"));
+  } catch {
+    return null;
+  }
+}
+
+function parseCookies(header) {
+  return String(header || "")
+    .split(";")
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .reduce((cookies, part) => {
+      const index = part.indexOf("=");
+      if (index === -1) return cookies;
+      cookies[part.slice(0, index)] = decodeURIComponent(part.slice(index + 1));
+      return cookies;
+    }, {});
+}
+
+function adminCookie(value, options = {}) {
+  const parts = [`fleetinspect_admin=${encodeURIComponent(value)}`];
+  if (options.maxAge !== undefined) parts.push(`Max-Age=${options.maxAge}`);
+  if (options.path) parts.push(`Path=${options.path}`);
+  if (options.httpOnly) parts.push("HttpOnly");
+  if (options.sameSite) parts.push(`SameSite=${options.sameSite}`);
+  if (options.secure) parts.push("Secure");
+  return parts.join("; ");
+}
+
+function isSecureRequest(request) {
+  return request.secure || request.headers["x-forwarded-proto"] === "https";
+}
 
 app.get(["/", "/driver", "/driver/"], (_request, response) => {
   response.sendFile(path.join(process.cwd(), "index.html"));
@@ -47,10 +287,90 @@ app.get(["/admin", "/admin/"], (_request, response) => {
   response.sendFile(path.join(process.cwd(), "admin.html"));
 });
 
-app.post("/api/admin/unlock", (request, response) => {
-  if (request.body?.pin !== ADMIN_PIN) {
-    return response.status(401).json({ ok: false, error: "Incorrect PIN" });
+app.post("/api/admin/login", (request, response) => {
+  const email = normalizeEmail(request.body?.email || request.body?.username || "");
+  const password = String(request.body?.password || "");
+
+  findDispatcherAccount(email)
+    .then((account) => {
+      if (!account || !verifyPassword(account, password)) {
+        return response.status(401).json({ ok: false, error: "Email o contrasena incorrectos." });
+      }
+
+      setAdminSessionCookie(request, response, {
+        username: account.username || account.email,
+        email: account.email || account.username,
+        name: account.name,
+        role: account.role,
+      });
+      response.json({ ok: true, user: publicDispatcher(account) });
+    })
+    .catch((error) => {
+      console.error(error);
+      response.status(500).json({ ok: false, error: "No se pudo comprobar la cuenta." });
+    });
+});
+
+app.post("/api/admin/register", async (request, response) => {
+  const email = normalizeEmail(request.body?.email || "");
+  const name = String(request.body?.name || "").trim();
+  const password = String(request.body?.password || "");
+  const signupCode = String(request.body?.signupCode || "").trim();
+
+  if (!isValidEmail(email)) {
+    return response.status(400).json({ ok: false, error: "Email no valido." });
   }
+
+  if (password.length < 8) {
+    return response.status(400).json({ ok: false, error: "La contrasena debe tener minimo 8 caracteres." });
+  }
+
+  if (DISPATCHER_SIGNUP_CODE && signupCode !== DISPATCHER_SIGNUP_CODE) {
+    return response.status(403).json({ ok: false, error: "Codigo de empresa incorrecto." });
+  }
+
+  const existing = await findDispatcherAccount(email).catch((error) => {
+    console.error(error);
+    return null;
+  });
+
+  if (existing) {
+    return response.status(409).json({ ok: false, error: "Ya existe una cuenta con este email." });
+  }
+
+  const account = {
+    email,
+    username: email,
+    name: name || email.split("@")[0],
+    role: "Dispatcher",
+    passwordHash: hashPassword(password),
+    createdAt: new Date().toISOString(),
+  };
+
+  try {
+    await saveStoredDispatcher(account);
+  } catch (error) {
+    console.error(error);
+    return response.status(500).json({ ok: false, error: error.message });
+  }
+
+  setAdminSessionCookie(request, response, account);
+  response.json({ ok: true, user: publicDispatcher(account) });
+});
+
+app.get("/api/admin/session", (request, response) => {
+  const user = getAdminSession(request);
+  if (!user) return response.status(401).json({ ok: false, error: "No session" });
+  response.json({ ok: true, user });
+});
+
+app.post("/api/admin/logout", (_request, response) => {
+  response.setHeader("Set-Cookie", adminCookie("", {
+    maxAge: 0,
+    httpOnly: true,
+    sameSite: "Lax",
+    path: "/",
+  }));
   response.json({ ok: true });
 });
 
@@ -66,7 +386,7 @@ app.get("/api/status", (_request, response) => {
   });
 });
 
-app.get("/api/inspections", async (_request, response) => {
+app.get("/api/inspections", requireAdmin, async (_request, response) => {
   if (supabaseEnabled) {
     const supabaseItems = await listSupabaseInspections().catch(() => null);
     if (supabaseItems) return response.json(supabaseItems);
@@ -89,7 +409,7 @@ app.get("/api/inspections", async (_request, response) => {
   response.json(items);
 });
 
-app.get("/api/inspections/:id", async (request, response) => {
+app.get("/api/inspections/:id", requireAdmin, async (request, response) => {
   const item = supabaseEnabled
     ? await readSupabaseInspection(request.params.id).catch(() => null)
     : await readInspection(request.params.id);

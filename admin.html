@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>9Bar Fleet Dashboard</title>
-    <link rel="stylesheet" href="/styles.css?v=19" />
+  <link rel="stylesheet" href="/styles.css?v=27" />
   </head>
   <body class="admin-body">
     <div class="admin-shell">
@@ -45,7 +45,8 @@
             </select>
             <button id="refreshDashboard" type="button" class="icon-button" aria-label="Refresh" data-i18n-aria="refresh">↻</button>
             <a class="icon-button" href="/driver" aria-label="Capture app" data-i18n-aria="captureApp">＋</a>
-            <span class="user-chip">Admin</span>
+            <span id="currentUserChip" class="user-chip">Admin</span>
+            <button id="logoutAdmin" type="button" class="icon-button hidden" aria-label="Logout" data-i18n-aria="logout">⇥</button>
           </div>
         </header>
 
@@ -81,9 +82,28 @@
               </div>
             </div>
 
-            <div id="adminLock" class="admin-lock">
-              <input id="adminPin" type="password" placeholder="Admin PIN" data-i18n-placeholder="adminPin" />
-              <button id="unlockAdmin" type="button" data-i18n="enter">Enter</button>
+            <div id="adminLock" class="admin-auth">
+              <article class="admin-auth-card">
+                <p class="eyebrow" data-i18n="dispatcherAccess">Dispatcher access</p>
+                <h3 data-i18n="login">Login</h3>
+                <div class="admin-lock">
+                  <input id="dispatcherEmail" type="email" autocomplete="email" placeholder="Email" data-i18n-placeholder="dispatcherEmail" />
+                  <input id="dispatcherPassword" type="password" autocomplete="current-password" placeholder="Password" data-i18n-placeholder="dispatcherPassword" />
+                  <button id="unlockAdmin" type="button" data-i18n="login">Login</button>
+                </div>
+              </article>
+
+              <article class="admin-auth-card">
+                <p class="eyebrow" data-i18n="newDispatcher">New dispatcher</p>
+                <h3 data-i18n="createAccount">Create account</h3>
+                <div class="admin-signup">
+                  <input id="signupName" type="text" autocomplete="name" placeholder="Name" data-i18n-placeholder="dispatcherName" />
+                  <input id="signupEmail" type="email" autocomplete="email" placeholder="Email" data-i18n-placeholder="dispatcherEmail" />
+                  <input id="signupPassword" type="password" autocomplete="new-password" placeholder="Password" data-i18n-placeholder="dispatcherPassword" />
+                  <input id="signupCode" type="password" autocomplete="off" placeholder="Company code" data-i18n-placeholder="signupCode" />
+                  <button id="createDispatcherAccount" type="button" data-i18n="createAccount">Create account</button>
+                </div>
+              </article>
             </div>
 
             <div id="dashboardContent" class="hidden">
