@@ -12,16 +12,13 @@
     <link rel="manifest" href="/admin.webmanifest" />
     <link rel="apple-touch-icon" href="/admin-apple-touch-icon.png" />
     <link rel="icon" href="/admin-icon-192.png" sizes="192x192" />
-    <link rel="stylesheet" href="/styles.css?v=31" />
+    <link rel="stylesheet" href="/styles.css?v=32" />
   </head>
   <body class="admin-body">
     <div class="admin-shell">
       <aside class="fleet-sidebar">
         <div class="fleet-logo">
-          <div class="sidebar-logo brand-logo" aria-label="9Bar Solutions GmbH">
-            <strong><span>9</span>BAR</strong>
-            <small>SOLUTIONS GMBH</small>
-          </div>
+          <img class="admin-product-logo" src="/admin-logo.svg" alt="9Bar FleetControl" />
           <p>FleetInspect Control</p>
         </div>
         <nav class="fleet-nav" aria-label="Admin navigation">
@@ -55,6 +52,7 @@
             <button id="installAdminApp" type="button" class="icon-button install-admin-button hidden" aria-label="Install admin app" data-i18n-aria="installAdminApp">⬇</button>
             <a class="icon-button" href="/driver" aria-label="Capture app" data-i18n-aria="captureApp">＋</a>
             <span id="currentUserChip" class="user-chip">Admin</span>
+            <span id="currentRoleChip" class="role-chip hidden">Dispatcher</span>
             <button id="logoutAdmin" type="button" class="icon-button hidden" aria-label="Logout" data-i18n-aria="logout">⇥</button>
           </div>
         </header>
@@ -87,6 +85,7 @@
               <div class="dashboard-actions">
                 <button id="exportCsv" type="button" class="ghost" data-i18n="exportCsv">Export CSV</button>
                 <button id="exportDay" type="button" class="ghost" data-i18n="exportDay">Export day</button>
+                <button id="closeDay" type="button" class="ghost strong-action" data-i18n="closeDay">Close day</button>
                 <button id="printDashboard" type="button" class="ghost" data-i18n="print">Print</button>
               </div>
             </div>
@@ -139,6 +138,29 @@
                 <article>
                   <span data-i18n="filtered">Filtered</span>
                   <strong id="activeFilterCount">0</strong>
+                </article>
+              </section>
+
+              <section class="control-room-strip" aria-label="Control room">
+                <article>
+                  <span data-i18n="completedToday">Completed today</span>
+                  <strong id="todayCompletion">0 / 0</strong>
+                  <small id="todayCompletionMeta">0%</small>
+                </article>
+                <article>
+                  <span data-i18n="pendingToday">Pending today</span>
+                  <strong id="todayPendingCount">0</strong>
+                  <small data-i18n="dailyVehicleControl">Daily vehicle control</small>
+                </article>
+                <article>
+                  <span data-i18n="latestInspection">Latest inspection</span>
+                  <strong id="latestInspectionTime">--</strong>
+                  <small id="latestInspectionMeta">--</small>
+                </article>
+                <article>
+                  <span data-i18n="liveOperations">Live operations</span>
+                  <strong id="liveAiState">--</strong>
+                  <small><b id="liveDriver">--</b> · <b id="livePlate">--</b></small>
                 </article>
               </section>
 

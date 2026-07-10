@@ -205,6 +205,19 @@ window.FI18N = (() => {
       ,wideCamera: "Wide camera"
       ,rearCamera: "Rear camera"
       ,frontCamera: "Front camera"
+      ,photoSavedNext: "Photo saved. Press Next photo."
+      ,completedToday: "Completed today"
+      ,pendingToday: "Pending today"
+      ,latestInspection: "Latest inspection"
+      ,liveOperations: "Live operations"
+      ,closeDay: "Close day"
+      ,closeDayStarted: "Daily closing report is opening."
+      ,noReportsForDay: "There are no reports for this day."
+      ,reviewed: "Reviewed"
+      ,resolved: "Resolved"
+      ,pendingReview: "Pending review"
+      ,markReviewed: "Mark reviewed"
+      ,markResolved: "Mark resolved"
     },
     es: {
       dailyInspection: "Inspección diaria del vehículo",
@@ -411,6 +424,19 @@ window.FI18N = (() => {
       ,wideCamera: "Gran angular"
       ,rearCamera: "Cámara trasera"
       ,frontCamera: "Cámara frontal"
+      ,photoSavedNext: "Foto guardada. Pulsa Siguiente foto."
+      ,completedToday: "Completados hoy"
+      ,pendingToday: "Pendientes hoy"
+      ,latestInspection: "Última inspección"
+      ,liveOperations: "Operación en vivo"
+      ,closeDay: "Cerrar día"
+      ,closeDayStarted: "Se abrirá el cierre diario para PDF."
+      ,noReportsForDay: "No hay reportes para este día."
+      ,reviewed: "Revisada"
+      ,resolved: "Resuelta"
+      ,pendingReview: "Pendiente de revisar"
+      ,markReviewed: "Marcar revisada"
+      ,markResolved: "Marcar resuelta"
     },
     de: {
       dailyInspection: "Tägliche Fahrzeuginspektion",
@@ -584,6 +610,19 @@ window.FI18N = (() => {
       ,allVehicles: "Alle Fahrzeuge"
       ,missingVehicles: "Fahrzeuge ohne Inspektion"
       ,inspectedVehicles: "Geprüfte Fahrzeuge"
+      ,photoSavedNext: "Foto gespeichert. Nächstes Foto drücken."
+      ,completedToday: "Heute erledigt"
+      ,pendingToday: "Heute offen"
+      ,latestInspection: "Letzte Inspektion"
+      ,liveOperations: "Live-Betrieb"
+      ,closeDay: "Tag abschließen"
+      ,closeDayStarted: "Der Tagesabschluss wird geöffnet."
+      ,noReportsForDay: "Für diesen Tag gibt es keine Berichte."
+      ,reviewed: "Geprüft"
+      ,resolved: "Erledigt"
+      ,pendingReview: "Prüfung offen"
+      ,markReviewed: "Als geprüft markieren"
+      ,markResolved: "Als erledigt markieren"
     },
     ro: {
       dailyInspection: "Inspecție zilnică vehicul",
@@ -757,6 +796,19 @@ window.FI18N = (() => {
       ,allVehicles: "Toate vehiculele"
       ,missingVehicles: "Vehicule fără inspecție"
       ,inspectedVehicles: "Vehicule verificate"
+      ,photoSavedNext: "Fotografie salvată. Apăsați Următoarea foto."
+      ,completedToday: "Finalizate azi"
+      ,pendingToday: "În așteptare azi"
+      ,latestInspection: "Ultima inspecție"
+      ,liveOperations: "Operațiuni live"
+      ,closeDay: "Închide ziua"
+      ,closeDayStarted: "Se deschide raportul de închidere zilnică."
+      ,noReportsForDay: "Nu există rapoarte pentru această zi."
+      ,reviewed: "Verificată"
+      ,resolved: "Rezolvată"
+      ,pendingReview: "În așteptare verificare"
+      ,markReviewed: "Marchează verificată"
+      ,markResolved: "Marchează rezolvată"
     }
   };
 

@@ -12,7 +12,7 @@
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="icon" href="/icon-192.png" sizes="192x192" />
-    <link rel="stylesheet" href="/styles.css?v=31" />
+    <link rel="stylesheet" href="/styles.css?v=32" />
   </head>
   <body class="driver-body driver-pro driver-v17">
     <header class="app-header driver-app-header">
@@ -116,8 +116,12 @@
               <span class="capture-kicker" data-i18n="captureStep">Capture step</span>
               <h2 id="stepTitle">Front</h2>
               <p id="sessionMeta"></p>
+              <small id="stepHelp" class="step-help" data-i18n="placeVehicle">Place the vehicle in frame and press Capture.</small>
             </div>
-            <button id="resetSession" class="ghost" type="button" data-i18n="newReport">New report</button>
+            <div class="photo-command-meta">
+              <span id="photoCounter" class="photo-counter">0 / 9</span>
+              <button id="resetSession" class="ghost" type="button" data-i18n="newReport">New report</button>
+            </div>
           </header>
 
           <div class="photo-workspace">

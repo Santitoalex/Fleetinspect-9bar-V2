@@ -20,6 +20,7 @@ const nodes = {
   unlockAdmin: document.querySelector("#unlockAdmin"),
   logoutAdmin: document.querySelector("#logoutAdmin"),
   currentUserChip: document.querySelector("#currentUserChip"),
+  currentRoleChip: document.querySelector("#currentRoleChip"),
   reportList: document.querySelector("#reportList"),
   alertList: document.querySelector("#alertList"),
   vehicleSummary: document.querySelector("#vehicleSummary"),
@@ -30,6 +31,7 @@ const nodes = {
   dateFilter: document.querySelector("#dateFilter"),
   exportCsv: document.querySelector("#exportCsv"),
   exportDay: document.querySelector("#exportDay"),
+  closeDay: document.querySelector("#closeDay"),
   printDashboard: document.querySelector("#printDashboard"),
   lastSync: document.querySelector("#lastSync"),
   activeFilterCount: document.querySelector("#activeFilterCount"),
@@ -53,6 +55,14 @@ const nodes = {
   metricAlerts: document.querySelector("#metricAlerts"),
   metricToday: document.querySelector("#metricToday"),
   widgetAlertCount: document.querySelector("#widgetAlertCount"),
+  todayCompletion: document.querySelector("#todayCompletion"),
+  todayCompletionMeta: document.querySelector("#todayCompletionMeta"),
+  todayPendingCount: document.querySelector("#todayPendingCount"),
+  latestInspectionTime: document.querySelector("#latestInspectionTime"),
+  latestInspectionMeta: document.querySelector("#latestInspectionMeta"),
+  liveAiState: document.querySelector("#liveAiState"),
+  liveDriver: document.querySelector("#liveDriver"),
+  livePlate: document.querySelector("#livePlate"),
 };
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -83,6 +93,8 @@ document.addEventListener("DOMContentLoaded", () => {
   nodes.vehicleControlView.addEventListener("change", renderDailyVehicleControl);
   nodes.exportCsv.addEventListener("click", exportCurrentCsv);
   nodes.exportDay.addEventListener("click", openSelectedDayReport);
+  nodes.closeDay.addEventListener("click", closeSelectedDay);
+  nodes.alertList.addEventListener("click", handleAlertAction);
   nodes.vehicleHistoryPlate.addEventListener("change", renderVehicleHistory);
   nodes.printDashboard.addEventListener("click", () => window.print());
   window.addEventListener("fleetinspect:language", renderDashboard);
@@ -195,6 +207,8 @@ function showAdminDashboard(user = {}) {
   nodes.dashboardContent.classList.remove("hidden");
   nodes.logoutAdmin.classList.remove("hidden");
   nodes.currentUserChip.textContent = user.name || user.email || user.username || "Dispatcher";
+  nodes.currentRoleChip.textContent = user.role || "Dispatcher";
+  nodes.currentRoleChip.classList.remove("hidden");
   nodes.dispatcherPassword.value = "";
   nodes.signupPassword.value = "";
   nodes.signupCode.value = "";
@@ -209,6 +223,7 @@ function showAdminLogin() {
   nodes.dashboardContent.classList.add("hidden");
   nodes.adminLock.classList.remove("hidden");
   nodes.logoutAdmin.classList.add("hidden");
+  nodes.currentRoleChip.classList.add("hidden");
   nodes.currentUserChip.textContent = "Admin";
   nodes.dispatcherPassword.value = "";
   nodes.signupPassword.value = "";
@@ -252,6 +267,7 @@ function renderDashboard() {
   nodes.activeFilterCount.textContent = String(items.length);
   renderStatusPills();
 
+  renderControlRoom(dashboardItems);
   renderAlerts(items.length ? items : dashboardItems);
   renderVehicleSummary(allGroups);
   renderDailyVehicleControl();
@@ -333,10 +349,50 @@ function renderAlerts(items) {
         <strong>${escapeHtml(item.plate || t("noRegistration"))}</strong>
         <span>${escapeHtml(item.ai?.label || t("possibleNewDamage"))}</span>
         <p>${escapeHtml(item.ai?.summary || t("reviewInspection"))}</p>
+        ${renderAlertState(item)}
       </div>
-      <a href="/report.html?id=${encodeURIComponent(item.id)}" target="_blank" rel="noopener">${escapeHtml(t("review"))}</a>
+      <div class="alert-actions">
+        <a href="/report.html?id=${encodeURIComponent(item.id)}" target="_blank" rel="noopener">${escapeHtml(t("review"))}</a>
+        <button type="button" data-alert-id="${escapeHtml(item.id)}" data-alert-status="reviewed">${escapeHtml(t("markReviewed"))}</button>
+        <button type="button" data-alert-id="${escapeHtml(item.id)}" data-alert-status="resolved">${escapeHtml(t("markResolved"))}</button>
+      </div>
     </article>
   `).join("");
+}
+
+function renderControlRoom(items) {
+  const fleetVehicles = Array.isArray(window.FLEET_VEHICLES) ? window.FLEET_VEHICLES : [];
+  const today = localDateKey(new Date());
+  const todayItems = items.filter((item) => localDateKey(new Date(item.finishedAt || item.startedAt || 0)) === today);
+  const inspectedPlates = new Set(todayItems.map((item) => normalizePlate(item.plate || "")).filter(Boolean));
+  const totalVehicles = fleetVehicles.length || inspectedPlates.size;
+  const done = inspectedPlates.size;
+  const pending = Math.max(totalVehicles - done, 0);
+  const percent = totalVehicles ? Math.round((done / totalVehicles) * 100) : 0;
+  const latest = [...items].sort((a, b) => new Date(b.finishedAt || b.startedAt || 0) - new Date(a.finishedAt || a.startedAt || 0))[0];
+  const latestStatus = latest ? getAiStatus(latest) : null;
+
+  nodes.todayCompletion.textContent = `${done} / ${totalVehicles}`;
+  nodes.todayCompletionMeta.textContent = `${percent}% ${t("completedToday").toLowerCase()}`;
+  nodes.todayPendingCount.textContent = String(pending);
+  nodes.latestInspectionTime.textContent = latest ? formatTime(new Date(latest.finishedAt || latest.startedAt)) : "--";
+  nodes.latestInspectionMeta.textContent = latest ? `${latest.plate || t("noRegistration")} · ${latest.driverName || t("noDriver")}` : t("noRecentActivity");
+  nodes.liveAiState.textContent = latestStatus ? latestStatus.label : t("pending");
+  nodes.liveDriver.textContent = latest?.driverName || "--";
+  nodes.livePlate.textContent = latest?.plate || "--";
+}
+
+function renderAlertState(item) {
+  const status = getAlertStatus(item.id);
+  const label = status === "resolved" ? t("resolved") : status === "reviewed" ? t("reviewed") : t("pendingReview");
+  return `<em class="alert-state ${status}">${escapeHtml(label)}</em>`;
+}
+
+function handleAlertAction(event) {
+  const button = event.target.closest("[data-alert-status]");
+  if (!button) return;
+  setAlertStatus(button.dataset.alertId, button.dataset.alertStatus);
+  renderDashboard();
 }
 
 function renderVehicleSummary(groups) {
@@ -738,6 +794,36 @@ function exportCurrentCsv() {
 function openSelectedDayReport() {
   const selectedDate = nodes.vehicleControlDate.value || localDateKey(new Date());
   window.open(`/day-report.html?date=${encodeURIComponent(selectedDate)}`, "_blank", "noopener");
+}
+
+function closeSelectedDay() {
+  const selectedDate = nodes.vehicleControlDate.value || localDateKey(new Date());
+  const todayItems = dashboardItems.filter((item) => localDateKey(new Date(item.finishedAt || item.startedAt || 0)) === selectedDate);
+  if (!todayItems.length) {
+    alert(t("noReportsForDay"));
+    return;
+  }
+  alert(t("closeDayStarted"));
+  window.open(`/day-report.html?date=${encodeURIComponent(selectedDate)}&closed=1`, "_blank", "noopener");
+}
+
+function getAlertStatus(id) {
+  return readAlertStatuses()[id] || "pending";
+}
+
+function setAlertStatus(id, status) {
+  if (!id) return;
+  const statuses = readAlertStatuses();
+  statuses[id] = status;
+  localStorage.setItem("fleetinspect_alert_statuses", JSON.stringify(statuses));
+}
+
+function readAlertStatuses() {
+  try {
+    return JSON.parse(localStorage.getItem("fleetinspect_alert_statuses") || "{}") || {};
+  } catch {
+    return {};
+  }
 }
 
 function downloadCsv(filename, rows) {

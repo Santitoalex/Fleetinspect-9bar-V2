@@ -26,6 +26,8 @@ const nodes = {
   vehiclePlate: document.querySelector("#vehiclePlate"),
   sessionMeta: document.querySelector("#sessionMeta"),
   stepTitle: document.querySelector("#stepTitle"),
+  stepHelp: document.querySelector("#stepHelp"),
+  photoCounter: document.querySelector("#photoCounter"),
   cameraVideo: document.querySelector("#cameraVideo"),
   capturedPreview: document.querySelector("#capturedPreview"),
   cameraEmpty: document.querySelector("#cameraEmpty"),
@@ -411,6 +413,7 @@ function saveCurrentPhoto(dataUrl, quality = null) {
 
   nodes.capturedPreview.src = dataUrl;
   nodes.cameraFrame.classList.add("has-photo");
+  showSaveToast(t("photoSaved"), "ok");
   updateCaptureUI();
 }
 
@@ -544,9 +547,12 @@ function resetSession() {
 function updateCaptureUI() {
   const step = STEPS[stepIndex];
   const photo = session?.photos[step.id];
+  const completedCount = STEPS.filter((item) => session?.photos[item.id]).length;
 
   nodes.stepTitle.textContent = getStepLabel(step);
   nodes.sessionMeta.textContent = `${session.driverName} - ${session.plate}`;
+  nodes.photoCounter.textContent = `${completedCount} / ${STEPS.length}`;
+  nodes.stepHelp.textContent = photo ? t("photoSavedNext") : t("placeVehicle");
 
   if (photo) {
     nodes.capturedPreview.src = photo.url;
@@ -581,7 +587,7 @@ function updateButtons() {
   nodes.aiStatus.textContent = complete
     ? t("allPhotosDone")
     : hasCurrent
-      ? t("photoSaved")
+      ? t("photoSavedNext")
       : t("placeVehicle");
 
   const quality = session.photos[STEPS[stepIndex].id]?.quality;
