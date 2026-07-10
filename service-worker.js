@@ -1,17 +1,23 @@
-const CACHE_NAME = "fleetinspect-driver-v30";
+const CACHE_NAME = "fleetinspect-driver-v31";
 const APP_SHELL = [
   "/",
   "/driver",
   "/index.html",
-  "/styles.css?v=30",
+  "/admin",
+  "/admin.html",
+  "/styles.css?v=31",
   "/app.js",
   "/i18n.js",
   "/vehicles.js",
   "/manifest.webmanifest",
+  "/admin.webmanifest",
   "/icon.svg",
   "/icon-192.png",
   "/icon-512.png",
   "/apple-touch-icon.png",
+  "/admin-icon-192.png",
+  "/admin-icon-512.png",
+  "/admin-apple-touch-icon.png",
 ];
 
 self.addEventListener("install", (event) => {

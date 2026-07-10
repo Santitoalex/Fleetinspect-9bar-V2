@@ -3,8 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0b1220" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="FleetInspect Admin" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>9Bar Fleet Dashboard</title>
-  <link rel="stylesheet" href="/styles.css?v=27" />
+    <link rel="manifest" href="/admin.webmanifest" />
+    <link rel="apple-touch-icon" href="/admin-apple-touch-icon.png" />
+    <link rel="icon" href="/admin-icon-192.png" sizes="192x192" />
+    <link rel="stylesheet" href="/styles.css?v=31" />
   </head>
   <body class="admin-body">
     <div class="admin-shell">
@@ -44,6 +52,7 @@
               <option value="ro">RO</option>
             </select>
             <button id="refreshDashboard" type="button" class="icon-button" aria-label="Refresh" data-i18n-aria="refresh">↻</button>
+            <button id="installAdminApp" type="button" class="icon-button install-admin-button hidden" aria-label="Install admin app" data-i18n-aria="installAdminApp">⬇</button>
             <a class="icon-button" href="/driver" aria-label="Capture app" data-i18n-aria="captureApp">＋</a>
             <span id="currentUserChip" class="user-chip">Admin</span>
             <button id="logoutAdmin" type="button" class="icon-button hidden" aria-label="Logout" data-i18n-aria="logout">⇥</button>

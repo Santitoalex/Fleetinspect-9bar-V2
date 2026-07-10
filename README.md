@@ -14,6 +14,8 @@ Esta version esta preparada para empezar en Render Free + Supabase Free usando W
 - Fotos comprimidas para datos moviles.
 - Instalable en movil como app PWA desde `/driver`.
 - Icono propio para iPhone y Android.
+- Panel admin instalable como app PWA separada desde `/admin`.
+- Icono propio para el dashboard administrador.
 - Aviso de calidad de foto: posible foto oscura, borrosa o con poco detalle.
 - Reintento automatico si falla la subida.
 - Cola local visible en el movil: si falla internet, las fotos quedan pendientes y se reintentan.

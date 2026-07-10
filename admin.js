@@ -3,9 +3,11 @@ let systemConfig = {
   driveConfigured: false,
   aiConfigured: false,
 };
+let deferredAdminInstallPrompt = null;
 
 const nodes = {
   refreshDashboard: document.querySelector("#refreshDashboard"),
+  installAdminApp: document.querySelector("#installAdminApp"),
   adminLock: document.querySelector("#adminLock"),
   dashboardContent: document.querySelector("#dashboardContent"),
   dispatcherEmail: document.querySelector("#dispatcherEmail"),
@@ -54,8 +56,10 @@ const nodes = {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
+  registerAdminServiceWorker();
   window.FI18N.bindLanguageSelectors();
   nodes.refreshDashboard.addEventListener("click", loadDashboard);
+  nodes.installAdminApp.addEventListener("click", installAdminApp);
   nodes.unlockAdmin.addEventListener("click", unlockAdmin);
   nodes.createDispatcherAccount.addEventListener("click", createDispatcherAccount);
   nodes.logoutAdmin.addEventListener("click", logoutAdmin);
@@ -82,8 +86,34 @@ document.addEventListener("DOMContentLoaded", () => {
   nodes.vehicleHistoryPlate.addEventListener("change", renderVehicleHistory);
   nodes.printDashboard.addEventListener("click", () => window.print());
   window.addEventListener("fleetinspect:language", renderDashboard);
+  window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    deferredAdminInstallPrompt = event;
+    nodes.installAdminApp.classList.remove("hidden");
+  });
+  window.addEventListener("appinstalled", () => {
+    deferredAdminInstallPrompt = null;
+    nodes.installAdminApp.classList.add("hidden");
+  });
   checkAdminSession();
 });
+
+function registerAdminServiceWorker() {
+  if (!("serviceWorker" in navigator)) return;
+  navigator.serviceWorker.register("/service-worker.js").catch(() => {});
+}
+
+async function installAdminApp() {
+  if (!deferredAdminInstallPrompt) {
+    alert(t("installAdminHint"));
+    return;
+  }
+
+  deferredAdminInstallPrompt.prompt();
+  await deferredAdminInstallPrompt.userChoice.catch(() => null);
+  deferredAdminInstallPrompt = null;
+  nodes.installAdminApp.classList.add("hidden");
+}
 
 async function unlockAdmin() {
   const email = nodes.dispatcherEmail.value.trim();

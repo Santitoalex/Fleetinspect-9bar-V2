@@ -56,3 +56,27 @@ Si ves `Instalar app` y da error, usa `Anadir a pantalla de inicio`. El resultad
 Una vez instalada, deben abrir FleetInspect desde el icono del telefono, no desde WhatsApp.
 
 La app abrira directamente la pantalla del conductor para empezar inspecciones.
+
+## Instalar panel admin
+
+El panel admin tambien puede tener icono propio.
+
+URL:
+
+```text
+https://TU-APP.onrender.com/admin
+```
+
+En ordenador:
+
+1. Abre `/admin` en Chrome.
+2. Si aparece el icono de instalar en la barra del navegador, pulsalo.
+3. Si no aparece, usa menu de Chrome > Guardar y compartir > Instalar pagina.
+
+En Android:
+
+1. Abre `/admin` en Chrome.
+2. Menu de Chrome.
+3. `Instalar app` o `Anadir a pantalla de inicio`.
+
+El icono del admin es diferente al icono del conductor y abre directamente el dashboard.
