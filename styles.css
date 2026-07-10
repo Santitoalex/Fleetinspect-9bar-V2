@@ -3906,3 +3906,350 @@ body.driver-pro {
     justify-items: stretch;
   }
 }
+
+/* v33 premium admin interface */
+.admin-premium {
+  --admin-navy: #071827;
+  --admin-blue: #123c69;
+  --admin-blue-2: #1d5a91;
+  --admin-orange: #f28c00;
+  --admin-green: #0f766e;
+  --admin-border: #d8e2ed;
+  --admin-surface: #ffffff;
+  --admin-muted-surface: #f6f9fc;
+  background:
+    linear-gradient(180deg, #f3f7fb 0%, #edf3f8 100%);
+  color: #101828;
+}
+
+.admin-premium .admin-shell {
+  grid-template-columns: 286px minmax(0, 1fr);
+}
+
+.admin-premium .fleet-sidebar {
+  background:
+    linear-gradient(180deg, rgba(7, 24, 39, 0.98), rgba(10, 35, 57, 0.98)),
+    radial-gradient(circle at top left, rgba(242, 140, 0, 0.2), transparent 34%);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 22px 16px;
+}
+
+.admin-premium .fleet-logo {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 14px;
+  padding-bottom: 18px;
+}
+
+.admin-premium .admin-product-logo {
+  width: 100%;
+  max-width: 210px;
+  border: 0;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.18);
+}
+
+.admin-premium .fleet-logo p {
+  margin-top: 12px;
+  color: #b7c9db;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+.admin-premium .fleet-nav {
+  gap: 8px;
+}
+
+.admin-premium .fleet-nav a {
+  min-height: 48px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: #c9d8e6;
+  padding: 10px 12px;
+}
+
+.admin-premium .fleet-nav a:hover {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
+}
+
+.admin-premium .fleet-nav a.active {
+  border-color: rgba(242, 140, 0, 0.45);
+  background: linear-gradient(135deg, rgba(242, 140, 0, 0.2), rgba(255, 255, 255, 0.08));
+}
+
+.admin-premium .fleet-nav a span {
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.admin-premium .fleet-topbar {
+  min-height: 76px;
+  border-bottom: 1px solid var(--admin-border);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 12px 34px rgba(15, 23, 42, 0.06);
+}
+
+.admin-premium .global-search {
+  min-height: 48px;
+  border-color: #cdddec;
+  border-radius: 10px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+}
+
+.admin-premium .sync-chip,
+.admin-premium .admin-language,
+.admin-premium .icon-button,
+.admin-premium .user-chip,
+.admin-premium .role-chip {
+  border-radius: 10px;
+}
+
+.admin-premium .icon-button:hover,
+.admin-premium .dashboard-actions .ghost:hover {
+  border-color: var(--admin-orange);
+  color: #9a3412;
+}
+
+.admin-premium .dashboard-main {
+  padding: 26px 30px 78px;
+}
+
+.admin-premium .admin-hero {
+  grid-template-columns: minmax(0, 1.12fr) minmax(340px, 0.88fr);
+  margin-bottom: 20px;
+}
+
+.admin-premium .admin-hero-copy {
+  position: relative;
+  overflow: hidden;
+  border: 0;
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, rgba(7, 24, 39, 0.96), rgba(18, 60, 105, 0.96)),
+    radial-gradient(circle at 85% 0%, rgba(242, 140, 0, 0.32), transparent 36%);
+  padding: 28px;
+  color: #ffffff;
+}
+
+.admin-premium .admin-hero-copy::after {
+  content: "";
+  position: absolute;
+  right: -58px;
+  bottom: -82px;
+  width: 230px;
+  height: 230px;
+  border: 32px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+}
+
+.admin-premium .admin-hero h1 {
+  color: #ffffff;
+  font-size: 40px;
+}
+
+.admin-premium .admin-hero span {
+  color: #d9e7f4;
+}
+
+.admin-premium .admin-hero .eyebrow {
+  color: #fbbf24;
+}
+
+.admin-premium .hero-status-grid article {
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, #ffffff, #f8fbfe);
+  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.08);
+}
+
+.admin-premium .hero-status-grid strong {
+  border-radius: 999px;
+}
+
+.admin-premium .hero-dashboard {
+  overflow: hidden;
+  border-radius: 14px;
+  border-color: var(--admin-border);
+  background: var(--admin-surface);
+  box-shadow: 0 22px 58px rgba(15, 23, 42, 0.08);
+}
+
+.admin-premium .admin-command-header {
+  background:
+    linear-gradient(90deg, #ffffff, #f8fbfe);
+}
+
+.admin-premium .dashboard-actions .ghost {
+  min-height: 42px;
+  border-radius: 10px;
+  font-weight: 950;
+}
+
+.admin-premium .dashboard-actions .strong-action {
+  background: linear-gradient(135deg, #f28c00, #ffb020);
+  color: #111827;
+  border-color: transparent;
+  box-shadow: 0 12px 22px rgba(242, 140, 0, 0.18);
+}
+
+.admin-premium .admin-filter-panel label,
+.admin-premium .admin-filter-panel article,
+.admin-premium .control-room-strip article,
+.admin-premium .metrics article,
+.admin-premium .dashboard-widget,
+.admin-premium .vehicle-control-summary article,
+.admin-premium .vehicle-control-section > header,
+.admin-premium .vehicle-control-row,
+.admin-premium .status-row,
+.admin-premium .activity-row {
+  border-color: var(--admin-border);
+  border-radius: 12px;
+}
+
+.admin-premium .control-room-strip article {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 251, 254, 0.98));
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.06);
+}
+
+.admin-premium .control-room-strip article::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 5px;
+  background: var(--admin-orange);
+}
+
+.admin-premium .control-room-strip article:nth-child(1)::before {
+  background: var(--admin-green);
+}
+
+.admin-premium .control-room-strip article:nth-child(3)::before {
+  background: var(--admin-blue-2);
+}
+
+.admin-premium .control-room-strip article:nth-child(4)::before {
+  background: #7c3aed;
+}
+
+.admin-premium .metrics {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.admin-premium .metrics article {
+  background:
+    linear-gradient(180deg, #ffffff, #f8fbfe);
+  border-left-width: 0;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);
+}
+
+.admin-premium .metrics article::before {
+  content: "";
+  display: block;
+  width: 42px;
+  height: 5px;
+  border-radius: 999px;
+  margin-bottom: 12px;
+  background: var(--admin-orange);
+}
+
+.admin-premium .metrics article:nth-child(2)::before {
+  background: var(--admin-blue-2);
+}
+
+.admin-premium .metrics article:nth-child(3)::before {
+  background: var(--admin-green);
+}
+
+.admin-premium .metrics article:nth-child(4)::before {
+  background: #d92d20;
+}
+
+.admin-premium .metrics article:nth-child(5)::before {
+  background: #7c3aed;
+}
+
+.admin-premium .dashboard-card-grid {
+  gap: 18px;
+}
+
+.admin-premium .dashboard-widget {
+  background:
+    linear-gradient(180deg, #ffffff, #fbfdff);
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.06);
+}
+
+.admin-premium .dashboard-widget > header {
+  border-bottom: 1px solid #e6eef6;
+  margin: -2px -2px 16px;
+  padding: 2px 2px 14px;
+}
+
+.admin-premium .dashboard-widget h3 {
+  color: #101828;
+  font-size: 19px;
+}
+
+.admin-premium .dashboard-widget header strong {
+  border-radius: 12px;
+  background: #fff7ed;
+  color: #9a3412;
+}
+
+.admin-premium .primary-widget {
+  border-top: 4px solid #d92d20;
+}
+
+.admin-premium .vehicle-control-widget {
+  border-top: 4px solid var(--admin-orange);
+}
+
+.admin-premium .alert-card,
+.admin-premium .vehicle-tile,
+.admin-premium .report-card {
+  border-radius: 12px;
+}
+
+.admin-premium .alert-card {
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+}
+
+.admin-premium .vehicle-control-row {
+  min-height: 72px;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.035);
+}
+
+.admin-premium .vehicle-control-row:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.admin-premium .admin-auth {
+  align-items: stretch;
+}
+
+.admin-premium .admin-auth-card {
+  border-radius: 14px;
+  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.08);
+}
+
+@media (max-width: 1120px) {
+  .admin-premium .admin-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-premium .fleet-sidebar {
+    position: static;
+    height: auto;
+  }
+
+  .admin-premium .admin-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-premium .metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
