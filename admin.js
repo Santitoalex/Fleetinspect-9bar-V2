@@ -40,6 +40,10 @@ const nodes = {
   vehicleControlDate: document.querySelector("#vehicleControlDate"),
   vehicleControlSearch: document.querySelector("#vehicleControlSearch"),
   vehicleControlView: document.querySelector("#vehicleControlView"),
+  plannedRoutesInput: document.querySelector("#plannedRoutesInput"),
+  saveRoutePlan: document.querySelector("#saveRoutePlan"),
+  clearRoutePlan: document.querySelector("#clearRoutePlan"),
+  routePlanStatus: document.querySelector("#routePlanStatus"),
   vehicleControlList: document.querySelector("#vehicleControlList"),
   controlTotalVehicles: document.querySelector("#controlTotalVehicles"),
   controlInspectedVehicles: document.querySelector("#controlInspectedVehicles"),
@@ -88,9 +92,14 @@ document.addEventListener("DOMContentLoaded", () => {
   nodes.statusFilter.addEventListener("change", renderDashboard);
   nodes.dateFilter.addEventListener("change", renderDashboard);
   nodes.vehicleControlDate.value = localDateKey(new Date());
-  nodes.vehicleControlDate.addEventListener("change", renderDashboard);
+  nodes.vehicleControlDate.addEventListener("change", () => {
+    syncRoutePlanInput();
+    renderDashboard();
+  });
   nodes.vehicleControlSearch.addEventListener("input", renderDailyVehicleControl);
   nodes.vehicleControlView.addEventListener("change", renderDailyVehicleControl);
+  nodes.saveRoutePlan.addEventListener("click", saveRoutePlan);
+  nodes.clearRoutePlan.addEventListener("click", clearRoutePlan);
   nodes.exportCsv.addEventListener("click", exportCurrentCsv);
   nodes.exportDay.addEventListener("click", openSelectedDayReport);
   nodes.closeDay.addEventListener("click", closeSelectedDay);
@@ -108,6 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
     nodes.installAdminApp.classList.add("hidden");
   });
   checkAdminSession();
+  syncRoutePlanInput();
 });
 
 function registerAdminServiceWorker() {
@@ -361,20 +371,20 @@ function renderAlerts(items) {
 }
 
 function renderControlRoom(items) {
-  const fleetVehicles = Array.isArray(window.FLEET_VEHICLES) ? window.FLEET_VEHICLES : [];
   const today = localDateKey(new Date());
   const todayItems = items.filter((item) => localDateKey(new Date(item.finishedAt || item.startedAt || 0)) === today);
-  const inspectedPlates = new Set(todayItems.map((item) => normalizePlate(item.plate || "")).filter(Boolean));
-  const totalVehicles = fleetVehicles.length || inspectedPlates.size;
-  const done = inspectedPlates.size;
-  const pending = Math.max(totalVehicles - done, 0);
-  const percent = totalVehicles ? Math.round((done / totalVehicles) * 100) : 0;
+  const plannedRoutes = getRoutePlan(today);
+  const hasPlan = plannedRoutes > 0;
+  const done = todayItems.length;
+  const totalRoutes = hasPlan ? plannedRoutes : done;
+  const pending = hasPlan ? Math.max(plannedRoutes - done, 0) : 0;
+  const percent = totalRoutes ? Math.round((done / totalRoutes) * 100) : 0;
   const latest = [...items].sort((a, b) => new Date(b.finishedAt || b.startedAt || 0) - new Date(a.finishedAt || a.startedAt || 0))[0];
   const latestStatus = latest ? getAiStatus(latest) : null;
 
-  nodes.todayCompletion.textContent = `${done} / ${totalVehicles}`;
-  nodes.todayCompletionMeta.textContent = `${percent}% ${t("completedToday").toLowerCase()}`;
-  nodes.todayPendingCount.textContent = String(pending);
+  nodes.todayCompletion.textContent = hasPlan ? `${done} / ${plannedRoutes}` : String(done);
+  nodes.todayCompletionMeta.textContent = hasPlan ? `${percent}% ${t("completedToday").toLowerCase()}` : t("noRoutePlanToday");
+  nodes.todayPendingCount.textContent = hasPlan ? String(pending) : "-";
   nodes.latestInspectionTime.textContent = latest ? formatTime(new Date(latest.finishedAt || latest.startedAt)) : "--";
   nodes.latestInspectionMeta.textContent = latest ? `${latest.plate || t("noRegistration")} · ${latest.driverName || t("noDriver")}` : t("noRecentActivity");
   nodes.liveAiState.textContent = latestStatus ? latestStatus.label : t("pending");
@@ -428,9 +438,10 @@ function renderVehicleSummary(groups) {
 }
 
 function renderDailyVehicleControl() {
-  const fleetVehicles = Array.isArray(window.FLEET_VEHICLES) ? window.FLEET_VEHICLES : [];
   const selectedDate = nodes.vehicleControlDate.value || localDateKey(new Date());
   const search = nodes.vehicleControlSearch.value.trim().toLowerCase();
+  const plannedRoutes = getRoutePlan(selectedDate);
+  const hasRoutePlan = plannedRoutes > 0;
   const inspectionsByPlate = dashboardItems.reduce((groups, item) => {
     const plate = normalizePlate(item.plate || "");
     const inspectionDate = localDateKey(new Date(item.finishedAt || item.startedAt || 0));
@@ -440,7 +451,8 @@ function renderDailyVehicleControl() {
     return groups;
   }, {});
 
-  const vehicles = fleetVehicles
+  const sourceVehicles = Object.keys(inspectionsByPlate);
+  const vehicles = sourceVehicles
     .map((plate) => {
       const normalized = normalizePlate(plate);
       const inspections = (inspectionsByPlate[normalized] || [])
@@ -463,11 +475,15 @@ function renderDailyVehicleControl() {
   const allVehicles = [...missingVehicles, ...doneVehicles];
 
   const inspectedCount = doneVehicles.length;
+  const pendingRoutes = hasRoutePlan ? Math.max(plannedRoutes - inspectedCount, 0) : 0;
   const alertCount = vehicles.filter((vehicle) => vehicle.hasAlert).length;
-  nodes.controlTotalVehicles.textContent = String(vehicles.length);
+  nodes.controlTotalVehicles.textContent = hasRoutePlan ? String(plannedRoutes) : String(doneVehicles.length);
   nodes.controlInspectedVehicles.textContent = String(inspectedCount);
-  nodes.controlMissingVehicles.textContent = String(vehicles.length - inspectedCount);
+  nodes.controlMissingVehicles.textContent = hasRoutePlan ? String(pendingRoutes) : "0";
   nodes.controlAlertVehicles.textContent = String(alertCount);
+  nodes.routePlanStatus.textContent = hasRoutePlan
+    ? t("routePlanActive", { count: plannedRoutes })
+    : t("routePlanNotSet");
 
   if (!vehicles.length) {
     nodes.vehicleControlList.innerHTML = `<article class="empty-state">${escapeHtml(t("noVehiclesFound"))}</article>`;
@@ -475,7 +491,9 @@ function renderDailyVehicleControl() {
   }
 
   if (viewMode === "missing") {
-    nodes.vehicleControlList.innerHTML = renderVehicleControlSection(t("missingVehicles"), missingVehicles, selectedDate);
+    nodes.vehicleControlList.innerHTML = hasRoutePlan
+      ? renderRoutePendingSection(pendingRoutes)
+      : renderVehicleControlSection(t("missingVehicles"), missingVehicles, selectedDate);
     return;
   }
 
@@ -490,10 +508,65 @@ function renderDailyVehicleControl() {
   }
 
   nodes.vehicleControlList.innerHTML = [
-    renderVehicleControlSection(t("missingVehicles"), missingVehicles, selectedDate, "priority"),
+    hasRoutePlan ? renderRoutePendingSection(pendingRoutes, "priority") : renderVehicleControlSection(t("missingVehicles"), missingVehicles, selectedDate, "priority"),
     renderVehicleControlSection(t("inspectedVehicles"), doneVehicles, selectedDate),
   ].join("");
 }
+
+function renderRoutePendingSection(count, variant = "") {
+  return `
+    <section class="vehicle-control-section ${variant}">
+      <header>
+        <div>
+          <strong>${escapeHtml(t("pendingRoutes"))}</strong>
+          <span>${count} ${escapeHtml(t("routes").toLowerCase())}</span>
+        </div>
+      </header>
+      <div class="vehicle-control-table">
+        <article class="empty-state">${escapeHtml(count ? t("pendingRoutesHelp", { count }) : t("allRoutesCompleted"))}</article>
+      </div>
+    </section>
+  `;
+}
+
+function saveRoutePlan() {
+  const selectedDate = nodes.vehicleControlDate.value || localDateKey(new Date());
+  const routes = Math.max(0, Math.round(Number(nodes.plannedRoutesInput.value || 0)));
+  localStorage.setItem(routePlanKey(selectedDate), String(routes));
+  renderDashboard();
+}
+
+function clearRoutePlan() {
+  const selectedDate = nodes.vehicleControlDate.value || localDateKey(new Date());
+  localStorage.removeItem(routePlanKey(selectedDate));
+  nodes.plannedRoutesInput.value = "";
+  renderDashboard();
+}
+
+function syncRoutePlanInput() {
+  const selectedDate = nodes.vehicleControlDate?.value || localDateKey(new Date());
+  if (!nodes.plannedRoutesInput) return;
+  const routes = getRoutePlan(selectedDate);
+  nodes.plannedRoutesInput.value = routes ? String(routes) : "";
+}
+
+function getRoutePlan(dateKey) {
+  const value = localStorage.getItem(routePlanKey(dateKey));
+  if (!value) return 0;
+  if (value.startsWith("[")) {
+    try {
+      return JSON.parse(value).length || 0;
+    } catch {
+      return 0;
+    }
+  }
+  return Math.max(0, Math.round(Number(value) || 0));
+}
+
+function routePlanKey(dateKey) {
+  return `fleetinspect_route_plan_${dateKey}`;
+}
+
 
 function renderVehicleControlSection(title, vehicles, selectedDate, variant = "") {
   return `

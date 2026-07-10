@@ -218,6 +218,18 @@ window.FI18N = (() => {
       ,pendingReview: "Pending review"
       ,markReviewed: "Mark reviewed"
       ,markResolved: "Mark resolved"
+      ,plannedRoutes: "Number of planned routes for this day"
+      ,plannedRoutesShort: "Planned routes"
+      ,saveRoutePlan: "Save route plan"
+      ,clearRoutePlan: "Clear"
+      ,routePlanHelp: "Pending is calculated from planned routes minus inspections saved that day."
+      ,routePlanActive: "{count} planned route(s) for this day."
+      ,routePlanNotSet: "No planned route count set. The panel shows only inspections already saved that day."
+      ,noRoutePlanToday: "No route plan set"
+      ,pendingRoutes: "Pending routes"
+      ,routes: "Routes"
+      ,pendingRoutesHelp: "{count} route(s) still need an inspection."
+      ,allRoutesCompleted: "All planned routes are completed."
     },
     es: {
       dailyInspection: "Inspección diaria del vehículo",
@@ -437,6 +449,18 @@ window.FI18N = (() => {
       ,pendingReview: "Pendiente de revisar"
       ,markReviewed: "Marcar revisada"
       ,markResolved: "Marcar resuelta"
+      ,plannedRoutes: "Número de rutas planificadas para este día"
+      ,plannedRoutesShort: "Rutas planificadas"
+      ,saveRoutePlan: "Guardar rutas"
+      ,clearRoutePlan: "Limpiar"
+      ,routePlanHelp: "Los pendientes se calculan con rutas planificadas menos inspecciones guardadas ese día."
+      ,routePlanActive: "{count} ruta(s) planificadas para este día."
+      ,routePlanNotSet: "No hay número de rutas planificadas. El panel muestra solo inspecciones ya guardadas ese día."
+      ,noRoutePlanToday: "Sin rutas planificadas"
+      ,pendingRoutes: "Rutas pendientes"
+      ,routes: "Rutas"
+      ,pendingRoutesHelp: "Faltan {count} ruta(s) por inspeccionar."
+      ,allRoutesCompleted: "Todas las rutas planificadas están completadas."
     },
     de: {
       dailyInspection: "Tägliche Fahrzeuginspektion",
@@ -623,6 +647,18 @@ window.FI18N = (() => {
       ,pendingReview: "Prüfung offen"
       ,markReviewed: "Als geprüft markieren"
       ,markResolved: "Als erledigt markieren"
+      ,plannedRoutes: "Anzahl geplanter Routen für diesen Tag"
+      ,plannedRoutesShort: "Geplante Routen"
+      ,saveRoutePlan: "Routenplan speichern"
+      ,clearRoutePlan: "Leeren"
+      ,routePlanHelp: "Offene Routen werden aus geplanten Routen minus gespeicherten Inspektionen berechnet."
+      ,routePlanActive: "{count} geplante Routen für diesen Tag."
+      ,routePlanNotSet: "Keine geplante Routenzahl gespeichert. Das Panel zeigt nur gespeicherte Inspektionen dieses Tages."
+      ,noRoutePlanToday: "Kein Routenplan"
+      ,pendingRoutes: "Offene Routen"
+      ,routes: "Routen"
+      ,pendingRoutesHelp: "{count} Routen benötigen noch eine Inspektion."
+      ,allRoutesCompleted: "Alle geplanten Routen sind abgeschlossen."
     },
     ro: {
       dailyInspection: "Inspecție zilnică vehicul",
@@ -809,6 +845,18 @@ window.FI18N = (() => {
       ,pendingReview: "În așteptare verificare"
       ,markReviewed: "Marchează verificată"
       ,markResolved: "Marchează rezolvată"
+      ,plannedRoutes: "Numărul rutelor planificate pentru această zi"
+      ,plannedRoutesShort: "Rute planificate"
+      ,saveRoutePlan: "Salvează rutele"
+      ,clearRoutePlan: "Șterge"
+      ,routePlanHelp: "Rutele lipsă se calculează din rute planificate minus inspecțiile salvate în ziua respectivă."
+      ,routePlanActive: "{count} rută/rute planificate pentru această zi."
+      ,routePlanNotSet: "Nu există număr de rute planificate. Panoul arată doar inspecțiile salvate în acea zi."
+      ,noRoutePlanToday: "Fără rute planificate"
+      ,pendingRoutes: "Rute în așteptare"
+      ,routes: "Rute"
+      ,pendingRoutesHelp: "{count} rută/rute mai au nevoie de inspecție."
+      ,allRoutesCompleted: "Toate rutele planificate sunt finalizate."
     }
   };
 

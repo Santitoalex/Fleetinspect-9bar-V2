@@ -12,7 +12,7 @@
     <link rel="manifest" href="/admin.webmanifest" />
     <link rel="apple-touch-icon" href="/admin-apple-touch-icon.png" />
     <link rel="icon" href="/admin-icon-192.png" sizes="192x192" />
-    <link rel="stylesheet" href="/styles.css?v=33" />
+    <link rel="stylesheet" href="/styles.css?v=35" />
   </head>
   <body class="admin-body admin-premium">
     <div class="admin-shell">
@@ -221,10 +221,21 @@
                     </div>
                   </header>
                   <div class="vehicle-control-summary">
-                    <article><span data-i18n="vehicles">Vehicles</span><strong id="controlTotalVehicles">0</strong></article>
+                    <article><span data-i18n="plannedRoutesShort">Planned routes</span><strong id="controlTotalVehicles">0</strong></article>
                     <article><span data-i18n="inspected">Inspected</span><strong id="controlInspectedVehicles">0</strong></article>
                     <article><span data-i18n="missing">Missing</span><strong id="controlMissingVehicles">0</strong></article>
                     <article><span data-i18n="aiAlerts">AI alerts</span><strong id="controlAlertVehicles">0</strong></article>
+                  </div>
+                  <div class="route-plan-card">
+                    <label>
+                      <span data-i18n="plannedRoutes">Planned routes for this day</span>
+                      <input id="plannedRoutesInput" type="number" min="0" step="1" inputmode="numeric" placeholder="28" />
+                    </label>
+                    <div class="route-plan-actions">
+                      <button id="saveRoutePlan" type="button" data-i18n="saveRoutePlan">Save route plan</button>
+                      <button id="clearRoutePlan" type="button" class="ghost" data-i18n="clearRoutePlan">Clear</button>
+                    </div>
+                    <p id="routePlanStatus" data-i18n="routePlanHelp">Pending is calculated from planned routes minus inspections saved that day.</p>
                   </div>
                   <div id="vehicleControlList" class="vehicle-control-list"></div>
                 </article>
@@ -300,7 +311,7 @@
     </div>
 
     <script src="/vehicles.js?v=2"></script>
-    <script src="/i18n.js?v=9"></script>
-    <script src="/admin.js?v=17"></script>
+    <script src="/i18n.js?v=11"></script>
+    <script src="/admin.js?v=19"></script>
   </body>
 </html>

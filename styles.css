@@ -4206,6 +4206,84 @@ body.driver-pro {
   border-top: 4px solid var(--admin-orange);
 }
 
+.route-plan-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+  border: 1px solid var(--admin-border);
+  border-radius: 12px;
+  background:
+    linear-gradient(135deg, rgba(18, 60, 105, 0.06), rgba(242, 140, 0, 0.08)),
+    #fff;
+  margin: 0 0 14px;
+  padding: 14px;
+}
+
+.route-plan-card label span {
+  display: block;
+  margin-bottom: 7px;
+  color: #667085;
+  font-size: 12px;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.route-plan-card textarea,
+.route-plan-card input {
+  width: 100%;
+  min-height: 52px;
+  border: 1px solid #cdddec;
+  border-radius: 10px;
+  background: #fff;
+  padding: 12px;
+  color: #101828;
+  font: inherit;
+  font-weight: 800;
+}
+
+.route-plan-card input {
+  max-width: 220px;
+  font-size: 22px;
+  font-weight: 950;
+}
+
+.route-plan-card textarea:focus,
+.route-plan-card input:focus {
+  outline: 3px solid rgba(242, 140, 0, 0.18);
+  border-color: #f28c00;
+}
+
+.route-plan-actions {
+  display: grid;
+  gap: 8px;
+}
+
+.route-plan-actions button {
+  min-height: 42px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--admin-blue);
+  color: #fff;
+  padding: 0 14px;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.route-plan-actions .ghost {
+  border: 1px solid #cdddec;
+  background: #fff;
+  color: var(--admin-blue);
+}
+
+.route-plan-card p {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #52697f;
+  font-size: 13px;
+  font-weight: 850;
+}
+
 .admin-premium .alert-card,
 .admin-premium .vehicle-tile,
 .admin-premium .report-card {
@@ -4251,5 +4329,9 @@ body.driver-pro {
 
   .admin-premium .metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .route-plan-card {
+    grid-template-columns: 1fr;
   }
 }
