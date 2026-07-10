@@ -27,6 +27,7 @@ const nodes = {
   stepTitle: document.querySelector("#stepTitle"),
   cameraVideo: document.querySelector("#cameraVideo"),
   capturedPreview: document.querySelector("#capturedPreview"),
+  vehicleGuide: document.querySelector("#vehicleGuide"),
   cameraEmpty: document.querySelector("#cameraEmpty"),
   cameraFrame: document.querySelector(".camera-frame"),
   cameraPickerControl: document.querySelector("#cameraPickerControl"),
@@ -475,6 +476,7 @@ function resetSession() {
   nodes.startScreen.classList.remove("hidden");
   nodes.captureScreen.classList.add("hidden");
   nodes.cameraFrame.classList.remove("is-live", "has-photo");
+  nodes.vehicleGuide.innerHTML = "";
   nodes.qualityStatus.textContent = t("qualityWaiting");
   renderProgress();
 }
@@ -485,6 +487,7 @@ function updateCaptureUI() {
 
   nodes.stepTitle.textContent = getStepLabel(step);
   nodes.sessionMeta.textContent = `${session.driverName} - ${session.plate}`;
+  renderVehicleGuide(step.id);
 
   if (photo) {
     nodes.capturedPreview.src = photo.url;
@@ -496,6 +499,167 @@ function updateCaptureUI() {
 
   renderProgress();
   updateButtons();
+}
+
+function renderVehicleGuide(stepId) {
+  if (!nodes.vehicleGuide) return;
+  nodes.vehicleGuide.className = `vehicle-guide vehicle-guide-${stepId}`;
+  nodes.vehicleGuide.innerHTML = getVehicleGuideSvg(stepId);
+}
+
+function getVehicleGuideSvg(stepId) {
+  const guides = {
+    front: guideFront(),
+    front_left: guideFrontAngle("left"),
+    left_side: guideSide("left"),
+    rear_left: guideRearAngle("left"),
+    rear: guideRear(),
+    rear_right: guideRearAngle("right"),
+    right_side: guideSide("right"),
+    front_right: guideFrontAngle("right"),
+    interior: guideInterior(),
+  };
+
+  return guides[stepId] || guideSide("left");
+}
+
+function guideSvg(content, extraClass = "") {
+  return `
+    <svg class="vehicle-guide-svg ${extraClass}" viewBox="0 0 1000 560" preserveAspectRatio="none" role="img">
+      <g class="guide-lines">
+        ${content}
+      </g>
+    </svg>
+  `;
+}
+
+function guideSide(direction = "left") {
+  const mirror = direction === "right" ? 'transform="translate(1000 0) scale(-1 1)"' : "";
+  return guideSvg(`
+    <g ${mirror}>
+      <path d="M92 430 L92 318 C92 272 124 244 176 232 L252 126 C284 92 324 76 374 76 L842 78 C902 78 938 114 942 172 L954 414 C956 448 932 472 898 472 L110 472 C99 472 92 461 92 430 Z" />
+      <path d="M252 126 L350 126 C366 126 378 140 378 158 L378 248 L176 248" />
+      <path d="M392 132 L802 132 C836 132 858 154 862 188 L878 352 L412 352 L392 132 Z" />
+      <path d="M378 158 L402 352" />
+      <path d="M468 132 L472 352" />
+      <path d="M612 132 L612 352" />
+      <path d="M760 132 L760 352" />
+      <path d="M164 362 L306 362" />
+      <path d="M462 386 L742 386" />
+      <path d="M854 366 L922 366" />
+      <circle cx="244" cy="472" r="74" />
+      <circle cx="244" cy="472" r="38" />
+      <circle cx="802" cy="472" r="74" />
+      <circle cx="802" cy="472" r="38" />
+      <path d="M88 476 L960 476" />
+    </g>
+  `, "vehicle-guide-side");
+}
+
+function guideFront() {
+  return guideSvg(`
+    <path d="M326 486 C312 486 300 474 302 460 L328 186 C336 112 390 76 500 76 C610 76 664 112 672 186 L698 460 C700 474 688 486 674 486 Z" />
+    <path d="M352 252 L648 252" />
+    <path d="M372 160 C404 126 448 112 500 112 C552 112 596 126 628 160 L648 246 L352 246 Z" />
+    <path d="M378 282 L622 282" />
+    <path d="M392 320 L608 320" />
+    <path d="M412 356 L588 356" />
+    <path d="M356 390 L446 390" />
+    <path d="M554 390 L644 390" />
+    <path d="M334 304 L260 336 L260 430" />
+    <path d="M666 304 L740 336 L740 430" />
+    <path d="M340 454 L426 454" />
+    <path d="M574 454 L660 454" />
+    <circle cx="384" cy="500" r="42" />
+    <circle cx="616" cy="500" r="42" />
+  `, "vehicle-guide-front");
+}
+
+function guideRear() {
+  return guideSvg(`
+    <path d="M324 486 C310 486 300 474 302 460 L326 156 C332 102 378 76 500 76 C622 76 668 102 674 156 L698 460 C700 474 690 486 676 486 Z" />
+    <path d="M352 132 L648 132" />
+    <path d="M356 164 L644 164 L644 376 L356 376 Z" />
+    <path d="M500 164 L500 486" />
+    <path d="M382 208 L618 208" />
+    <path d="M382 250 L618 250" />
+    <path d="M384 404 L454 404" />
+    <path d="M546 404 L616 404" />
+    <path d="M438 450 L562 450" />
+    <path d="M304 330 L248 356 L248 442" />
+    <path d="M696 330 L752 356 L752 442" />
+    <circle cx="382" cy="502" r="38" />
+    <circle cx="618" cy="502" r="38" />
+  `, "vehicle-guide-rear");
+}
+
+function guideFrontAngle(direction = "left") {
+  const mirror = direction === "right" ? 'transform="translate(1000 0) scale(-1 1)"' : "";
+  return guideSvg(`
+    <g ${mirror}>
+      <path d="M120 458 C94 442 84 408 98 374 L154 242 C170 204 202 182 244 176 L318 92 C344 62 382 50 430 58 L792 116 C850 126 892 170 904 228 L948 426 C956 462 930 494 892 494 L270 494 C218 494 164 486 120 458 Z" />
+      <path d="M244 176 L386 176 C412 176 430 194 430 220 L430 374 L154 374" />
+      <path d="M448 128 L770 172 C812 178 842 210 850 252 L876 388 L458 374 Z" />
+      <path d="M430 220 L458 374" />
+      <path d="M538 142 L548 376" />
+      <path d="M674 160 L692 382" />
+      <path d="M150 316 C202 286 280 274 390 286" />
+      <path d="M174 392 L346 404" />
+      <path d="M520 414 L756 414" />
+      <path d="M788 424 L908 430" />
+      <circle cx="282" cy="494" r="78" />
+      <circle cx="282" cy="494" r="40" />
+      <circle cx="780" cy="494" r="68" />
+      <circle cx="780" cy="494" r="34" />
+      <path d="M102 500 L934 500" />
+      <path d="M126 374 L84 430" />
+      <path d="M178 246 L126 272" />
+      <path d="M204 224 L256 218" />
+    </g>
+  `, "vehicle-guide-angle-front");
+}
+
+function guideRearAngle(direction = "left") {
+  const mirror = direction === "right" ? 'transform="translate(1000 0) scale(-1 1)"' : "";
+  return guideSvg(`
+    <g ${mirror}>
+      <path d="M114 430 L130 220 C136 150 186 106 258 98 L672 60 C738 54 792 84 820 144 L916 352 C932 386 918 432 884 454 C844 480 782 494 722 494 L174 494 C138 494 112 468 114 430 Z" />
+      <path d="M144 222 L312 212 C338 210 356 230 356 258 L356 438 L130 438" />
+      <path d="M374 110 L668 84 C718 80 760 104 780 150 L850 316 L372 438 Z" />
+      <path d="M356 258 L372 438" />
+      <path d="M464 102 L462 416" />
+      <path d="M606 90 L612 386" />
+      <path d="M736 130 L742 348" />
+      <path d="M166 278 L288 272" />
+      <path d="M170 366 L308 362" />
+      <path d="M460 450 L662 450" />
+      <path d="M704 432 L850 392" />
+      <circle cx="268" cy="494" r="74" />
+      <circle cx="268" cy="494" r="38" />
+      <circle cx="732" cy="494" r="70" />
+      <circle cx="732" cy="494" r="36" />
+      <path d="M116 500 L906 500" />
+      <path d="M144 248 L98 286" />
+      <path d="M132 424 L94 456" />
+      <path d="M248 124 L310 118" />
+    </g>
+  `, "vehicle-guide-angle-rear");
+}
+
+function guideInterior() {
+  return guideSvg(`
+    <path d="M190 96 L810 96 C842 96 866 122 858 152 L796 384 C788 416 762 436 728 436 L272 436 C238 436 212 416 204 384 L142 152 C134 122 158 96 190 96 Z" />
+    <path d="M214 142 L786 142 L746 312 L254 312 Z" />
+    <path d="M254 312 L184 418" />
+    <path d="M746 312 L816 418" />
+    <path d="M340 366 L660 366" />
+    <circle cx="404" cy="384" r="56" />
+    <circle cx="404" cy="384" r="28" />
+    <path d="M514 382 L698 382" />
+    <path d="M538 412 L676 412" />
+    <path d="M286 182 L382 182" />
+    <path d="M618 182 L714 182" />
+  `, "vehicle-guide-interior");
 }
 
 function updateButtons() {

@@ -414,6 +414,44 @@ button:disabled {
   z-index: 1;
 }
 
+.vehicle-guide {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0.86;
+}
+
+.camera-frame:not(.is-live) .vehicle-guide,
+.camera-frame.has-photo .vehicle-guide {
+  display: none;
+}
+
+.vehicle-guide-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.vehicle-guide .guide-lines {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.88);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.55));
+}
+
+.vehicle-guide-front,
+.vehicle-guide-rear {
+  opacity: 0.8;
+}
+
+.vehicle-guide-interior {
+  opacity: 0.72;
+}
+
 #capturedPreview {
   display: none;
 }
