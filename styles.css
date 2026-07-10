@@ -3659,3 +3659,54 @@ body.driver-pro {
     width: 100%;
   }
 }
+
+.driver-install-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  width: min(980px, calc(100% - 28px));
+  margin: 14px auto 0;
+  padding: 14px;
+  border: 1px solid #cdddec;
+  border-left: 5px solid var(--brand);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+}
+
+.driver-install-card strong {
+  display: block;
+  color: var(--ink);
+  font-size: 15px;
+}
+
+.driver-install-card p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.install-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.install-actions button {
+  min-height: 42px;
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .driver-install-card {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .install-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}

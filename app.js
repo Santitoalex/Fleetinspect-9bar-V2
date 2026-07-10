@@ -16,6 +16,7 @@ let stream = null;
 let cameraTrack = null;
 let selectedCameraId = localStorage.getItem("fleetinspect_camera_id") || "";
 let cameraZoomState = { min: 1, max: 1, step: 0.1, value: 1, dragging: false };
+let deferredInstallPrompt = null;
 
 const nodes = {
   startScreen: document.querySelector("#startScreen"),
@@ -52,13 +53,19 @@ const nodes = {
   retryPending: document.querySelector("#retryPending"),
   saveToast: document.querySelector("#saveToast"),
   resetSession: document.querySelector("#resetSession"),
+  installPrompt: document.querySelector("#installPrompt"),
+  installPromptText: document.querySelector("#installPromptText"),
+  installAppButton: document.querySelector("#installAppButton"),
+  dismissInstallPrompt: document.querySelector("#dismissInstallPrompt"),
 };
 
 document.addEventListener("DOMContentLoaded", () => {
+  registerServiceWorker();
   window.FI18N.bindLanguageSelectors();
   window.addEventListener("fleetinspect:language", () => {
     loadVehicleOptions();
     renderProgress();
+    showInstallPrompt();
     if (session) updateCaptureUI();
   });
   loadVehicleOptions();
@@ -71,6 +78,13 @@ document.addEventListener("DOMContentLoaded", () => {
     processPendingInspections();
   });
   window.addEventListener("offline", updateSyncStatus);
+  window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    showInstallPrompt();
+  });
+  window.addEventListener("appinstalled", hideInstallPrompt);
+  window.setTimeout(showInstallPrompt, 1000);
 });
 
 function loadVehicleOptions() {
@@ -97,6 +111,49 @@ function bindEvents() {
   nodes.cameraPicker.addEventListener("change", changeCamera);
   nodes.cameraZoom.addEventListener("pointerdown", startCameraZoomDrag);
   nodes.resetSession.addEventListener("click", resetSession);
+  nodes.installAppButton.addEventListener("click", installDriverApp);
+  nodes.dismissInstallPrompt.addEventListener("click", dismissInstallPrompt);
+}
+
+function registerServiceWorker() {
+  if (!("serviceWorker" in navigator)) return;
+  navigator.serviceWorker.register("/service-worker.js").catch(() => {});
+}
+
+function showInstallPrompt() {
+  if (!nodes.installPrompt || isStandaloneApp() || localStorage.getItem("fleetinspect_install_dismissed") === "1") {
+    return;
+  }
+
+  const isiPhone = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  nodes.installPromptText.textContent = isiPhone ? t("installIosHint") : t("installDriverHint");
+  nodes.installAppButton.classList.toggle("hidden", isiPhone && !deferredInstallPrompt);
+  nodes.installPrompt.classList.remove("hidden");
+}
+
+function hideInstallPrompt() {
+  nodes.installPrompt?.classList.add("hidden");
+}
+
+async function installDriverApp() {
+  if (!deferredInstallPrompt) {
+    alert(t("installIosHint"));
+    return;
+  }
+
+  deferredInstallPrompt.prompt();
+  await deferredInstallPrompt.userChoice.catch(() => null);
+  deferredInstallPrompt = null;
+  hideInstallPrompt();
+}
+
+function dismissInstallPrompt() {
+  localStorage.setItem("fleetinspect_install_dismissed", "1");
+  hideInstallPrompt();
+}
+
+function isStandaloneApp() {
+  return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
 }
 
 async function beginSession(event) {

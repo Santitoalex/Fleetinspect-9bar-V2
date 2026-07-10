@@ -12,6 +12,8 @@ Web app profesional para inspecciones diarias de vehiculos desde movil.
 Esta version esta preparada para empezar en Render Free + Supabase Free usando Web Service normal, sin Blueprint y sin Docker:
 
 - Fotos comprimidas para datos moviles.
+- Instalable en movil como app PWA desde `/driver`.
+- Icono propio para iPhone y Android.
 - Aviso de calidad de foto: posible foto oscura, borrosa o con poco detalle.
 - Reintento automatico si falla la subida.
 - Cola local visible en el movil: si falla internet, las fotos quedan pendientes y se reintentan.
@@ -102,6 +104,7 @@ Para produccion con muchos conductores:
 - `report.html`, `report.js`, `report.css`: reporte imprimible.
 - `day-report.html`, `day-report.js`: reporte diario imprimible para guardar como PDF.
 - `CONFIGURAR-SUPABASE.md`: pasos para crear bucket, tabla y variables.
+- `INSTALAR-APP-MOVIL.md`: pasos para instalar la app del conductor en iPhone y Android.
 
 ## Render recomendado para esta version
 

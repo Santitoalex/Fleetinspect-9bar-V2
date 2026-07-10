@@ -30,3 +30,17 @@ https://fleetinspect-pro.onrender.com/driver
 El panel administrador sera:
 
 https://fleetinspect-pro.onrender.com/admin
+
+## Instalar en el movil
+
+Cuando Render este publicado, abre la URL de conductores desde el movil:
+
+```text
+https://TU-APP.onrender.com/driver
+```
+
+En iPhone: Safari > Compartir > Anadir a pantalla de inicio.
+
+En Android: Chrome > Instalar app o Anadir a pantalla de inicio.
+
+Tambien puedes enviar a los conductores el archivo `INSTALAR-APP-MOVIL.md` como instrucciones.
