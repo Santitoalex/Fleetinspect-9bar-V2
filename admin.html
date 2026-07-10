@@ -12,7 +12,7 @@
     <link rel="manifest" href="/admin.webmanifest" />
     <link rel="apple-touch-icon" href="/admin-apple-touch-icon.png" />
     <link rel="icon" href="/admin-icon-192.png" sizes="192x192" />
-    <link rel="stylesheet" href="/styles.css?v=35" />
+    <link rel="stylesheet" href="/styles.css?v=36" />
   </head>
   <body class="admin-body admin-premium">
     <div class="admin-shell">
@@ -73,6 +73,17 @@
                 <span data-i18n="aiDamageDetection">AI damage detection</span>
                 <strong id="aiPill">--</strong>
               </article>
+            </div>
+          </section>
+
+          <section id="adminInstallPanel" class="admin-install-panel hidden">
+            <div>
+              <strong data-i18n="installAdminApp">Install admin panel</strong>
+              <p id="adminInstallPanelText" data-i18n="installAdminHint">Open the browser menu and add the admin panel to the home screen.</p>
+            </div>
+            <div class="admin-install-actions">
+              <button id="installAdminPanelButton" type="button" data-i18n="installApp">Install</button>
+              <button id="dismissAdminInstallPanel" type="button" class="ghost" data-i18n="notNow">Not now</button>
             </div>
           </section>
 
@@ -311,7 +322,7 @@
     </div>
 
     <script src="/vehicles.js?v=2"></script>
-    <script src="/i18n.js?v=11"></script>
-    <script src="/admin.js?v=19"></script>
+    <script src="/i18n.js?v=12"></script>
+    <script src="/admin.js?v=20"></script>
   </body>
 </html>

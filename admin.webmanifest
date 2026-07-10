@@ -4,7 +4,7 @@
   "description": "Fleet inspection dashboard for 9Bar Solutions GmbH dispatchers.",
   "id": "/admin",
   "start_url": "/admin",
-  "scope": "/",
+  "scope": "/admin",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui", "browser"],
   "orientation": "any",
@@ -37,12 +37,6 @@
       "short_name": "Dashboard",
       "url": "/admin",
       "icons": [{ "src": "/admin-icon-192.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Open driver app",
-      "short_name": "Driver",
-      "url": "/driver",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     }
   ]
 }

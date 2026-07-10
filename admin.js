@@ -8,6 +8,10 @@ let deferredAdminInstallPrompt = null;
 const nodes = {
   refreshDashboard: document.querySelector("#refreshDashboard"),
   installAdminApp: document.querySelector("#installAdminApp"),
+  adminInstallPanel: document.querySelector("#adminInstallPanel"),
+  adminInstallPanelText: document.querySelector("#adminInstallPanelText"),
+  installAdminPanelButton: document.querySelector("#installAdminPanelButton"),
+  dismissAdminInstallPanel: document.querySelector("#dismissAdminInstallPanel"),
   adminLock: document.querySelector("#adminLock"),
   dashboardContent: document.querySelector("#dashboardContent"),
   dispatcherEmail: document.querySelector("#dispatcherEmail"),
@@ -74,6 +78,8 @@ document.addEventListener("DOMContentLoaded", () => {
   window.FI18N.bindLanguageSelectors();
   nodes.refreshDashboard.addEventListener("click", loadDashboard);
   nodes.installAdminApp.addEventListener("click", installAdminApp);
+  nodes.installAdminPanelButton.addEventListener("click", installAdminApp);
+  nodes.dismissAdminInstallPanel.addEventListener("click", dismissAdminInstallPanel);
   nodes.unlockAdmin.addEventListener("click", unlockAdmin);
   nodes.createDispatcherAccount.addEventListener("click", createDispatcherAccount);
   nodes.logoutAdmin.addEventListener("click", logoutAdmin);
@@ -106,18 +112,24 @@ document.addEventListener("DOMContentLoaded", () => {
   nodes.alertList.addEventListener("click", handleAlertAction);
   nodes.vehicleHistoryPlate.addEventListener("change", renderVehicleHistory);
   nodes.printDashboard.addEventListener("click", () => window.print());
-  window.addEventListener("fleetinspect:language", renderDashboard);
+  window.addEventListener("fleetinspect:language", () => {
+    renderDashboard();
+    showAdminInstallPanel();
+  });
   window.addEventListener("beforeinstallprompt", (event) => {
     event.preventDefault();
     deferredAdminInstallPrompt = event;
     nodes.installAdminApp.classList.remove("hidden");
+    showAdminInstallPanel();
   });
   window.addEventListener("appinstalled", () => {
     deferredAdminInstallPrompt = null;
     nodes.installAdminApp.classList.add("hidden");
+    hideAdminInstallPanel();
   });
   checkAdminSession();
   syncRoutePlanInput();
+  window.setTimeout(showAdminInstallPanel, 500);
 });
 
 function registerAdminServiceWorker() {
@@ -128,6 +140,7 @@ function registerAdminServiceWorker() {
 async function installAdminApp() {
   if (!deferredAdminInstallPrompt) {
     alert(t("installAdminHint"));
+    showAdminInstallPanel();
     return;
   }
 
@@ -135,6 +148,33 @@ async function installAdminApp() {
   await deferredAdminInstallPrompt.userChoice.catch(() => null);
   deferredAdminInstallPrompt = null;
   nodes.installAdminApp.classList.add("hidden");
+  hideAdminInstallPanel();
+}
+
+function showAdminInstallPanel() {
+  if (!nodes.adminInstallPanel || isStandaloneApp() || localStorage.getItem("fleetinspect_admin_install_dismissed") === "1") {
+    return;
+  }
+
+  nodes.adminInstallPanelText.textContent = isIosDevice() ? t("installIosHint") : t("installAndroidHint");
+  nodes.adminInstallPanel.classList.remove("hidden");
+}
+
+function hideAdminInstallPanel() {
+  nodes.adminInstallPanel?.classList.add("hidden");
+}
+
+function dismissAdminInstallPanel() {
+  localStorage.setItem("fleetinspect_admin_install_dismissed", "1");
+  hideAdminInstallPanel();
+}
+
+function isStandaloneApp() {
+  return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+}
+
+function isIosDevice() {
+  return /iphone|ipad|ipod/i.test(navigator.userAgent);
 }
 
 async function unlockAdmin() {

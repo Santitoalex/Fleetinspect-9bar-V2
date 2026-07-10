@@ -1,11 +1,11 @@
-const CACHE_NAME = "fleetinspect-driver-v35";
+const CACHE_NAME = "fleetinspect-driver-v36";
 const APP_SHELL = [
   "/",
   "/driver",
   "/index.html",
   "/admin",
   "/admin.html",
-  "/styles.css?v=35",
+  "/styles.css?v=36",
   "/app.js",
   "/i18n.js",
   "/vehicles.js",
@@ -45,14 +45,15 @@ self.addEventListener("fetch", (event) => {
   }
 
   if (request.mode === "navigate") {
+    const cacheKey = url.pathname.startsWith("/admin") ? "/admin" : "/driver";
     event.respondWith(
       fetch(request)
         .then((response) => {
           const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put("/driver", copy));
+          caches.open(CACHE_NAME).then((cache) => cache.put(cacheKey, copy));
           return response;
         })
-        .catch(() => caches.match("/driver").then((cached) => cached || caches.match("/index.html")))
+        .catch(() => caches.match(cacheKey).then((cached) => cached || caches.match(cacheKey === "/admin" ? "/admin.html" : "/index.html")))
     );
     return;
   }
