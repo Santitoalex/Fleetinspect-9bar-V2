@@ -126,8 +126,13 @@ function showInstallPrompt() {
   }
 
   const isiPhone = /iphone|ipad|ipod/i.test(navigator.userAgent);
-  nodes.installPromptText.textContent = isiPhone ? t("installIosHint") : t("installDriverHint");
-  nodes.installAppButton.classList.toggle("hidden", isiPhone && !deferredInstallPrompt);
+  const canInstallFromButton = Boolean(deferredInstallPrompt);
+  nodes.installPromptText.textContent = isiPhone
+    ? t("installIosHint")
+    : canInstallFromButton
+      ? t("installDriverHint")
+      : t("installAndroidHint");
+  nodes.installAppButton.classList.toggle("hidden", !canInstallFromButton);
   nodes.installPrompt.classList.remove("hidden");
 }
 
@@ -137,7 +142,7 @@ function hideInstallPrompt() {
 
 async function installDriverApp() {
   if (!deferredInstallPrompt) {
-    alert(t("installIosHint"));
+    alert(t("installAndroidHint"));
     return;
   }
 

@@ -6,6 +6,7 @@
   "start_url": "/driver",
   "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
   "orientation": "portrait",
   "background_color": "#f4f7fb",
   "theme_color": "#123c69",
@@ -34,6 +35,7 @@
       "purpose": "any"
     }
   ],
+  "categories": ["business", "productivity", "utilities"],
   "shortcuts": [
     {
       "name": "Start inspection",
