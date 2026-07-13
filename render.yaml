@@ -1,0 +1,34 @@
+services:
+  - type: web
+    name: fleetinspect-9bar
+    runtime: node
+    plan: standard
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: SESSION_SECRET
+        sync: false
+      - key: OWNER_EMAIL
+        sync: false
+      - key: DISPATCHER_SIGNUP_CODE
+        sync: false
+      - key: DISPATCHER_TABLE
+        value: dispatchers
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: SUPABASE_BUCKET
+        value: fleetinspect-photos
+      - key: SUPABASE_TABLE
+        value: inspections
+      - key: ROUTE_PLAN_TABLE
+        value: route_plans
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-4.1-mini
+      - key: OPENAI_MAX_PAIRS
+        value: "9"
+      - key: OPENAI_TIMEOUT_MS
+        value: "60000"

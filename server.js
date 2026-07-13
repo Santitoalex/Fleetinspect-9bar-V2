@@ -23,11 +23,14 @@ const SUPABASE_URL = process.env.SUPABASE_URL || "";
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 const SUPABASE_BUCKET = process.env.SUPABASE_BUCKET || "fleetinspect-photos";
 const SUPABASE_TABLE = process.env.SUPABASE_TABLE || "inspections";
+const ROUTE_PLAN_TABLE = process.env.ROUTE_PLAN_TABLE || "route_plans";
 const SIGNED_URL_SECONDS = 60 * 60 * 24 * 7;
 
 const inspectionsDir = path.join(DATA_DIR, "inspections");
 const dispatchersDir = path.join(DATA_DIR, "dispatchers");
 const dispatchersFile = path.join(dispatchersDir, "accounts.json");
+const routePlansDir = path.join(DATA_DIR, "route-plans");
+const routePlansFile = path.join(routePlansDir, "plans.json");
 const supabaseEnabled = Boolean(SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY && SUPABASE_BUCKET);
 const supabase = supabaseEnabled
   ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
@@ -47,6 +50,7 @@ app.use(express.static(process.cwd(), {
 
 await fs.mkdir(inspectionsDir, { recursive: true });
 await fs.mkdir(dispatchersDir, { recursive: true });
+await fs.mkdir(routePlansDir, { recursive: true });
 
 function parseDispatcherAccounts() {
   if (!DISPATCHER_ACCOUNTS.trim()) {
@@ -359,6 +363,16 @@ function requireOwner(request, response, next) {
   next();
 }
 
+function requireOperationsEditor(request, response, next) {
+  const user = getAdminSession(request);
+  if (!user) return response.status(401).json({ ok: false, error: "Admin login required." });
+  if (!["owner", "supervisor", "dispatcher"].includes(roleKey(user.role))) {
+    return response.status(403).json({ ok: false, error: "Modo solo lectura. No puedes cambiar el plan diario." });
+  }
+  request.adminUser = user;
+  next();
+}
+
 function signSession(payload) {
   const body = Buffer.from(JSON.stringify(payload)).toString("base64url");
   const signature = crypto.createHmac("sha256", SESSION_SECRET).update(body).digest("base64url");
@@ -526,33 +540,79 @@ app.get("/api/status", (_request, response) => {
     supabaseConfigured: supabaseEnabled,
     cloudStorageConfigured: supabaseEnabled,
     firestoreConfigured: supabaseEnabled,
+    routePlansConfigured: supabaseEnabled,
     aiConfigured: Boolean(OPENAI_API_KEY),
     model: OPENAI_MODEL,
     storageProvider: supabaseEnabled ? "supabase" : "local",
   });
 });
 
+app.get("/api/route-plans/:date", requireAdmin, async (request, response) => {
+  try {
+    const date = normalizeDateKey(request.params.date);
+    if (!date) return response.status(400).json({ ok: false, error: "Fecha no valida." });
+    response.json({ ok: true, plan: await readRoutePlan(date) });
+  } catch (error) {
+    console.error(error);
+    response.status(500).json({ ok: false, error: "No se pudo cargar el plan de rutas." });
+  }
+});
+
+app.put("/api/route-plans/:date", requireOperationsEditor, async (request, response) => {
+  try {
+    const date = normalizeDateKey(request.params.date);
+    const plannedRoutes = Math.max(0, Math.round(Number(request.body?.plannedRoutes || 0)));
+    if (!date) return response.status(400).json({ ok: false, error: "Fecha no valida." });
+    const plan = await saveRoutePlanRecord({
+      date,
+      plannedRoutes,
+      updatedBy: request.adminUser?.email || request.adminUser?.username || "admin",
+    });
+    response.json({ ok: true, plan });
+  } catch (error) {
+    console.error(error);
+    response.status(500).json({ ok: false, error: "No se pudo guardar el plan de rutas." });
+  }
+});
+
+app.delete("/api/route-plans/:date", requireOperationsEditor, async (request, response) => {
+  try {
+    const date = normalizeDateKey(request.params.date);
+    if (!date) return response.status(400).json({ ok: false, error: "Fecha no valida." });
+    await deleteRoutePlanRecord(date);
+    response.json({ ok: true });
+  } catch (error) {
+    console.error(error);
+    response.status(500).json({ ok: false, error: "No se pudo borrar el plan de rutas." });
+  }
+});
+
 app.get("/api/inspections", requireAdmin, async (_request, response) => {
-  if (supabaseEnabled) {
-    const supabaseItems = await listSupabaseInspections().catch(() => null);
-    if (supabaseItems) return response.json(supabaseItems);
-  }
+  response.json(await listAllInspectionRecords());
+});
 
-  const files = await fs.readdir(inspectionsDir).catch(() => []);
-  const items = [];
+app.get("/api/admin/export/:date", requireAdmin, async (request, response) => {
+  const date = normalizeDateKey(request.params.date);
+  if (!date) return response.status(400).json({ ok: false, error: "Fecha no valida." });
 
-  for (const file of files) {
-    if (!file.endsWith(".json")) continue;
-    try {
-      const raw = await fs.readFile(path.join(inspectionsDir, file), "utf8");
-      items.push(JSON.parse(raw));
-    } catch {
-      // Ignore damaged local files.
-    }
-  }
+  const items = (await listAllInspectionRecords()).filter((item) => {
+    return normalizeDateKey(item.finishedAt || item.startedAt) === date;
+  });
+  const plan = await readRoutePlan(date).catch(() => emptyRoutePlan(date));
+  const payload = {
+    date,
+    generatedAt: new Date().toISOString(),
+    plannedRoutes: plan.plannedRoutes,
+    completedInspections: items.length,
+    pendingRoutes: Math.max((plan.plannedRoutes || 0) - items.length, 0),
+    vehicles: [...new Set(items.map((item) => item.plate).filter(Boolean))].length,
+    photos: items.reduce((sum, item) => sum + (item.photos?.length || 0), 0),
+    aiAlerts: items.filter((item) => item.ai?.newDamageDetected).length,
+    inspections: items,
+  };
 
-  items.sort((a, b) => new Date(b.finishedAt || b.startedAt) - new Date(a.finishedAt || a.startedAt));
-  response.json(items);
+  response.setHeader("Content-Disposition", `attachment; filename="fleetinspect-${date}.json"`);
+  response.json(payload);
 });
 
 app.get("/api/inspections/:id", requireAdmin, async (request, response) => {
@@ -697,7 +757,7 @@ async function listSupabaseInspections() {
     .limit(1000);
 
   if (error) throw new Error(error.message);
-  return data || [];
+  return Promise.all((data || []).map(withSignedSupabasePhotos));
 }
 
 async function readSupabaseInspection(id) {
@@ -749,10 +809,138 @@ async function signSupabasePhoto(photo) {
   };
 }
 
+async function listAllInspectionRecords() {
+  if (supabaseEnabled) {
+    const supabaseItems = await listSupabaseInspections().catch(() => null);
+    if (supabaseItems) return supabaseItems;
+  }
+
+  const files = await fs.readdir(inspectionsDir).catch(() => []);
+  const items = [];
+
+  for (const file of files) {
+    if (!file.endsWith(".json")) continue;
+    try {
+      const raw = await fs.readFile(path.join(inspectionsDir, file), "utf8");
+      items.push(JSON.parse(raw));
+    } catch {
+      // Ignore damaged local files.
+    }
+  }
+
+  items.sort((a, b) => new Date(b.finishedAt || b.startedAt) - new Date(a.finishedAt || a.startedAt));
+  return items;
+}
+
 function getSupabaseBucketUrl() {
   const match = SUPABASE_URL.match(/^https:\/\/([^.]+)\.supabase\.co/i);
   if (!match) return SUPABASE_URL;
   return `https://supabase.com/dashboard/project/${match[1]}/storage/buckets/${SUPABASE_BUCKET}`;
+}
+
+async function readRoutePlan(date) {
+  const dateKey = normalizeDateKey(date);
+  if (!dateKey) return emptyRoutePlan(date);
+
+  if (supabase) {
+    const { data, error } = await supabase
+      .from(ROUTE_PLAN_TABLE)
+      .select("*")
+      .eq("date", dateKey)
+      .maybeSingle();
+
+    if (error && error.code !== "PGRST116") throw new Error(`Supabase Route Plans: ${error.message}`);
+    return data ? mapRoutePlan(data) : emptyRoutePlan(dateKey);
+  }
+
+  const plans = await readLocalRoutePlans();
+  return plans[dateKey] || emptyRoutePlan(dateKey);
+}
+
+async function saveRoutePlanRecord(plan) {
+  const item = {
+    date: normalizeDateKey(plan.date),
+    plannedRoutes: Math.max(0, Math.round(Number(plan.plannedRoutes || 0))),
+    updatedAt: new Date().toISOString(),
+    updatedBy: normalizeEmail(plan.updatedBy || "admin"),
+  };
+
+  if (supabase) {
+    const row = {
+      date: item.date,
+      planned_routes: item.plannedRoutes,
+      updated_at: item.updatedAt,
+      updated_by: item.updatedBy,
+    };
+    const { data, error } = await supabase
+      .from(ROUTE_PLAN_TABLE)
+      .upsert(row, { onConflict: "date" })
+      .select("*")
+      .maybeSingle();
+
+    if (error) throw new Error(`Supabase Route Plans: ${error.message}`);
+    return data ? mapRoutePlan(data) : item;
+  }
+
+  const plans = await readLocalRoutePlans();
+  plans[item.date] = item;
+  await fs.writeFile(routePlansFile, JSON.stringify(plans, null, 2));
+  return item;
+}
+
+async function deleteRoutePlanRecord(date) {
+  const dateKey = normalizeDateKey(date);
+  if (!dateKey) return;
+
+  if (supabase) {
+    const { error } = await supabase
+      .from(ROUTE_PLAN_TABLE)
+      .delete()
+      .eq("date", dateKey);
+
+    if (error) throw new Error(`Supabase Route Plans: ${error.message}`);
+    return;
+  }
+
+  const plans = await readLocalRoutePlans();
+  delete plans[dateKey];
+  await fs.writeFile(routePlansFile, JSON.stringify(plans, null, 2));
+}
+
+async function readLocalRoutePlans() {
+  try {
+    const raw = await fs.readFile(routePlansFile, "utf8");
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function mapRoutePlan(row) {
+  return {
+    date: normalizeDateKey(row.date),
+    plannedRoutes: Math.max(0, Math.round(Number(row.planned_routes ?? row.plannedRoutes ?? 0))),
+    updatedAt: row.updated_at || row.updatedAt || "",
+    updatedBy: row.updated_by || row.updatedBy || "",
+  };
+}
+
+function emptyRoutePlan(date) {
+  return {
+    date: normalizeDateKey(date),
+    plannedRoutes: 0,
+    updatedAt: "",
+    updatedBy: "",
+  };
+}
+
+function normalizeDateKey(value) {
+  const text = String(value || "").trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(text)) return text;
+  const date = new Date(text);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toISOString().slice(0, 10);
 }
 
 async function readInspection(id) {

@@ -6,6 +6,7 @@ let systemConfig = {
 let deferredAdminInstallPrompt = null;
 let currentAdminUser = null;
 let dispatcherUsers = [];
+let routePlans = {};
 
 const nodes = {
   refreshDashboard: document.querySelector("#refreshDashboard"),
@@ -37,6 +38,7 @@ const nodes = {
   dateFilter: document.querySelector("#dateFilter"),
   exportCsv: document.querySelector("#exportCsv"),
   exportDay: document.querySelector("#exportDay"),
+  backupDay: document.querySelector("#backupDay"),
   closeDay: document.querySelector("#closeDay"),
   printDashboard: document.querySelector("#printDashboard"),
   lastSync: document.querySelector("#lastSync"),
@@ -105,7 +107,8 @@ document.addEventListener("DOMContentLoaded", () => {
   nodes.statusFilter.addEventListener("change", renderDashboard);
   nodes.dateFilter.addEventListener("change", renderDashboard);
   nodes.vehicleControlDate.value = localDateKey(new Date());
-  nodes.vehicleControlDate.addEventListener("change", () => {
+  nodes.vehicleControlDate.addEventListener("change", async () => {
+    await loadRoutePlanForDate(nodes.vehicleControlDate.value);
     syncRoutePlanInput();
     renderDashboard();
   });
@@ -115,6 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
   nodes.clearRoutePlan.addEventListener("click", clearRoutePlan);
   nodes.exportCsv.addEventListener("click", exportCurrentCsv);
   nodes.exportDay.addEventListener("click", openSelectedDayReport);
+  nodes.backupDay.addEventListener("click", downloadDailyBackup);
   nodes.closeDay.addEventListener("click", closeSelectedDay);
   nodes.alertList.addEventListener("click", handleAlertAction);
   nodes.vehicleHistoryPlate.addEventListener("change", renderVehicleHistory);
@@ -312,6 +316,10 @@ async function loadDashboard() {
     }
     systemConfig = await statusResponse.json();
     dashboardItems = await inspectionsResponse.json();
+    await Promise.all([
+      loadRoutePlanForDate(localDateKey(new Date())),
+      loadRoutePlanForDate(nodes.vehicleControlDate.value || localDateKey(new Date())),
+    ]);
     nodes.lastSync.textContent = `${t("lastSync")}: ${formatTime(new Date())}`;
     renderDashboard();
   } catch {
@@ -701,26 +709,56 @@ function renderRoutePendingSection(count, variant = "") {
   `;
 }
 
-function saveRoutePlan() {
+async function saveRoutePlan() {
   if (!canEditOperations()) {
     alert(t("readonlyMode"));
     return;
   }
   const selectedDate = nodes.vehicleControlDate.value || localDateKey(new Date());
   const routes = Math.max(0, Math.round(Number(nodes.plannedRoutesInput.value || 0)));
-  localStorage.setItem(routePlanKey(selectedDate), String(routes));
-  renderDashboard();
+  nodes.saveRoutePlan.disabled = true;
+  try {
+    const response = await fetch(`/api/route-plans/${encodeURIComponent(selectedDate)}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ plannedRoutes: routes }),
+    });
+    const result = await response.json();
+    if (!response.ok || result.ok === false) throw new Error(result.error || t("routePlanCouldNotSave"));
+    routePlans[selectedDate] = result.plan || { date: selectedDate, plannedRoutes: routes };
+    localStorage.setItem(routePlanKey(selectedDate), String(routes));
+    renderDashboard();
+  } catch (error) {
+    alert(error.message || t("routePlanCouldNotSave"));
+  } finally {
+    nodes.saveRoutePlan.disabled = false;
+    applyRoleUi();
+  }
 }
 
-function clearRoutePlan() {
+async function clearRoutePlan() {
   if (!canEditOperations()) {
     alert(t("readonlyMode"));
     return;
   }
   const selectedDate = nodes.vehicleControlDate.value || localDateKey(new Date());
-  localStorage.removeItem(routePlanKey(selectedDate));
-  nodes.plannedRoutesInput.value = "";
-  renderDashboard();
+  nodes.clearRoutePlan.disabled = true;
+  try {
+    const response = await fetch(`/api/route-plans/${encodeURIComponent(selectedDate)}`, {
+      method: "DELETE",
+    });
+    const result = await response.json();
+    if (!response.ok || result.ok === false) throw new Error(result.error || t("routePlanCouldNotClear"));
+    delete routePlans[selectedDate];
+    localStorage.removeItem(routePlanKey(selectedDate));
+    nodes.plannedRoutesInput.value = "";
+    renderDashboard();
+  } catch (error) {
+    alert(error.message || t("routePlanCouldNotClear"));
+  } finally {
+    nodes.clearRoutePlan.disabled = false;
+    applyRoleUi();
+  }
 }
 
 function syncRoutePlanInput() {
@@ -731,6 +769,11 @@ function syncRoutePlanInput() {
 }
 
 function getRoutePlan(dateKey) {
+  const serverPlan = routePlans[dateKey];
+  if (serverPlan) {
+    return Math.max(0, Math.round(Number(serverPlan.plannedRoutes || 0)));
+  }
+
   const value = localStorage.getItem(routePlanKey(dateKey));
   if (!value) return 0;
   if (value.startsWith("[")) {
@@ -745,6 +788,20 @@ function getRoutePlan(dateKey) {
 
 function routePlanKey(dateKey) {
   return `fleetinspect_route_plan_${dateKey}`;
+}
+
+async function loadRoutePlanForDate(dateKey) {
+  const selectedDate = dateKey || localDateKey(new Date());
+  if (!selectedDate || !currentAdminUser) return;
+
+  try {
+    const response = await fetch(`/api/route-plans/${encodeURIComponent(selectedDate)}`);
+    const result = await response.json();
+    if (!response.ok || result.ok === false) throw new Error(result.error || t("routePlanCouldNotLoad"));
+    routePlans[selectedDate] = result.plan || { date: selectedDate, plannedRoutes: 0 };
+  } catch {
+    // Keep the local browser copy as a fallback if the server is temporarily unavailable.
+  }
 }
 
 
@@ -1047,6 +1104,11 @@ function exportCurrentCsv() {
 function openSelectedDayReport() {
   const selectedDate = nodes.vehicleControlDate.value || localDateKey(new Date());
   window.open(`/day-report.html?date=${encodeURIComponent(selectedDate)}`, "_blank", "noopener");
+}
+
+function downloadDailyBackup() {
+  const selectedDate = nodes.vehicleControlDate.value || localDateKey(new Date());
+  window.open(`/api/admin/export/${encodeURIComponent(selectedDate)}`, "_blank", "noopener");
 }
 
 function closeSelectedDay() {

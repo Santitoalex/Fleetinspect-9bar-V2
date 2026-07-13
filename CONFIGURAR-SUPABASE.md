@@ -64,7 +64,25 @@ create table if not exists public.dispatchers (
 alter table public.dispatchers enable row level security;
 ```
 
-## 5. Variables en Render
+## 5. Crear tabla de rutas planificadas
+
+Esta tabla guarda el numero de rutas que tienes planificadas cada dia. Asi todos los usuarios del panel ven el mismo control diario:
+
+```sql
+create table if not exists public.route_plans (
+  date text primary key,
+  planned_routes integer not null default 0,
+  updated_at timestamptz default now(),
+  updated_by text
+);
+
+create index if not exists route_plans_date_idx
+on public.route_plans (date desc);
+
+alter table public.route_plans enable row level security;
+```
+
+## 6. Variables en Render
 
 En Render > tu servicio > Environment, pon:
 
@@ -77,6 +95,7 @@ SUPABASE_URL=tu Project URL
 SUPABASE_SERVICE_ROLE_KEY=tu service_role key
 SUPABASE_BUCKET=fleetinspect-photos
 SUPABASE_TABLE=inspections
+ROUTE_PLAN_TABLE=route_plans
 OPENAI_API_KEY=tu clave OpenAI
 OPENAI_MODEL=gpt-4.1-mini
 OPENAI_MAX_PAIRS=9
@@ -95,7 +114,7 @@ Opcional: si quieres crear cuentas manuales desde Render, tambien puedes usar:
 DISPATCHER_ACCOUNTS=alex@empresa.com:ClaveSegura123:Alex:Owner,maria@empresa.com:OtraClave456:Maria:Dispatcher
 ```
 
-## 6. URLs
+## 7. URLs
 
 Cuando Render termine de desplegar:
 
@@ -105,7 +124,7 @@ Panel admin: https://TU-APP.onrender.com/admin
 Estado sistema: https://TU-APP.onrender.com/api/status
 ```
 
-## 7. Que debe salir en el panel
+## 8. Que debe salir en el panel
 
 En el panel admin, Estado del sistema debe mostrar:
 

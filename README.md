@@ -1,4 +1,4 @@
-# FleetInspect 9Bar - Web Service gratis
+# FleetInspect 9Bar - Version profesional V1
 
 Web app profesional para inspecciones diarias de vehiculos desde movil.
 
@@ -7,9 +7,9 @@ Web app profesional para inspecciones diarias de vehiculos desde movil.
 - Conductores: `/driver`
 - Administrador: `/admin`
 
-## Version limpia para empezar gratis
+## Version profesional estable
 
-Esta version esta preparada para empezar en Render Free + Supabase Free usando Web Service normal, sin Blueprint y sin Docker:
+Esta version esta preparada para produccion con Render Standard + Supabase Pro usando Web Service normal:
 
 - Fotos comprimidas para datos moviles.
 - Instalable en movil como app PWA desde `/driver`.
@@ -29,6 +29,8 @@ Esta version esta preparada para empezar en Render Free + Supabase Free usando W
 - Control diario por fecha con vehiculos revisados y vehiculos pendientes.
 - Historial por matricula, resumen de conductores y estado claro de IA.
 - Exportacion CSV general y reporte diario imprimible en PDF con vehiculos hechos/faltantes.
+- Backup JSON por dia desde el panel admin.
+- Plan diario de rutas guardado en servidor/Supabase para que todos los dispatchers vean el mismo numero.
 - IA con OpenAI opcional para comparar danos nuevos con inspecciones anteriores.
 - Guardado rapido: primero se guardan fotos y reporte; despues la IA analiza en segundo plano.
 
@@ -44,6 +46,7 @@ Obligatorias:
 - `SUPABASE_SERVICE_ROLE_KEY`: clave secreta `service_role` de Supabase.
 - `SUPABASE_BUCKET`: `fleetinspect-photos`.
 - `SUPABASE_TABLE`: `inspections`.
+- `ROUTE_PLAN_TABLE`: `route_plans`.
 
 Opcional:
 
@@ -93,19 +96,12 @@ Compresion de fotos:
 - La IA sigue pudiendo detectar danos visibles como golpes, abolladuras, roturas y rayones claros.
 - Los aranazos muy pequenos pueden verse peor si la foto esta lejos, borrosa o con poca luz.
 
-## Coste
+## Produccion recomendada
 
-Para pruebas:
-
-- Render Free.
-- Supabase Free.
-- OpenAI opcional.
-
-Para produccion con muchos conductores:
-
-- Cambiar Render de Free a Standard.
-- Mantener Supabase o subir de plan si el uso crece.
-- Activar OpenAI con `OPENAI_API_KEY`.
+- Render Standard para que la app no se duerma.
+- Supabase Pro para fotos, base de datos y margen de uso diario.
+- OpenAI activo si quieres deteccion automatica de danos nuevos.
+- Usar `Backup dia` en admin para guardar una copia JSON del dia cuando lo necesites.
 
 ## Archivos importantes
 
@@ -117,6 +113,7 @@ Para produccion con muchos conductores:
 - `report.html`, `report.js`, `report.css`: reporte imprimible.
 - `day-report.html`, `day-report.js`: reporte diario imprimible para guardar como PDF.
 - `CONFIGURAR-SUPABASE.md`: pasos para crear bucket, tabla y variables.
+- `supabase-schema.sql`: SQL completo para crear tablas.
 - `INSTALAR-APP-MOVIL.md`: pasos para instalar la app del conductor en iPhone y Android.
 
 ## Render recomendado para esta version
@@ -127,4 +124,4 @@ Crear en Render como:
 - Runtime: Node.
 - Build Command: `npm install`.
 - Start Command: `npm start`.
-- Plan: Free para pruebas.
+- Plan: Standard para produccion.
