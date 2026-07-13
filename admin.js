@@ -717,19 +717,25 @@ async function saveRoutePlan() {
   const selectedDate = nodes.vehicleControlDate.value || localDateKey(new Date());
   const routes = Math.max(0, Math.round(Number(nodes.plannedRoutesInput.value || 0)));
   nodes.saveRoutePlan.disabled = true;
+  nodes.routePlanStatus.textContent = t("routePlanSaving");
   try {
     const response = await fetch(`/api/route-plans/${encodeURIComponent(selectedDate)}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ plannedRoutes: routes }),
     });
-    const result = await response.json();
+    const result = await readJsonResponse(response);
     if (!response.ok || result.ok === false) throw new Error(result.error || t("routePlanCouldNotSave"));
     routePlans[selectedDate] = result.plan || { date: selectedDate, plannedRoutes: routes };
     localStorage.setItem(routePlanKey(selectedDate), String(routes));
+    nodes.routePlanStatus.textContent = t("routePlanSaved", { count: routes });
     renderDashboard();
   } catch (error) {
-    alert(error.message || t("routePlanCouldNotSave"));
+    localStorage.setItem(routePlanKey(selectedDate), String(routes));
+    routePlans[selectedDate] = { date: selectedDate, plannedRoutes: routes, localOnly: true };
+    nodes.routePlanStatus.textContent = t("routePlanSavedLocal", { error: error.message || t("routePlanCouldNotSave") });
+    renderDashboard();
+    alert(t("routePlanSavedLocal", { error: error.message || t("routePlanCouldNotSave") }));
   } finally {
     nodes.saveRoutePlan.disabled = false;
     applyRoleUi();
@@ -747,11 +753,12 @@ async function clearRoutePlan() {
     const response = await fetch(`/api/route-plans/${encodeURIComponent(selectedDate)}`, {
       method: "DELETE",
     });
-    const result = await response.json();
+    const result = await readJsonResponse(response);
     if (!response.ok || result.ok === false) throw new Error(result.error || t("routePlanCouldNotClear"));
     delete routePlans[selectedDate];
     localStorage.removeItem(routePlanKey(selectedDate));
     nodes.plannedRoutesInput.value = "";
+    nodes.routePlanStatus.textContent = t("routePlanCleared");
     renderDashboard();
   } catch (error) {
     alert(error.message || t("routePlanCouldNotClear"));
@@ -796,11 +803,21 @@ async function loadRoutePlanForDate(dateKey) {
 
   try {
     const response = await fetch(`/api/route-plans/${encodeURIComponent(selectedDate)}`);
-    const result = await response.json();
+    const result = await readJsonResponse(response);
     if (!response.ok || result.ok === false) throw new Error(result.error || t("routePlanCouldNotLoad"));
     routePlans[selectedDate] = result.plan || { date: selectedDate, plannedRoutes: 0 };
   } catch {
     // Keep the local browser copy as a fallback if the server is temporarily unavailable.
+  }
+}
+
+async function readJsonResponse(response) {
+  const text = await response.text();
+  if (!text) return {};
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error(`${t("serverReturnedInvalidResponse")} (${response.status})`);
   }
 }
 
