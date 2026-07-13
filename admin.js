@@ -394,7 +394,7 @@ function applyRoleUi() {
   nodes.userManagementNav.classList.toggle("hidden", !canManage);
   nodes.userManagementTopLink.classList.toggle("hidden", !canManage);
   if (canManage) {
-    document.querySelector(".metrics")?.after(nodes.userManagement);
+    document.querySelector(".admin-filter-panel")?.before(nodes.userManagement);
   }
   [nodes.saveRoutePlan, nodes.clearRoutePlan, nodes.closeDay].forEach((node) => {
     node.disabled = !canEdit;

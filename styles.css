@@ -3716,6 +3716,17 @@ body.driver-pro {
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
 }
 
+.topbar-company-logo {
+  width: 172px;
+  height: 52px;
+  border: 1px solid #d8e2ed;
+  border-radius: 10px;
+  background: #fff;
+  object-fit: contain;
+  padding: 6px;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+}
+
 .admin-body .install-admin-button {
   background: #0f766e;
   color: #fff;
@@ -3963,6 +3974,30 @@ body.driver-pro {
   padding: 0 14px;
   text-decoration: none;
   font-weight: 950;
+}
+
+.user-admin-link.hidden {
+  display: none;
+}
+
+.admin-premium .user-management-widget {
+  border-top: 4px solid #f28c00;
+  background:
+    linear-gradient(135deg, rgba(242, 140, 0, 0.07), rgba(18, 60, 105, 0.04)),
+    #fff;
+}
+
+@media (max-width: 920px) {
+  .topbar-company-logo {
+    width: 128px;
+    height: 44px;
+  }
+}
+
+@media (max-width: 620px) {
+  .topbar-company-logo {
+    display: none;
+  }
 }
 
 .admin-premium .fleet-logo p {

@@ -1,11 +1,11 @@
-const CACHE_NAME = "fleetinspect-driver-v38";
+const CACHE_NAME = "fleetinspect-driver-v39";
 const APP_SHELL = [
   "/",
   "/driver",
   "/index.html",
   "/admin",
   "/admin.html",
-  "/styles.css?v=38",
+  "/styles.css?v=39",
   "/app.js",
   "/i18n.js",
   "/vehicles.js",
