@@ -4,6 +4,8 @@ let systemConfig = {
   aiConfigured: false,
 };
 let deferredAdminInstallPrompt = null;
+let currentAdminUser = null;
+let dispatcherUsers = [];
 
 const nodes = {
   refreshDashboard: document.querySelector("#refreshDashboard"),
@@ -71,6 +73,11 @@ const nodes = {
   liveAiState: document.querySelector("#liveAiState"),
   liveDriver: document.querySelector("#liveDriver"),
   livePlate: document.querySelector("#livePlate"),
+  userManagementNav: document.querySelector("#userManagementNav"),
+  userManagementTopLink: document.querySelector("#userManagementTopLink"),
+  userManagement: document.querySelector("#userManagement"),
+  refreshDispatchers: document.querySelector("#refreshDispatchers"),
+  dispatcherList: document.querySelector("#dispatcherList"),
 };
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -111,6 +118,8 @@ document.addEventListener("DOMContentLoaded", () => {
   nodes.closeDay.addEventListener("click", closeSelectedDay);
   nodes.alertList.addEventListener("click", handleAlertAction);
   nodes.vehicleHistoryPlate.addEventListener("change", renderVehicleHistory);
+  nodes.refreshDispatchers.addEventListener("click", loadDispatchers);
+  nodes.dispatcherList.addEventListener("change", handleDispatcherRoleChange);
   nodes.printDashboard.addEventListener("click", () => window.print());
   window.addEventListener("fleetinspect:language", () => {
     renderDashboard();
@@ -253,15 +262,18 @@ async function checkAdminSession() {
 }
 
 function showAdminDashboard(user = {}) {
+  currentAdminUser = user;
   nodes.adminLock.classList.add("hidden");
   nodes.dashboardContent.classList.remove("hidden");
   nodes.logoutAdmin.classList.remove("hidden");
   nodes.currentUserChip.textContent = user.name || user.email || user.username || "Dispatcher";
   nodes.currentRoleChip.textContent = user.role || "Dispatcher";
   nodes.currentRoleChip.classList.remove("hidden");
+  applyRoleUi();
   nodes.dispatcherPassword.value = "";
   nodes.signupPassword.value = "";
   nodes.signupCode.value = "";
+  if (canManageUsers()) loadDispatchers();
 }
 
 async function logoutAdmin() {
@@ -275,6 +287,11 @@ function showAdminLogin() {
   nodes.logoutAdmin.classList.add("hidden");
   nodes.currentRoleChip.classList.add("hidden");
   nodes.currentUserChip.textContent = "Admin";
+  currentAdminUser = null;
+  dispatcherUsers = [];
+  nodes.userManagement.classList.add("hidden");
+  nodes.userManagementNav.classList.add("hidden");
+  nodes.userManagementTopLink.classList.add("hidden");
   nodes.dispatcherPassword.value = "";
   nodes.signupPassword.value = "";
   nodes.signupCode.value = "";
@@ -316,6 +333,7 @@ function renderDashboard() {
   nodes.metricToday.textContent = String(dashboardItems.filter((item) => String(item.finishedAt || item.startedAt || "").startsWith(todayKey)).length);
   nodes.activeFilterCount.textContent = String(items.length);
   renderStatusPills();
+  applyRoleUi();
 
   renderControlRoom(dashboardItems);
   renderAlerts(items.length ? items : dashboardItems);
@@ -366,6 +384,116 @@ function renderDashboard() {
       </div>
     </section>
   `).join("");
+}
+
+function applyRoleUi() {
+  const canManage = canManageUsers();
+  const canEdit = canEditOperations();
+
+  nodes.userManagement.classList.toggle("hidden", !canManage);
+  nodes.userManagementNav.classList.toggle("hidden", !canManage);
+  nodes.userManagementTopLink.classList.toggle("hidden", !canManage);
+  if (canManage) {
+    document.querySelector(".metrics")?.after(nodes.userManagement);
+  }
+  [nodes.saveRoutePlan, nodes.clearRoutePlan, nodes.closeDay].forEach((node) => {
+    node.disabled = !canEdit;
+    node.classList.toggle("disabled", !canEdit);
+    node.title = canEdit ? "" : t("readonlyMode");
+  });
+}
+
+function canManageUsers() {
+  return currentAdminUser?.canManageUsers || roleKey(currentAdminUser?.role) === "owner";
+}
+
+function canEditOperations() {
+  return currentAdminUser?.canEditOperations || ["owner", "supervisor", "dispatcher"].includes(roleKey(currentAdminUser?.role));
+}
+
+function roleKey(value) {
+  const normalized = String(value || "").trim().toLowerCase().replace(/[_-]+/g, " ");
+  if (["owner", "admin", "dueno", "dueño", "propietario"].includes(normalized)) return "owner";
+  if (["supervisor", "manager"].includes(normalized)) return "supervisor";
+  if (["dispatcher", "dispatch", "operador"].includes(normalized)) return "dispatcher";
+  return "readonly";
+}
+
+async function loadDispatchers() {
+  if (!canManageUsers()) return;
+  nodes.dispatcherList.innerHTML = `<article class="empty-state">${escapeHtml(t("loadingUsers"))}</article>`;
+
+  try {
+    const response = await fetch("/api/admin/dispatchers");
+    const result = await response.json();
+    if (!response.ok || result.ok === false) throw new Error(result.error || t("usersCouldNotLoad"));
+    dispatcherUsers = result.users || [];
+    renderDispatcherUsers();
+  } catch (error) {
+    nodes.dispatcherList.innerHTML = `<article class="empty-state">${escapeHtml(error.message || t("usersCouldNotLoad"))}</article>`;
+  }
+}
+
+function renderDispatcherUsers() {
+  if (!dispatcherUsers.length) {
+    nodes.dispatcherList.innerHTML = `<article class="empty-state">${escapeHtml(t("noUsersYet"))}</article>`;
+    return;
+  }
+
+  nodes.dispatcherList.innerHTML = dispatcherUsers.map((user) => {
+    const locked = user.lockedOwner || user.roleKey === "owner" || user.source === "config";
+    return `
+      <article class="dispatcher-row ${escapeHtml(user.roleKey || "readonly")}">
+        <div>
+          <strong>${escapeHtml(user.name || user.email)}</strong>
+          <span>${escapeHtml(user.email)}</span>
+        </div>
+        <div>
+          <em>${escapeHtml(roleLabel(user.role))}</em>
+          <small>${escapeHtml(user.source === "config" ? t("configuredAccount") : t("editableAccount"))}</small>
+        </div>
+        <select data-user-email="${escapeHtml(user.email)}" ${locked ? "disabled" : ""} aria-label="${escapeHtml(t("role"))}">
+          ${roleOptions(user.role)}
+        </select>
+      </article>
+    `;
+  }).join("");
+}
+
+function roleOptions(selectedRole) {
+  return [
+    ["Supervisor", t("roleSupervisor")],
+    ["Dispatcher", t("roleDispatcher")],
+    ["Read only", t("roleReadonly")],
+  ].map(([value, label]) => `<option value="${value}" ${roleKey(value) === roleKey(selectedRole) ? "selected" : ""}>${escapeHtml(label)}</option>`).join("");
+}
+
+function roleLabel(role) {
+  const key = roleKey(role);
+  if (key === "owner") return t("roleOwner");
+  if (key === "supervisor") return t("roleSupervisor");
+  if (key === "dispatcher") return t("roleDispatcher");
+  return t("roleReadonly");
+}
+
+async function handleDispatcherRoleChange(event) {
+  const select = event.target.closest("[data-user-email]");
+  if (!select || !canManageUsers()) return;
+  select.disabled = true;
+
+  try {
+    const response = await fetch(`/api/admin/dispatchers/${encodeURIComponent(select.dataset.userEmail)}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ role: select.value }),
+    });
+    const result = await response.json();
+    if (!response.ok || result.ok === false) throw new Error(result.error || t("roleCouldNotUpdate"));
+    await loadDispatchers();
+  } catch (error) {
+    alert(error.message || t("roleCouldNotUpdate"));
+    await loadDispatchers();
+  }
 }
 
 function renderAlerts(items) {
@@ -441,6 +569,10 @@ function renderAlertState(item) {
 function handleAlertAction(event) {
   const button = event.target.closest("[data-alert-status]");
   if (!button) return;
+  if (!canEditOperations()) {
+    alert(t("readonlyMode"));
+    return;
+  }
   setAlertStatus(button.dataset.alertId, button.dataset.alertStatus);
   renderDashboard();
 }
@@ -570,6 +702,10 @@ function renderRoutePendingSection(count, variant = "") {
 }
 
 function saveRoutePlan() {
+  if (!canEditOperations()) {
+    alert(t("readonlyMode"));
+    return;
+  }
   const selectedDate = nodes.vehicleControlDate.value || localDateKey(new Date());
   const routes = Math.max(0, Math.round(Number(nodes.plannedRoutesInput.value || 0)));
   localStorage.setItem(routePlanKey(selectedDate), String(routes));
@@ -577,6 +713,10 @@ function saveRoutePlan() {
 }
 
 function clearRoutePlan() {
+  if (!canEditOperations()) {
+    alert(t("readonlyMode"));
+    return;
+  }
   const selectedDate = nodes.vehicleControlDate.value || localDateKey(new Date());
   localStorage.removeItem(routePlanKey(selectedDate));
   nodes.plannedRoutesInput.value = "";
@@ -910,6 +1050,10 @@ function openSelectedDayReport() {
 }
 
 function closeSelectedDay() {
+  if (!canEditOperations()) {
+    alert(t("readonlyMode"));
+    return;
+  }
   const selectedDate = nodes.vehicleControlDate.value || localDateKey(new Date());
   const todayItems = dashboardItems.filter((item) => localDateKey(new Date(item.finishedAt || item.startedAt || 0)) === selectedDate);
   if (!todayItems.length) {

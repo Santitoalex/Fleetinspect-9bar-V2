@@ -25,6 +25,7 @@ Esta version esta preparada para empezar en Render Free + Supabase Free usando W
 - Dashboard administrador separado en `/admin`.
 - Acceso admin con email y contrasena.
 - Registro de dispatchers/trabajadores desde `/admin` con codigo interno de empresa.
+- Cuenta owner para Alex y gestion de roles: Owner, Supervisor, Dispatcher y Solo lectura.
 - Control diario por fecha con vehiculos revisados y vehiculos pendientes.
 - Historial por matricula, resumen de conductores y estado claro de IA.
 - Exportacion CSV general y reporte diario imprimible en PDF con vehiculos hechos/faltantes.
@@ -36,6 +37,7 @@ Esta version esta preparada para empezar en Render Free + Supabase Free usando W
 Obligatorias:
 
 - `SESSION_SECRET`: palabra secreta larga para proteger las sesiones.
+- `OWNER_EMAIL`: email del dueno de la app. Para tu caso puedes poner `a.marinescu` o el email completo.
 - `DISPATCHER_SIGNUP_CODE`: codigo interno para que cada dispatcher cree su cuenta.
 - `DISPATCHER_TABLE`: `dispatchers`.
 - `SUPABASE_URL`: URL del proyecto Supabase.
@@ -50,7 +52,7 @@ Opcional:
 Ejemplo opcional de `DISPATCHER_ACCOUNTS`:
 
 ```text
-alex@empresa.com:ClaveSegura123:Alex:Admin,maria@empresa.com:OtraClave456:Maria:Dispatcher
+alex@empresa.com:ClaveSegura123:Alex:Owner,maria@empresa.com:OtraClave456:Maria:Dispatcher
 ```
 
 Formato:
@@ -60,6 +62,15 @@ email:contrasena:nombre:rol
 ```
 
 Si no pones `DISPATCHER_ACCOUNTS`, tus dispatchers pueden crear su propia cuenta desde `/admin` usando el `DISPATCHER_SIGNUP_CODE`.
+
+Roles del panel admin:
+
+- `Owner`: control total y puede cambiar roles.
+- `Supervisor`: puede operar el dashboard.
+- `Dispatcher`: puede revisar operaciones diarias.
+- `Read only`: solo puede ver reportes y PDFs.
+
+Las cuentas nuevas entran como `Read only` hasta que el owner les cambie el rol.
 
 IA:
 

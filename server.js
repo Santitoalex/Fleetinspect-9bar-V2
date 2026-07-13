@@ -10,6 +10,7 @@ const PORT = Number(process.env.PORT || 5173);
 const HOST = process.env.HOST || "0.0.0.0";
 const DATA_DIR = process.env.DATA_DIR || "./data";
 const ADMIN_PIN = process.env.ADMIN_PIN || "1234";
+const OWNER_EMAIL = normalizeEmail(process.env.OWNER_EMAIL || "a.marinescu");
 const DISPATCHER_ACCOUNTS = process.env.DISPATCHER_ACCOUNTS || "";
 const DISPATCHER_SIGNUP_CODE = process.env.DISPATCHER_SIGNUP_CODE || "";
 const DISPATCHER_TABLE = process.env.DISPATCHER_TABLE || "dispatchers";
@@ -53,7 +54,7 @@ function parseDispatcherAccounts() {
       username: "admin",
       password: ADMIN_PIN,
       name: "Admin",
-      role: "Admin",
+      role: "Owner",
     }];
   }
 
@@ -66,7 +67,7 @@ function parseDispatcherAccounts() {
           email: normalizeEmail(account.email || account.username || account.user || ""),
           password: String(account.password || ""),
           name: String(account.name || account.username || account.user || account.email || "Dispatcher").trim(),
-          role: String(account.role || "Dispatcher").trim(),
+          role: normalizeRole(account.role || "Dispatcher"),
         }))
         .filter((account) => account.username && account.password);
     }
@@ -84,7 +85,7 @@ function parseDispatcherAccounts() {
         username,
         password,
         name: name || username,
-        role: role || "Dispatcher",
+        role: normalizeRole(role || "Dispatcher"),
       };
     })
     .filter((account) => account.username && account.password);
@@ -95,16 +96,20 @@ async function findDispatcherAccount(username) {
   const configured = parseDispatcherAccounts().find((account) => {
     return [account.username, account.email].filter(Boolean).some((value) => normalizeEmail(value) === normalized);
   });
-  if (configured) return configured;
+  if (configured) return withEffectiveRole(configured);
   return findStoredDispatcher(normalized);
 }
 
 function publicDispatcher(account) {
+  const role = getEffectiveRole(account);
   return {
     username: account.username || account.email,
     email: account.email || account.username,
     name: account.name,
-    role: account.role,
+    role,
+    roleKey: roleKey(role),
+    canManageUsers: roleKey(role) === "owner",
+    canEditOperations: ["owner", "supervisor", "dispatcher"].includes(roleKey(role)),
   };
 }
 
@@ -124,14 +129,15 @@ async function findStoredDispatcher(email) {
   }
 
   const accounts = await readLocalDispatchers();
-  return accounts.find((account) => normalizeEmail(account.email) === normalized) || null;
+  const account = accounts.find((item) => normalizeEmail(item.email) === normalized) || null;
+  return account ? withEffectiveRole(account) : null;
 }
 
 async function saveStoredDispatcher(account) {
   const stored = {
     email: normalizeEmail(account.email),
     name: account.name,
-    role: account.role || "Dispatcher",
+    role: normalizeRole(account.role || "Read only"),
     password_hash: account.passwordHash,
     created_at: account.createdAt || new Date().toISOString(),
   };
@@ -161,18 +167,128 @@ async function readLocalDispatchers() {
 }
 
 function mapStoredDispatcher(row) {
-  return {
+  const mapped = {
     username: row.email,
     email: row.email,
     name: row.name || row.email,
-    role: row.role || "Dispatcher",
+    role: normalizeRole(row.role || "Read only"),
     passwordHash: row.password_hash || row.passwordHash,
     createdAt: row.created_at || row.createdAt,
   };
+  return withEffectiveRole(mapped);
+}
+
+async function listDispatcherAccounts() {
+  const configured = parseDispatcherAccounts().map((account) => ({
+    ...withEffectiveRole(account),
+    source: "config",
+  }));
+  const stored = await listStoredDispatchers();
+  const byEmail = new Map();
+
+  [...configured, ...stored].forEach((account) => {
+    const key = normalizeEmail(account.email || account.username);
+    if (!key) return;
+    byEmail.set(key, {
+      email: key,
+      name: account.name || key,
+      role: getEffectiveRole(account),
+      roleKey: roleKey(getEffectiveRole(account)),
+      source: account.source || "database",
+      createdAt: account.createdAt || account.created_at || "",
+      lockedOwner: isOwnerEmail(key),
+    });
+  });
+
+  return [...byEmail.values()].sort((a, b) => {
+    if (a.roleKey === "owner") return -1;
+    if (b.roleKey === "owner") return 1;
+    return a.email.localeCompare(b.email);
+  });
+}
+
+async function listStoredDispatchers() {
+  if (supabase) {
+    const { data, error } = await supabase
+      .from(DISPATCHER_TABLE)
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) throw new Error(`Dispatcher database: ${error.message}`);
+    return (data || []).map((row) => ({ ...mapStoredDispatcher(row), source: "database" }));
+  }
+
+  return (await readLocalDispatchers()).map((account) => ({ ...withEffectiveRole(account), source: "local" }));
+}
+
+async function updateStoredDispatcherRole(email, role) {
+  const normalized = normalizeEmail(email);
+  const normalizedRole = normalizeRole(role);
+  if (!normalized || isOwnerEmail(normalized)) {
+    throw new Error("No se puede cambiar el rol del dueno.");
+  }
+
+  if (supabase) {
+    const { data, error } = await supabase
+      .from(DISPATCHER_TABLE)
+      .update({ role: normalizedRole })
+      .eq("email", normalized)
+      .select("*")
+      .maybeSingle();
+
+    if (error) throw new Error(`Dispatcher database: ${error.message}`);
+    if (!data) throw new Error("Cuenta no encontrada.");
+    return mapStoredDispatcher(data);
+  }
+
+  const accounts = await readLocalDispatchers();
+  const index = accounts.findIndex((account) => normalizeEmail(account.email) === normalized);
+  if (index === -1) throw new Error("Cuenta no encontrada.");
+  accounts[index].role = normalizedRole;
+  await fs.writeFile(dispatchersFile, JSON.stringify(accounts, null, 2));
+  return withEffectiveRole(accounts[index]);
 }
 
 function normalizeEmail(value) {
   return String(value || "").trim().toLowerCase();
+}
+
+function roleKey(value) {
+  const normalized = String(value || "").trim().toLowerCase().replace(/[_-]+/g, " ");
+  if (["owner", "admin", "dueno", "dueño", "propietario"].includes(normalized)) return "owner";
+  if (["supervisor", "manager"].includes(normalized)) return "supervisor";
+  if (["dispatcher", "dispatch", "operador"].includes(normalized)) return "dispatcher";
+  if (["readonly", "read only", "solo lectura", "viewer", "lector"].includes(normalized)) return "readonly";
+  return "readonly";
+}
+
+function normalizeRole(value) {
+  const labels = {
+    owner: "Owner",
+    supervisor: "Supervisor",
+    dispatcher: "Dispatcher",
+    readonly: "Read only",
+  };
+  return labels[roleKey(value)] || labels.readonly;
+}
+
+function isOwnerEmail(email) {
+  const normalized = normalizeEmail(email);
+  if (!OWNER_EMAIL || !normalized) return false;
+  if (OWNER_EMAIL.includes("@")) return normalized === OWNER_EMAIL;
+  return normalized === OWNER_EMAIL || normalized.startsWith(`${OWNER_EMAIL}@`);
+}
+
+function getEffectiveRole(account) {
+  if (isOwnerEmail(account.email || account.username)) return "Owner";
+  return normalizeRole(account.role || "Read only");
+}
+
+function withEffectiveRole(account) {
+  return {
+    ...account,
+    role: getEffectiveRole(account),
+  };
 }
 
 function isValidEmail(value) {
@@ -218,17 +334,27 @@ function getAdminSession(request) {
   if (!token) return null;
   const payload = verifySession(token);
   if (!payload || Number(payload.exp || 0) < Math.floor(Date.now() / 1000)) return null;
-  return {
+  return publicDispatcher({
     username: String(payload.username || ""),
     email: String(payload.email || payload.username || ""),
     name: String(payload.name || payload.username || "Dispatcher"),
     role: String(payload.role || "Dispatcher"),
-  };
+  });
 }
 
 function requireAdmin(request, response, next) {
   const user = getAdminSession(request);
   if (!user) return response.status(401).json({ ok: false, error: "Admin login required." });
+  request.adminUser = user;
+  next();
+}
+
+function requireOwner(request, response, next) {
+  const user = getAdminSession(request);
+  if (!user) return response.status(401).json({ ok: false, error: "Admin login required." });
+  if (roleKey(user.role) !== "owner") {
+    return response.status(403).json({ ok: false, error: "Solo el dueno puede gestionar usuarios." });
+  }
   request.adminUser = user;
   next();
 }
@@ -342,7 +468,7 @@ app.post("/api/admin/register", async (request, response) => {
     email,
     username: email,
     name: name || email.split("@")[0],
-    role: "Dispatcher",
+    role: isOwnerEmail(email) ? "Owner" : "Read only",
     passwordHash: hashPassword(password),
     createdAt: new Date().toISOString(),
   };
@@ -362,6 +488,26 @@ app.get("/api/admin/session", (request, response) => {
   const user = getAdminSession(request);
   if (!user) return response.status(401).json({ ok: false, error: "No session" });
   response.json({ ok: true, user });
+});
+
+app.get("/api/admin/dispatchers", requireOwner, async (_request, response) => {
+  try {
+    response.json({ ok: true, users: await listDispatcherAccounts() });
+  } catch (error) {
+    console.error(error);
+    response.status(500).json({ ok: false, error: "No se pudieron cargar los usuarios." });
+  }
+});
+
+app.patch("/api/admin/dispatchers/:email", requireOwner, async (request, response) => {
+  try {
+    const role = normalizeRole(request.body?.role || "");
+    const account = await updateStoredDispatcherRole(request.params.email, role);
+    response.json({ ok: true, user: publicDispatcher(account) });
+  } catch (error) {
+    console.error(error);
+    response.status(400).json({ ok: false, error: error.message });
+  }
 });
 
 app.post("/api/admin/logout", (_request, response) => {

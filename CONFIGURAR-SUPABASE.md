@@ -70,6 +70,7 @@ En Render > tu servicio > Environment, pon:
 
 ```text
 SESSION_SECRET=pon-una-frase-larga-y-secreta
+OWNER_EMAIL=a.marinescu
 DISPATCHER_SIGNUP_CODE=pon-un-codigo-interno-de-tu-empresa
 DISPATCHER_TABLE=dispatchers
 SUPABASE_URL=tu Project URL
@@ -84,10 +85,14 @@ OPENAI_TIMEOUT_MS=60000
 
 `DISPATCHER_SIGNUP_CODE` es el codigo que tendran que poner tus dispatchers/trabajadores para crear su cuenta en `/admin`.
 
+`OWNER_EMAIL` es tu cuenta duena. Puedes poner `a.marinescu` para que cualquier email que empiece por `a.marinescu@...` sea owner, o poner el email completo.
+
+Las cuentas nuevas se crean como `Read only`. Entra con tu cuenta owner en `/admin`, abre "Gestion de usuarios" y cambia el rol a `Dispatcher`, `Supervisor` o `Read only`.
+
 Opcional: si quieres crear cuentas manuales desde Render, tambien puedes usar:
 
 ```text
-DISPATCHER_ACCOUNTS=alex@empresa.com:ClaveSegura123:Alex:Admin,maria@empresa.com:OtraClave456:Maria:Dispatcher
+DISPATCHER_ACCOUNTS=alex@empresa.com:ClaveSegura123:Alex:Owner,maria@empresa.com:OtraClave456:Maria:Dispatcher
 ```
 
 ## 6. URLs
