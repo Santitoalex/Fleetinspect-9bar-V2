@@ -25,6 +25,8 @@ const SUPABASE_BUCKET = process.env.SUPABASE_BUCKET || "fleetinspect-photos";
 const SUPABASE_TABLE = process.env.SUPABASE_TABLE || "inspections";
 const ROUTE_PLAN_TABLE = process.env.ROUTE_PLAN_TABLE || "route_plans";
 const SIGNED_URL_SECONDS = 60 * 60 * 24 * 7;
+const FLEET_SITES = ["DRP3", "DSU1"];
+const FALLBACK_SITE = "UNASSIGNED";
 
 const inspectionsDir = path.join(DATA_DIR, "inspections");
 const dispatchersDir = path.join(DATA_DIR, "dispatchers");
@@ -550,8 +552,9 @@ app.get("/api/status", (_request, response) => {
 app.get("/api/route-plans/:date", requireAdmin, async (request, response) => {
   try {
     const date = normalizeDateKey(request.params.date);
+    const site = normalizeSite(request.query.site || "all");
     if (!date) return response.status(400).json({ ok: false, error: "Fecha no valida." });
-    response.json({ ok: true, plan: await readRoutePlan(date) });
+    response.json({ ok: true, plan: await readRoutePlan(date, site) });
   } catch (error) {
     console.error(error);
     response.status(500).json({ ok: false, error: "No se pudo cargar el plan de rutas." });
@@ -561,10 +564,12 @@ app.get("/api/route-plans/:date", requireAdmin, async (request, response) => {
 app.put("/api/route-plans/:date", requireOperationsEditor, async (request, response) => {
   try {
     const date = normalizeDateKey(request.params.date);
+    const site = normalizeSite(request.body?.site || request.query.site || "all");
     const plannedRoutes = Math.max(0, Math.round(Number(request.body?.plannedRoutes || 0)));
     if (!date) return response.status(400).json({ ok: false, error: "Fecha no valida." });
     const plan = await saveRoutePlanRecord({
       date,
+      site,
       plannedRoutes,
       updatedBy: request.adminUser?.email || request.adminUser?.username || "admin",
     });
@@ -578,8 +583,9 @@ app.put("/api/route-plans/:date", requireOperationsEditor, async (request, respo
 app.delete("/api/route-plans/:date", requireOperationsEditor, async (request, response) => {
   try {
     const date = normalizeDateKey(request.params.date);
+    const site = normalizeSite(request.query.site || "all");
     if (!date) return response.status(400).json({ ok: false, error: "Fecha no valida." });
-    await deleteRoutePlanRecord(date);
+    await deleteRoutePlanRecord(date, site);
     response.json({ ok: true });
   } catch (error) {
     console.error(error);
@@ -630,6 +636,7 @@ app.post("/api/inspections", async (request, response) => {
 
   const item = {
     id,
+    site: normalizeSite(payload.site || payload.depot || payload.station || FALLBACK_SITE),
     driverName: String(payload.driverName || "").trim(),
     plate: String(payload.plate || "").trim().toUpperCase(),
     startedAt: payload.startedAt || new Date().toISOString(),
@@ -705,7 +712,8 @@ async function saveToSupabase(item, dateKey) {
   if (!supabase) throw new Error("Supabase is not configured.");
 
   const plateKey = safeName(item.plate);
-  const folderPath = `fleetinspect/${plateKey}/${dateKey}/${item.id}`;
+  const siteKey = safeName(normalizeSite(item.site || FALLBACK_SITE));
+  const folderPath = `fleetinspect/${siteKey}/${plateKey}/${dateKey}/${item.id}`;
   const storedPhotos = [];
 
   for (const [index, photo] of item.photos.entries()) {
@@ -838,28 +846,32 @@ function getSupabaseBucketUrl() {
   return `https://supabase.com/dashboard/project/${match[1]}/storage/buckets/${SUPABASE_BUCKET}`;
 }
 
-async function readRoutePlan(date) {
+async function readRoutePlan(date, site = "all") {
   const dateKey = normalizeDateKey(date);
-  if (!dateKey) return emptyRoutePlan(date);
+  const siteKey = normalizeSite(site);
+  if (!dateKey) return emptyRoutePlan(date, siteKey);
 
   if (supabase) {
     const { data, error } = await supabase
       .from(ROUTE_PLAN_TABLE)
       .select("*")
       .eq("date", dateKey)
+      .eq("site", siteKey)
       .maybeSingle();
 
     if (error && error.code !== "PGRST116") throw new Error(`Supabase Route Plans: ${error.message}`);
-    return data ? mapRoutePlan(data) : emptyRoutePlan(dateKey);
+    return data ? mapRoutePlan(data) : emptyRoutePlan(dateKey, siteKey);
   }
 
   const plans = await readLocalRoutePlans();
-  return plans[dateKey] || emptyRoutePlan(dateKey);
+  return plans[routePlanKey(dateKey, siteKey)] || plans[dateKey] || emptyRoutePlan(dateKey, siteKey);
 }
 
 async function saveRoutePlanRecord(plan) {
+  const siteKey = normalizeSite(plan.site || "all");
   const item = {
     date: normalizeDateKey(plan.date),
+    site: siteKey,
     plannedRoutes: Math.max(0, Math.round(Number(plan.plannedRoutes || 0))),
     updatedAt: new Date().toISOString(),
     updatedBy: normalizeEmail(plan.updatedBy || "admin"),
@@ -868,13 +880,14 @@ async function saveRoutePlanRecord(plan) {
   if (supabase) {
     const row = {
       date: item.date,
+      site: item.site,
       planned_routes: item.plannedRoutes,
       updated_at: item.updatedAt,
       updated_by: item.updatedBy,
     };
     const { data, error } = await supabase
       .from(ROUTE_PLAN_TABLE)
-      .upsert(row, { onConflict: "date" })
+      .upsert(row, { onConflict: "date,site" })
       .select("*")
       .maybeSingle();
 
@@ -883,27 +896,29 @@ async function saveRoutePlanRecord(plan) {
   }
 
   const plans = await readLocalRoutePlans();
-  plans[item.date] = item;
+  plans[routePlanKey(item.date, item.site)] = item;
   await fs.writeFile(routePlansFile, JSON.stringify(plans, null, 2));
   return item;
 }
 
-async function deleteRoutePlanRecord(date) {
+async function deleteRoutePlanRecord(date, site = "all") {
   const dateKey = normalizeDateKey(date);
+  const siteKey = normalizeSite(site);
   if (!dateKey) return;
 
   if (supabase) {
     const { error } = await supabase
       .from(ROUTE_PLAN_TABLE)
       .delete()
-      .eq("date", dateKey);
+      .eq("date", dateKey)
+      .eq("site", siteKey);
 
     if (error) throw new Error(`Supabase Route Plans: ${error.message}`);
     return;
   }
 
   const plans = await readLocalRoutePlans();
-  delete plans[dateKey];
+  delete plans[routePlanKey(dateKey, siteKey)];
   await fs.writeFile(routePlansFile, JSON.stringify(plans, null, 2));
 }
 
@@ -920,19 +935,25 @@ async function readLocalRoutePlans() {
 function mapRoutePlan(row) {
   return {
     date: normalizeDateKey(row.date),
+    site: normalizeSite(row.site || "all"),
     plannedRoutes: Math.max(0, Math.round(Number(row.planned_routes ?? row.plannedRoutes ?? 0))),
     updatedAt: row.updated_at || row.updatedAt || "",
     updatedBy: row.updated_by || row.updatedBy || "",
   };
 }
 
-function emptyRoutePlan(date) {
+function emptyRoutePlan(date, site = "all") {
   return {
     date: normalizeDateKey(date),
+    site: normalizeSite(site),
     plannedRoutes: 0,
     updatedAt: "",
     updatedBy: "",
   };
+}
+
+function routePlanKey(date, site = "all") {
+  return `${normalizeDateKey(date)}__${normalizeSite(site)}`;
 }
 
 function normalizeDateKey(value) {
@@ -941,6 +962,14 @@ function normalizeDateKey(value) {
   const date = new Date(text);
   if (Number.isNaN(date.getTime())) return "";
   return date.toISOString().slice(0, 10);
+}
+
+function normalizeSite(value) {
+  const site = String(value || "").trim().toUpperCase();
+  if (site === "ALL" || site === "TODOS") return "all";
+  if (FLEET_SITES.includes(site)) return site;
+  if (site === "UNASSIGNED" || site === "SIN SITE") return FALLBACK_SITE;
+  return FALLBACK_SITE;
 }
 
 async function readInspection(id) {

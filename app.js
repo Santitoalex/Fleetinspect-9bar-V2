@@ -22,6 +22,7 @@ const nodes = {
   startScreen: document.querySelector("#startScreen"),
   captureScreen: document.querySelector("#captureScreen"),
   startForm: document.querySelector("#startForm"),
+  siteSelect: document.querySelector("#siteSelect"),
   driverName: document.querySelector("#driverName"),
   vehiclePlate: document.querySelector("#vehiclePlate"),
   sessionMeta: document.querySelector("#sessionMeta"),
@@ -168,14 +169,16 @@ async function beginSession(event) {
 
   const driverName = nodes.driverName.value.trim();
   const plate = normalizePlate(nodes.vehiclePlate.value);
+  const site = normalizeSite(nodes.siteSelect?.value);
 
-  if (!driverName || !plate) {
+  if (!site || !driverName || !plate) {
     alert(t("missingDetails"));
     return;
   }
 
   session = {
     id: `inspection-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    site,
     driverName,
     plate,
     startedAt: new Date().toISOString(),
@@ -550,7 +553,7 @@ function updateCaptureUI() {
   const completedCount = STEPS.filter((item) => session?.photos[item.id]).length;
 
   nodes.stepTitle.textContent = getStepLabel(step);
-  nodes.sessionMeta.textContent = `${session.driverName} - ${session.plate}`;
+  nodes.sessionMeta.textContent = `${session.site} - ${session.driverName} - ${session.plate}`;
   nodes.photoCounter.textContent = `${completedCount} / ${STEPS.length}`;
   nodes.stepHelp.textContent = photo ? t("photoSavedNext") : t("placeVehicle");
 
@@ -873,6 +876,11 @@ function stopCamera() {
 
 function normalizePlate(value) {
   return String(value || "").trim().toUpperCase().replace(/\s+/g, " ");
+}
+
+function normalizeSite(value) {
+  const site = String(value || "").trim().toUpperCase();
+  return ["DRP3", "DSU1"].includes(site) ? site : "";
 }
 
 function getStepLabel(step) {

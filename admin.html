@@ -12,7 +12,7 @@
     <link rel="manifest" href="/admin.webmanifest" />
     <link rel="apple-touch-icon" href="/admin-apple-touch-icon.png" />
     <link rel="icon" href="/admin-icon-192.png" sizes="192x192" />
-    <link rel="stylesheet" href="/styles.css?v=41" />
+    <link rel="stylesheet" href="/styles.css?v=42" />
   </head>
   <body class="admin-body admin-premium">
     <div class="admin-shell">
@@ -132,6 +132,15 @@
             <div id="dashboardContent" class="hidden">
               <section class="admin-filter-panel" aria-label="Dashboard filters">
                 <label>
+                  <span>Site</span>
+                  <select id="siteFilter">
+                    <option value="all">DRP3 + DSU1</option>
+                    <option value="DRP3">DRP3</option>
+                    <option value="DSU1">DSU1</option>
+                    <option value="UNASSIGNED">Sin site</option>
+                  </select>
+                </label>
+                <label>
                   <span data-i18n="allInspections">All inspections</span>
                   <select id="statusFilter">
                     <option value="all" data-i18n="allInspections">All inspections</option>
@@ -178,6 +187,8 @@
                   <small><b id="liveDriver">--</b> · <b id="livePlate">--</b></small>
                 </article>
               </section>
+
+              <section id="siteOverview" class="site-overview-grid" aria-label="Sites"></section>
 
               <div class="metrics">
                 <article><span data-i18n="inspections">Inspections</span><strong id="metricInspections">0</strong></article>
@@ -344,6 +355,6 @@
 
     <script src="/vehicles.js?v=2"></script>
     <script src="/i18n.js?v=15"></script>
-    <script src="/admin.js?v=25"></script>
+    <script src="/admin.js?v=26"></script>
   </body>
 </html>

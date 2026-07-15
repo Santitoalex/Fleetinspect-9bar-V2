@@ -7,6 +7,8 @@ let deferredAdminInstallPrompt = null;
 let currentAdminUser = null;
 let dispatcherUsers = [];
 let routePlans = {};
+const FLEET_SITES = ["DRP3", "DSU1"];
+const FALLBACK_SITE = "UNASSIGNED";
 
 const nodes = {
   refreshDashboard: document.querySelector("#refreshDashboard"),
@@ -34,6 +36,8 @@ const nodes = {
   systemStatus: document.querySelector("#systemStatus"),
   recentActivity: document.querySelector("#recentActivity"),
   searchReports: document.querySelector("#searchReports"),
+  siteFilter: document.querySelector("#siteFilter"),
+  siteOverview: document.querySelector("#siteOverview"),
   statusFilter: document.querySelector("#statusFilter"),
   dateFilter: document.querySelector("#dateFilter"),
   exportCsv: document.querySelector("#exportCsv"),
@@ -104,6 +108,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
   nodes.searchReports.addEventListener("input", renderDashboard);
+  nodes.siteFilter?.addEventListener("change", async () => {
+    await loadRoutePlanForDate(nodes.vehicleControlDate.value || localDateKey(new Date()));
+    syncRoutePlanInput();
+    renderDashboard();
+  });
   nodes.statusFilter.addEventListener("change", renderDashboard);
   nodes.dateFilter.addEventListener("change", renderDashboard);
   nodes.vehicleControlDate.value = localDateKey(new Date());
@@ -328,31 +337,33 @@ async function loadDashboard() {
 }
 
 function renderDashboard() {
+  const siteItems = getSiteScopedItems(dashboardItems);
   const items = getFilteredItems();
 
-  const allGroups = groupByPlate(dashboardItems);
+  const allGroups = groupByPlate(siteItems);
   const todayKey = new Date().toISOString().slice(0, 10);
-  nodes.metricInspections.textContent = String(dashboardItems.length);
+  nodes.metricInspections.textContent = String(siteItems.length);
   nodes.metricVehicles.textContent = String(Object.keys(allGroups).length);
-  nodes.metricPhotos.textContent = String(dashboardItems.reduce((sum, item) => sum + (item.photos?.length || 0), 0));
-  const alertCount = dashboardItems.filter((item) => item.ai?.newDamageDetected).length;
+  nodes.metricPhotos.textContent = String(siteItems.reduce((sum, item) => sum + (item.photos?.length || 0), 0));
+  const alertCount = siteItems.filter((item) => item.ai?.newDamageDetected).length;
   nodes.metricAlerts.textContent = String(alertCount);
   nodes.widgetAlertCount.textContent = String(alertCount);
-  nodes.metricToday.textContent = String(dashboardItems.filter((item) => String(item.finishedAt || item.startedAt || "").startsWith(todayKey)).length);
+  nodes.metricToday.textContent = String(siteItems.filter((item) => String(item.finishedAt || item.startedAt || "").startsWith(todayKey)).length);
   nodes.activeFilterCount.textContent = String(items.length);
   renderStatusPills();
   applyRoleUi();
 
-  renderControlRoom(dashboardItems);
-  renderAlerts(items.length ? items : dashboardItems);
+  renderControlRoom(siteItems);
+  renderSiteOverview();
+  renderAlerts(items.length ? items : siteItems);
   renderVehicleSummary(allGroups);
   renderDailyVehicleControl();
-  renderAiStatusSummary(dashboardItems);
-  renderDriverSummary(dashboardItems);
+  renderAiStatusSummary(siteItems);
+  renderDriverSummary(siteItems);
   renderVehicleHistoryPicker();
   renderVehicleHistory();
-  renderSystemStatus(dashboardItems);
-  renderRecentActivity(dashboardItems);
+  renderSystemStatus(siteItems);
+  renderRecentActivity(siteItems);
 
   if (!items.length) {
     nodes.reportList.innerHTML = `<p>${t("noReports")}</p>`;
@@ -374,7 +385,7 @@ function renderDashboard() {
           <article class="report-card">
             <div>
               <strong>${escapeHtml(item.driverName || t("noDriver"))}</strong>
-              <span>${formatDate(item.finishedAt || item.startedAt)}</span>
+              <span>${escapeHtml(siteLabel(getItemSite(item)))} · ${formatDate(item.finishedAt || item.startedAt)}</span>
               <small>${item.photos?.length || 0} ${escapeHtml(t("photos").toLowerCase())}</small>
               ${renderPhotoStrip(item)}
               <p class="ai-result ${item.ai?.newDamageDetected ? "alert" : ""}">
@@ -568,6 +579,37 @@ function renderControlRoom(items) {
   nodes.livePlate.textContent = latest?.plate || "--";
 }
 
+function renderSiteOverview() {
+  if (!nodes.siteOverview) return;
+  const today = localDateKey(new Date());
+  const sites = [...FLEET_SITES, FALLBACK_SITE];
+  nodes.siteOverview.innerHTML = sites.map((site) => {
+    const todayItems = dashboardItems.filter((item) => {
+      return getItemSite(item) === site && localDateKey(new Date(item.finishedAt || item.startedAt || 0)) === today;
+    });
+    const planned = getRoutePlan(today, site);
+    const pending = planned ? Math.max(planned - todayItems.length, 0) : 0;
+    const alerts = todayItems.filter((item) => item.ai?.newDamageDetected).length;
+    const active = getSelectedSite() === site;
+    return `
+      <button class="site-overview-card ${active ? "active" : ""}" type="button" data-site-jump="${escapeHtml(site)}">
+        <span>${escapeHtml(siteLabel(site))}</span>
+        <strong>${todayItems.length}${planned ? ` / ${planned}` : ""}</strong>
+        <small>${planned ? `${pending} pendientes` : "Sin rutas planificadas"} · ${alerts} alertas</small>
+      </button>
+    `;
+  }).join("");
+
+  nodes.siteOverview.querySelectorAll("[data-site-jump]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      nodes.siteFilter.value = button.dataset.siteJump;
+      await loadRoutePlanForDate(nodes.vehicleControlDate.value || today);
+      syncRoutePlanInput();
+      renderDashboard();
+    });
+  });
+}
+
 function renderAlertState(item) {
   const status = getAlertStatus(item.id);
   const label = status === "resolved" ? t("resolved") : status === "reviewed" ? t("reviewed") : t("pendingReview");
@@ -622,7 +664,7 @@ function renderDailyVehicleControl() {
   const search = nodes.vehicleControlSearch.value.trim().toLowerCase();
   const plannedRoutes = getRoutePlan(selectedDate);
   const hasRoutePlan = plannedRoutes > 0;
-  const inspectionsByPlate = dashboardItems.reduce((groups, item) => {
+  const inspectionsByPlate = getSiteScopedItems(dashboardItems).reduce((groups, item) => {
     const plate = normalizePlate(item.plate || "");
     const inspectionDate = localDateKey(new Date(item.finishedAt || item.startedAt || 0));
     if (inspectionDate !== selectedDate || !plate) return groups;
@@ -662,7 +704,7 @@ function renderDailyVehicleControl() {
   nodes.controlMissingVehicles.textContent = hasRoutePlan ? String(pendingRoutes) : "0";
   nodes.controlAlertVehicles.textContent = String(alertCount);
   nodes.routePlanStatus.textContent = hasRoutePlan
-    ? t("routePlanActive", { count: plannedRoutes })
+    ? `${t("routePlanActive", { count: plannedRoutes })} · ${siteLabel(getSelectedSite())}`
     : t("routePlanNotSet");
 
   if (!vehicles.length) {
@@ -715,24 +757,25 @@ async function saveRoutePlan() {
     return;
   }
   const selectedDate = nodes.vehicleControlDate.value || localDateKey(new Date());
+  const selectedSite = getSelectedSite();
   const routes = Math.max(0, Math.round(Number(nodes.plannedRoutesInput.value || 0)));
   nodes.saveRoutePlan.disabled = true;
   nodes.routePlanStatus.textContent = t("routePlanSaving");
   try {
-    const response = await fetch(`/api/route-plans/${encodeURIComponent(selectedDate)}`, {
+    const response = await fetch(`/api/route-plans/${encodeURIComponent(selectedDate)}?site=${encodeURIComponent(selectedSite)}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ plannedRoutes: routes }),
+      body: JSON.stringify({ plannedRoutes: routes, site: selectedSite }),
     });
     const result = await readJsonResponse(response);
     if (!response.ok || result.ok === false) throw new Error(result.error || t("routePlanCouldNotSave"));
-    routePlans[selectedDate] = result.plan || { date: selectedDate, plannedRoutes: routes };
-    localStorage.setItem(routePlanKey(selectedDate), String(routes));
-    nodes.routePlanStatus.textContent = t("routePlanSaved", { count: routes });
+    routePlans[routePlanMapKey(selectedDate, selectedSite)] = result.plan || { date: selectedDate, site: selectedSite, plannedRoutes: routes };
+    localStorage.setItem(routePlanKey(selectedDate, selectedSite), String(routes));
+    nodes.routePlanStatus.textContent = `${t("routePlanSaved", { count: routes })} · ${siteLabel(selectedSite)}`;
     renderDashboard();
   } catch (error) {
-    localStorage.setItem(routePlanKey(selectedDate), String(routes));
-    routePlans[selectedDate] = { date: selectedDate, plannedRoutes: routes, localOnly: true };
+    localStorage.setItem(routePlanKey(selectedDate, selectedSite), String(routes));
+    routePlans[routePlanMapKey(selectedDate, selectedSite)] = { date: selectedDate, site: selectedSite, plannedRoutes: routes, localOnly: true };
     nodes.routePlanStatus.textContent = t("routePlanSavedLocal", { error: error.message || t("routePlanCouldNotSave") });
     renderDashboard();
     alert(t("routePlanSavedLocal", { error: error.message || t("routePlanCouldNotSave") }));
@@ -748,15 +791,16 @@ async function clearRoutePlan() {
     return;
   }
   const selectedDate = nodes.vehicleControlDate.value || localDateKey(new Date());
+  const selectedSite = getSelectedSite();
   nodes.clearRoutePlan.disabled = true;
   try {
-    const response = await fetch(`/api/route-plans/${encodeURIComponent(selectedDate)}`, {
+    const response = await fetch(`/api/route-plans/${encodeURIComponent(selectedDate)}?site=${encodeURIComponent(selectedSite)}`, {
       method: "DELETE",
     });
     const result = await readJsonResponse(response);
     if (!response.ok || result.ok === false) throw new Error(result.error || t("routePlanCouldNotClear"));
-    delete routePlans[selectedDate];
-    localStorage.removeItem(routePlanKey(selectedDate));
+    delete routePlans[routePlanMapKey(selectedDate, selectedSite)];
+    localStorage.removeItem(routePlanKey(selectedDate, selectedSite));
     nodes.plannedRoutesInput.value = "";
     nodes.routePlanStatus.textContent = t("routePlanCleared");
     renderDashboard();
@@ -775,13 +819,19 @@ function syncRoutePlanInput() {
   nodes.plannedRoutesInput.value = routes ? String(routes) : "";
 }
 
-function getRoutePlan(dateKey) {
-  const serverPlan = routePlans[dateKey];
+function getRoutePlan(dateKey, site = getSelectedSite()) {
+  const normalizedSite = normalizeSite(site);
+  if (normalizedSite === "all") {
+    const specificTotal = [...FLEET_SITES, FALLBACK_SITE].reduce((sum, itemSite) => sum + getRoutePlan(dateKey, itemSite), 0);
+    if (specificTotal > 0) return specificTotal;
+  }
+
+  const serverPlan = routePlans[routePlanMapKey(dateKey, normalizedSite)];
   if (serverPlan) {
     return Math.max(0, Math.round(Number(serverPlan.plannedRoutes || 0)));
   }
 
-  const value = localStorage.getItem(routePlanKey(dateKey));
+  const value = localStorage.getItem(routePlanKey(dateKey, normalizedSite));
   if (!value) return 0;
   if (value.startsWith("[")) {
     try {
@@ -793,8 +843,12 @@ function getRoutePlan(dateKey) {
   return Math.max(0, Math.round(Number(value) || 0));
 }
 
-function routePlanKey(dateKey) {
-  return `fleetinspect_route_plan_${dateKey}`;
+function routePlanMapKey(dateKey, site = getSelectedSite()) {
+  return `${dateKey}__${normalizeSite(site)}`;
+}
+
+function routePlanKey(dateKey, site = getSelectedSite()) {
+  return `fleetinspect_route_plan_${dateKey}_${normalizeSite(site)}`;
 }
 
 async function loadRoutePlanForDate(dateKey) {
@@ -802,10 +856,13 @@ async function loadRoutePlanForDate(dateKey) {
   if (!selectedDate || !currentAdminUser) return;
 
   try {
-    const response = await fetch(`/api/route-plans/${encodeURIComponent(selectedDate)}`);
-    const result = await readJsonResponse(response);
-    if (!response.ok || result.ok === false) throw new Error(result.error || t("routePlanCouldNotLoad"));
-    routePlans[selectedDate] = result.plan || { date: selectedDate, plannedRoutes: 0 };
+    const sites = getSelectedSite() === "all" ? ["all", ...FLEET_SITES, FALLBACK_SITE] : [getSelectedSite()];
+    await Promise.all(sites.map(async (site) => {
+      const response = await fetch(`/api/route-plans/${encodeURIComponent(selectedDate)}?site=${encodeURIComponent(site)}`);
+      const result = await readJsonResponse(response);
+      if (!response.ok || result.ok === false) throw new Error(result.error || t("routePlanCouldNotLoad"));
+      routePlans[routePlanMapKey(selectedDate, site)] = result.plan || { date: selectedDate, site, plannedRoutes: 0 };
+    }));
   } catch {
     // Keep the local browser copy as a fallback if the server is temporarily unavailable.
   }
@@ -1022,8 +1079,9 @@ function getFilteredItems() {
   const now = Date.now();
 
   return dashboardItems.filter((item) => {
-    const text = `${item.driverName || ""} ${item.plate || ""}`.toLowerCase();
+    const text = `${item.driverName || ""} ${item.plate || ""} ${getItemSite(item)}`.toLowerCase();
     const matchesQuery = text.includes(query);
+    const matchesSite = matchesSelectedSite(item);
     const hasAlert = Boolean(item.ai?.newDamageDetected);
     const matchesStatus =
       status === "all" ||
@@ -1037,8 +1095,41 @@ function getFilteredItems() {
       dateRange === "all" ||
       (dateRange === "today" && localDateKey(itemDate) === localDateKey(new Date())) ||
       (Number(dateRange) && ageDays <= Number(dateRange));
-    return matchesQuery && matchesStatus && matchesDate;
+    return matchesQuery && matchesSite && matchesStatus && matchesDate;
   });
+}
+
+function getSiteScopedItems(items) {
+  return items.filter(matchesSelectedSite);
+}
+
+function matchesSelectedSite(item) {
+  const selected = getSelectedSite();
+  if (selected === "all") return true;
+  return getItemSite(item) === selected;
+}
+
+function getSelectedSite() {
+  return normalizeSite(nodes.siteFilter?.value || "all");
+}
+
+function getItemSite(item) {
+  return normalizeSite(item?.site || item?.depot || item?.station || FALLBACK_SITE);
+}
+
+function normalizeSite(value) {
+  const site = String(value || "").trim().toUpperCase();
+  if (site === "ALL") return "all";
+  if (site === "DRP3" || site === "DSU1") return site;
+  if (site === "UNASSIGNED" || site === "SIN SITE") return FALLBACK_SITE;
+  return value === "all" ? "all" : FALLBACK_SITE;
+}
+
+function siteLabel(site) {
+  const normalized = normalizeSite(site);
+  if (normalized === "all") return "DRP3 + DSU1";
+  if (normalized === FALLBACK_SITE) return "Sin site";
+  return normalized;
 }
 
 function renderStatusPills() {
