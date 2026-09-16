@@ -7091,3 +7091,521 @@ body.driver-pro {
     order: -1;
   }
 }
+
+/* v47 dedicated 9Bar operations interface */
+.admin-dedicated-v47,
+.driver-dedicated-v47 {
+  --d47-night: #060d16;
+  --d47-panel: #ffffff;
+  --d47-ink: #0d1726;
+  --d47-muted: #667085;
+  --d47-line: #d8e3ee;
+  --d47-soft: #f3f6f9;
+  --d47-blue: #123c69;
+  --d47-blue-2: #1f6aa5;
+  --d47-orange: #f28c00;
+  --d47-green: #0f766e;
+  --d47-red: #dc2626;
+  --d47-shadow: 0 18px 48px rgba(15, 23, 42, 0.1);
+}
+
+.admin-dedicated-v47 {
+  background: #eaf0f6;
+}
+
+.admin-dedicated-v47 .admin-shell {
+  grid-template-columns: 72px minmax(0, 1fr);
+  background:
+    linear-gradient(180deg, rgba(18, 60, 105, 0.1), transparent 380px),
+    #eaf0f6;
+}
+
+.admin-dedicated-v47 .fleet-sidebar {
+  width: 72px;
+  padding: 10px 8px;
+  background: #060d16;
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.08);
+}
+
+.admin-dedicated-v47 .fleet-logo {
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.admin-dedicated-v47 .admin-product-logo {
+  width: 52px;
+  height: 52px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  object-fit: cover;
+  padding: 4px;
+}
+
+.admin-dedicated-v47 .fleet-logo p {
+  display: none;
+}
+
+.admin-dedicated-v47 .fleet-nav {
+  display: grid;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.admin-dedicated-v47 .fleet-nav a {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  min-height: 54px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 0;
+  color: #b8c7d9;
+}
+
+.admin-dedicated-v47 .fleet-nav a span {
+  width: auto;
+  color: inherit;
+  font-size: 20px;
+}
+
+.admin-dedicated-v47 .fleet-nav a b {
+  position: absolute;
+  left: 72px;
+  z-index: 60;
+  display: none;
+  min-width: 140px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background: #0b1726;
+  color: #ffffff;
+  padding: 8px 10px;
+  font-size: 12px;
+  box-shadow: 0 12px 30px rgba(2, 6, 23, 0.26);
+}
+
+.admin-dedicated-v47 .fleet-nav a:hover b {
+  display: block;
+}
+
+.admin-dedicated-v47 .fleet-nav a:hover,
+.admin-dedicated-v47 .fleet-nav a.active {
+  border-color: rgba(242, 140, 0, 0.5);
+  background: rgba(242, 140, 0, 0.16);
+  color: #ffffff;
+}
+
+.admin-dedicated-v47 .fleet-topbar {
+  min-height: 68px;
+  border-bottom: 1px solid #d4e0eb;
+  background: rgba(255, 255, 255, 0.96);
+  padding: 10px 22px;
+}
+
+.admin-dedicated-v47 .topbar-company-logo {
+  width: 164px;
+  height: 46px;
+  border: 1px solid #d8e3ee;
+  border-radius: 8px;
+  object-fit: contain;
+  background: #ffffff;
+}
+
+.admin-dedicated-v47 .global-search {
+  min-height: 44px;
+  border-radius: 8px;
+  background: #f7fafc;
+}
+
+.admin-dedicated-v47 .menu-button,
+.admin-dedicated-v47 .icon-button,
+.admin-dedicated-v47 .admin-language,
+.admin-dedicated-v47 .user-chip,
+.admin-dedicated-v47 .role-chip,
+.admin-dedicated-v47 .sync-chip,
+.admin-dedicated-v47 .user-admin-link {
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+.admin-dedicated-v47 .dashboard-main {
+  max-width: 1760px;
+  padding: 22px 26px 52px;
+}
+
+.admin-dedicated-v47 .admin-hero {
+  grid-template-columns: minmax(0, 1fr) 390px;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.admin-dedicated-v47 .admin-hero-copy,
+.admin-dedicated-v47 .hero-status-grid article,
+.admin-dedicated-v47 .hero-dashboard,
+.admin-dedicated-v47 .dashboard-widget,
+.admin-dedicated-v47 .site-overview-card,
+.admin-dedicated-v47 .ops-site-card,
+.admin-dedicated-v47 .control-room-strip article,
+.admin-dedicated-v47 .metrics article {
+  border-radius: 6px;
+  border-color: #d6e2ec;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.055);
+}
+
+.admin-dedicated-v47 .admin-hero-copy {
+  position: relative;
+  min-height: 132px;
+  background:
+    linear-gradient(90deg, #071827, #123c69 72%, #1d5a91);
+  padding: 22px 26px;
+}
+
+.admin-dedicated-v47 .admin-hero-copy::after {
+  opacity: 0.18;
+  background: #f28c00;
+}
+
+.admin-dedicated-v47 .admin-hero-copy .eyebrow,
+.admin-dedicated-v47 .admin-hero-copy h1,
+.admin-dedicated-v47 .admin-hero-copy span {
+  color: #ffffff;
+}
+
+.admin-dedicated-v47 .admin-hero-copy h1 {
+  margin: 8px 0 6px;
+  font-size: clamp(28px, 2.4vw, 40px);
+}
+
+.admin-dedicated-v47 .hero-status-grid {
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.admin-dedicated-v47 .hero-status-grid article {
+  min-height: 61px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-left-width: 5px;
+  padding: 13px 16px;
+}
+
+.admin-dedicated-v47 .hero-status-grid strong {
+  margin: 0;
+  padding: 7px 12px;
+}
+
+.admin-dedicated-v47 .admin-command-header {
+  min-height: 76px;
+  background: #ffffff;
+  padding: 18px 22px;
+}
+
+.admin-dedicated-v47 .admin-command-header h2 {
+  font-size: 26px;
+}
+
+.admin-dedicated-v47 .dashboard-actions .ghost,
+.admin-dedicated-v47 .route-plan-actions button,
+.admin-dedicated-v47 .admin-auth button {
+  border-radius: 6px;
+}
+
+.admin-dedicated-v47 #dashboardContent {
+  padding: 18px 20px 22px;
+}
+
+.admin-dedicated-v47 .admin-filter-panel {
+  grid-template-columns: minmax(320px, 1.2fr) minmax(240px, 0.85fr) minmax(210px, 0.7fr) 140px;
+  gap: 10px;
+}
+
+.admin-dedicated-v47 .admin-filter-panel label,
+.admin-dedicated-v47 .admin-filter-panel article {
+  min-height: 68px;
+  border-radius: 6px;
+}
+
+.admin-dedicated-v47 .control-room-strip {
+  grid-template-columns: 1.1fr 0.9fr 1fr 1.15fr;
+  gap: 10px;
+}
+
+.admin-dedicated-v47 .control-room-strip article {
+  min-height: 104px;
+  background: #ffffff;
+}
+
+.admin-dedicated-v47 .control-room-strip strong {
+  font-size: 30px;
+}
+
+.admin-dedicated-v47 .site-overview-grid,
+.admin-dedicated-v47 .operations-board {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.admin-dedicated-v47 .site-overview-card,
+.admin-dedicated-v47 .ops-site-card {
+  padding: 14px;
+  background: #ffffff;
+}
+
+.admin-dedicated-v47 .metrics {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin: 12px 0 16px;
+}
+
+.admin-dedicated-v47 .metrics article {
+  min-height: 106px;
+  background: #ffffff;
+}
+
+.admin-dedicated-v47 .metrics strong {
+  font-size: 34px;
+}
+
+.admin-dedicated-v47 .dashboard-card-grid {
+  grid-template-columns: minmax(330px, 0.82fr) minmax(500px, 1.26fr) minmax(330px, 0.82fr);
+  gap: 14px;
+}
+
+.admin-dedicated-v47 .dashboard-widget > header {
+  min-height: 68px;
+  background: #fbfdff;
+  padding: 15px 16px;
+}
+
+.admin-dedicated-v47 .dashboard-widget h3 {
+  font-size: 19px;
+}
+
+.admin-dedicated-v47 .vehicle-control-widget {
+  border-top-color: #f28c00;
+}
+
+.admin-dedicated-v47 .route-plan-card {
+  grid-template-columns: 220px 210px minmax(0, 1fr);
+  border-color: #f6c983;
+  background: #fff8ec;
+}
+
+.admin-dedicated-v47 .alert-card,
+.admin-dedicated-v47 .vehicle-tile,
+.admin-dedicated-v47 .report-card,
+.admin-dedicated-v47 .vehicle-control-row,
+.admin-dedicated-v47 .status-row,
+.admin-dedicated-v47 .activity-row,
+.admin-dedicated-v47 .driver-summary-row,
+.admin-dedicated-v47 .dispatcher-row,
+.admin-dedicated-v47 .audit-row {
+  border-radius: 6px;
+}
+
+.driver-dedicated-v47 {
+  background:
+    linear-gradient(180deg, #060d16 0, #060d16 92px, #edf2f7 92px, #edf2f7 100%);
+}
+
+.driver-dedicated-v47 .driver-app-header {
+  min-height: 80px;
+  background: #060d16;
+  box-shadow: 0 10px 28px rgba(2, 6, 23, 0.18);
+}
+
+.driver-dedicated-v47 .brand-logo {
+  width: 148px;
+  height: 52px;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+.driver-dedicated-v47 .header-brand h1 {
+  font-size: 18px;
+  letter-spacing: 0;
+}
+
+.driver-dedicated-v47 .header-brand p {
+  color: #94a3b8;
+}
+
+.driver-dedicated-v47 .driver-main {
+  max-width: 1220px;
+  padding: 18px 14px 52px;
+}
+
+.driver-dedicated-v47 .driver-hero-card {
+  grid-template-columns: minmax(0, 1fr) 290px;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, #ffffff 0, #ffffff 58%, #f7fbff 100%);
+  padding: 22px;
+}
+
+.driver-dedicated-v47 .driver-hero-copy h2 {
+  max-width: 720px;
+  font-size: clamp(28px, 5.5vw, 48px);
+  line-height: 1;
+}
+
+.driver-dedicated-v47 .driver-status-strip article,
+.driver-dedicated-v47 .driver-entry-card,
+.driver-dedicated-v47 .driver-help-card,
+.driver-dedicated-v47 .driver-install-card {
+  border-radius: 8px;
+}
+
+.driver-dedicated-v47 .driver-entry-grid {
+  grid-template-columns: minmax(320px, 0.78fr) minmax(260px, 0.42fr);
+  gap: 14px;
+}
+
+.driver-dedicated-v47 .driver-entry-card,
+.driver-dedicated-v47 .driver-help-card {
+  padding: 18px;
+}
+
+.driver-dedicated-v47 .driver-form-fields input,
+.driver-dedicated-v47 .driver-form-fields select {
+  min-height: 50px;
+  border-radius: 6px;
+}
+
+.driver-dedicated-v47 .driver-primary-action {
+  border-radius: 6px;
+  background: #123c69;
+}
+
+.driver-dedicated-v47 .driver-photo-app {
+  border-radius: 8px;
+  background: #060d16;
+}
+
+.driver-dedicated-v47 .photo-command-bar {
+  min-height: 72px;
+  background: #060d16;
+}
+
+.driver-dedicated-v47 .photo-command-bar h2 {
+  font-size: 24px;
+}
+
+.driver-dedicated-v47 .photo-workspace {
+  min-height: calc(100vh - 144px);
+  grid-template-columns: minmax(0, 1fr) 340px;
+}
+
+.driver-dedicated-v47 .photo-stage {
+  background:
+    linear-gradient(180deg, rgba(18, 60, 105, 0.18), transparent 42%),
+    #020617;
+}
+
+.driver-dedicated-v47 .photo-camera-frame {
+  min-height: min(76vh, 790px);
+  border-radius: 8px;
+}
+
+.driver-dedicated-v47 .photo-guide-card {
+  border-radius: 8px;
+  background: rgba(6, 13, 22, 0.82);
+}
+
+.driver-dedicated-v47 .photo-guide-card > span {
+  border-radius: 7px;
+  background: #f28c00;
+}
+
+.driver-dedicated-v47 .photo-action-dock {
+  border-radius: 8px;
+  background: rgba(6, 13, 22, 0.9);
+}
+
+.driver-dedicated-v47 .photo-main-action {
+  border-radius: 7px;
+  background: #f28c00;
+  color: #111827;
+}
+
+.driver-dedicated-v47 [data-capture-state="review"] .photo-main-action {
+  background: #22c55e;
+  color: #052e16;
+}
+
+.driver-dedicated-v47 .photo-control-panel {
+  background: #edf2f7;
+}
+
+.driver-dedicated-v47 .photo-panel-card {
+  border-radius: 7px;
+}
+
+@media (max-width: 1180px) {
+  .admin-dedicated-v47 .admin-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-dedicated-v47 .fleet-sidebar {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: 10px;
+  }
+
+  .admin-dedicated-v47 .fleet-logo {
+    display: none;
+  }
+
+  .admin-dedicated-v47 .fleet-nav {
+    display: flex;
+    overflow-x: auto;
+    margin: 0;
+  }
+
+  .admin-dedicated-v47 .fleet-nav a b {
+    display: none !important;
+  }
+
+  .admin-dedicated-v47 .admin-hero,
+  .admin-dedicated-v47 .dashboard-card-grid,
+  .driver-dedicated-v47 .photo-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-dedicated-v47 .dashboard-widget,
+  .admin-dedicated-v47 .dashboard-widget.wide-widget,
+  .admin-dedicated-v47 .vehicle-control-widget {
+    grid-column: 1;
+  }
+}
+
+@media (max-width: 760px) {
+  .admin-dedicated-v47 .dashboard-main {
+    padding: 12px 10px 38px;
+  }
+
+  .admin-dedicated-v47 .admin-filter-panel,
+  .admin-dedicated-v47 .control-room-strip,
+  .admin-dedicated-v47 .site-overview-grid,
+  .admin-dedicated-v47 .operations-board,
+  .admin-dedicated-v47 .metrics,
+  .admin-dedicated-v47 .route-plan-card,
+  .driver-dedicated-v47 .driver-hero-card,
+  .driver-dedicated-v47 .driver-entry-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .driver-dedicated-v47 .photo-workspace {
+    min-height: auto;
+  }
+
+  .driver-dedicated-v47 .photo-camera-frame {
+    min-height: 54vh;
+  }
+}
