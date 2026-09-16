@@ -1,4 +1,4 @@
-const CACHE_NAME = "fleetinspect-driver-v49";
+const CACHE_NAME = "fleetinspect-driver-v50";
 const APP_SHELL = [
   "/",
   "/driver",
@@ -7,10 +7,11 @@ const APP_SHELL = [
   "/admin.html",
   "/styles.css?v=48",
   "/theme-v49.css?v=49",
-  "/app.js?v=49",
-  "/admin.js?v=49",
-  "/i18n.js?v=49",
-  "/vehicles.js?v=49",
+  "/theme-v50.css?v=50",
+  "/app.js?v=50",
+  "/admin.js?v=50",
+  "/i18n.js?v=50",
+  "/vehicles.js?v=50",
   "/manifest.webmanifest",
   "/admin.webmanifest",
   "/icon.svg",
