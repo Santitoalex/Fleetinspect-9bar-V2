@@ -1,232 +1,230 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#123c69" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-title" content="FleetInspect" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <title>9Bar FleetInspect</title>
-    <link rel="manifest" href="/manifest.webmanifest" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="icon" href="/icon-192.png" sizes="192x192" />
-    <link rel="stylesheet" href="/styles.css?v=48" />
-    <link rel="stylesheet" href="/theme-v49.css?v=49" />
-    <link rel="stylesheet" href="/theme-v50.css?v=50" />
-  </head>
-  <body class="driver-body driver-pro driver-v17 driver-enterprise-v45 driver-photo-pro-v46 driver-dedicated-v47 driver-redesign-v48 driver-compact-v50">
-    <header class="app-header driver-app-header">
-      <div class="header-brand">
-        <img class="company-logo brand-logo" src="/9bar-logo.png" alt="9Bar Solutions GmbH" />
-        <div>
-          <h1>9Bar FleetInspect</h1>
-          <p data-i18n="vehicleInspectionPortal">Vehicle inspection portal</p>
-        </div>
-      </div>
-      <div class="header-actions">
-        <select class="language-select" data-language-select aria-label="Language">
-          <option value="en">EN</option>
-          <option value="es">ES</option>
-          <option value="de">DE</option>
-          <option value="ro">RO</option>
-        </select>
-      </div>
-    </header>
+ <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#123c69" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="FleetInspect" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>9Bar FleetInspect</title>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="icon" href="/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/styles.css?v=52" />
+ </head>
+ <body class="driver-body driver-pro driver-v17 driver-enterprise-v45 driver-photo-pro-v46 driver-dedicated-v47 ">
+  <header class="app-header driver-app-header">
+   <div class="header-brand">
+    <img class="company-logo brand-logo" src="/9bar-logo.png" alt="9Bar Solutions GmbH" />
+    <div>
+     <h1>9Bar FleetInspect</h1>
+     <p data-i18n="vehicleInspectionPortal">Vehicle inspection portal</p>
+    </div>
+   </div>
+   <div class="header-actions">
+    <select class="language-select" data-language-select aria-label="Language">
+     <option value="en">EN</option>
+     <option value="es">ES</option>
+     <option value="de">DE</option>
+     <option value="ro">RO</option>
+    </select>
+   </div>
+  </header>
 
-    <main class="driver-main">
-      <section id="installPrompt" class="driver-install-card hidden" aria-live="polite">
-        <div>
-          <strong data-i18n="installDriverApp">Install driver app</strong>
-          <p id="installPromptText" data-i18n="installDriverHint">Add FleetInspect to the phone home screen for faster daily access.</p>
-        </div>
-        <div class="install-actions">
-          <button id="installAppButton" type="button" data-i18n="installApp">Install</button>
-          <button id="dismissInstallPrompt" class="ghost" type="button" data-i18n="notNow">Not now</button>
-        </div>
-      </section>
+  <main class="driver-main">
+   <section id="installPrompt" class="driver-install-card hidden" aria-live="polite">
+    <div>
+     <strong data-i18n="installDriverApp">Install driver app</strong>
+     <p id="installPromptText" data-i18n="installDriverHint">Add FleetInspect to the phone home screen for faster daily access.</p>
+    </div>
+    <div class="install-actions">
+     <button id="installAppButton" type="button" data-i18n="installApp">Install</button>
+     <button id="dismissInstallPrompt" class="ghost" type="button" data-i18n="notNow">Not now</button>
+    </div>
+   </section>
 
-      <section id="startScreen" class="start-screen driver-start-pro">
-        <div class="driver-hero-card">
-          <div class="driver-hero-copy">
-            <span class="driver-kicker" data-i18n="dailyReport">Daily report</span>
-            <h2 data-i18n="driverVehicleId">Driver and vehicle identification</h2>
-            <p data-i18n="enterDetails">Enter the details before opening the camera.</p>
-          </div>
+   <section id="startScreen" class="start-screen driver-start-pro">
+    <div class="driver-hero-card">
+     <div class="driver-hero-copy">
+      <span class="driver-kicker" data-i18n="dailyReport">Daily report</span>
+      <h2 data-i18n="driverVehicleId">Driver and vehicle identification</h2>
+      <p data-i18n="enterDetails">Enter the details before opening the camera.</p>
+     </div>
 
-          <div class="driver-status-strip driver-start-metrics">
-            <article>
-              <strong>01</strong>
-              <span data-i18n="checkIn">Driver check-in</span>
-            </article>
-            <article>
-              <strong>09</strong>
-              <span data-i18n="guidedViews">Guided views</span>
-            </article>
-            <article>
-              <strong>PDF</strong>
-              <span data-i18n="reportReady">Report ready</span>
-            </article>
-          </div>
-        </div>
-
-        <div class="driver-entry-grid">
-          <form id="startForm" class="start-card driver-card driver-entry-card driver-login-card">
-            <div class="form-heading">
-              <span data-i18n="dailyInspection">Daily vehicle inspection</span>
-              <strong data-i18n="checkIn">Driver check-in</strong>
-            </div>
-
-            <div class="driver-form-fields">
-              <label>
-                <span>Site</span>
-                <select id="siteSelect" name="site" required>
-                  <option value="">Select site</option>
-                  <option value="DRP3">DRP3</option>
-                  <option value="DSU1">DSU1</option>
-                </select>
-              </label>
-              <label>
-                <span data-i18n="driverName">Driver name</span>
-                <input id="driverName" name="driverName" autocomplete="name" placeholder="Example: John Smith" data-i18n-placeholder="driverPlaceholder" required />
-              </label>
-              <label>
-                <span data-i18n="registrationNumber">Registration number</span>
-                <select id="vehiclePlate" name="vehiclePlate" required>
-                  <option value="" data-i18n="selectRegistration">Select registration</option>
-                </select>
-              </label>
-            </div>
-
-            <button type="submit" class="driver-primary-action" data-i18n="startPhotos">Start photos</button>
-          </form>
-
-          <aside class="driver-process-card driver-help-card" aria-label="Inspection process">
-            <div>
-              <strong data-i18n="captureStep">Capture step</strong>
-              <span data-i18n="placeVehicle">Place the vehicle in frame and press Capture.</span>
-            </div>
-            <div>
-              <strong data-i18n="inspectionStatus">Inspection status</strong>
-              <span data-i18n="cloudSync">Cloud sync</span>
-            </div>
-          </aside>
-        </div>
-      </section>
-
-      <section id="captureScreen" class="capture-screen driver-photo-screen hidden">
-        <div class="driver-photo-app">
-          <header class="photo-command-bar">
-            <div>
-              <span class="capture-kicker" data-i18n="captureStep">Capture step</span>
-              <h2 id="stepTitle">Front</h2>
-              <p id="sessionMeta"></p>
-              <small id="stepHelp" class="step-help" data-i18n="placeVehicle">Place the vehicle in frame and press Capture.</small>
-            </div>
-            <div class="photo-command-meta">
-              <span id="photoCounter" class="photo-counter">0 / 9</span>
-              <button id="resetSession" class="ghost" type="button" data-i18n="newReport">New report</button>
-            </div>
-          </header>
-
-          <div class="photo-progress-rail" aria-label="Inspection photo progress">
-            <span id="stepProgressFill"></span>
-          </div>
-
-          <div class="photo-workspace">
-            <section class="photo-stage">
-              <div id="cameraPickerControl" class="camera-picker-control hidden">
-                <span data-i18n="cameraLens">Camera</span>
-                <select id="cameraPicker" aria-label="Camera lens"></select>
-              </div>
-              <div class="photo-guide-card">
-                <span id="currentStepNumber">01</span>
-                <div>
-                  <strong id="photoGuideTitle">Front</strong>
-                  <p id="photoGuideText" data-i18n="placeVehicle">Place the vehicle in frame and press Capture.</p>
-                </div>
-              </div>
-              <div class="camera-frame photo-camera-frame">
-                <video id="cameraVideo" playsinline autoplay muted></video>
-                <img id="capturedPreview" alt="Captured photo" data-i18n-aria="capturedPhoto" />
-                <div id="cameraEmpty" class="camera-empty">
-                  <strong data-i18n="cameraPending">Camera pending</strong>
-                  <span data-i18n="allowCamera">Allow camera access to start the inspection.</span>
-                </div>
-                <div id="cameraZoomControl" class="camera-zoom-control hidden">
-                  <span data-i18n="cameraZoom">Zoom</span>
-                  <button id="cameraZoom" class="camera-zoom-slider" type="button" aria-label="Camera zoom">
-                    <span id="cameraZoomFill"></span>
-                    <i id="cameraZoomThumb"></i>
-                  </button>
-                  <strong id="cameraZoomValue">1.0x</strong>
-                </div>
-                <div class="camera-corners" aria-hidden="true"></div>
-              </div>
-
-              <div class="photo-action-dock">
-                <button id="previousPhoto" class="secondary photo-small-action" type="button" data-i18n="previousPhoto">Back</button>
-                <button id="capturePhoto" class="photo-main-action" type="button" data-i18n="capture">Capture</button>
-                <button id="retakePhoto" class="secondary photo-small-action hidden" type="button" data-i18n="retakePhoto">Retake</button>
-                <button id="zoomPhoto" class="secondary photo-small-action hidden" type="button" data-i18n="zoomPhoto">Zoom</button>
-              </div>
-            </section>
-
-            <aside class="photo-control-panel">
-              <div class="photo-panel-card photo-session-card">
-                <span>Vehículo</span>
-                <strong id="photoSessionVehicle">--</strong>
-                <small id="photoSessionDriver">--</small>
-              </div>
-
-              <div class="photo-panel-card photo-status-card">
-                <strong data-i18n="inspectionStatus">Inspection status</strong>
-                <p id="aiStatus" data-i18n="aiInitial">Capture all views to save and review the inspection.</p>
-              </div>
-
-              <div class="photo-panel-card photo-quality-card">
-                <strong data-i18n="photoQuality">Photo quality</strong>
-                <p id="qualityStatus" data-i18n="qualityWaiting">Waiting for the first photo.</p>
-              </div>
-
-              <div class="photo-panel-card photo-sync-card">
-                <strong data-i18n="syncStatus">Sync status</strong>
-                <p id="syncStatus" data-i18n="syncReady">Ready to save online.</p>
-                <button id="retryPending" class="secondary hidden" type="button" data-i18n="retryPending">Retry pending uploads</button>
-              </div>
-
-              <div class="photo-panel-card">
-                <div class="driver-panel-header">
-                  <strong data-i18n="guidedViews">Guided views</strong>
-                  <span data-i18n="dailyInspection">Daily vehicle inspection</span>
-                </div>
-                <div id="progressList" class="progress-list photo-step-list"></div>
-              </div>
-
-              <label class="photo-panel-card notes-field photo-notes-card">
-                <span data-i18n="driverNotes">Driver notes</span>
-                <textarea id="driverNotes" placeholder="Visible damage, incidents, mileage..." data-i18n-placeholder="notesPlaceholder"></textarea>
-              </label>
-            </aside>
-          </div>
-        </div>
-      </section>
-
-    </main>
-
-    <div id="photoModal" class="photo-modal hidden" role="dialog" aria-modal="true" aria-labelledby="photoModalTitle">
-      <div class="photo-modal-bar">
-        <strong id="photoModalTitle">Photo</strong>
-        <button id="closePhotoModal" type="button" aria-label="Close">×</button>
-      </div>
-      <img id="zoomPreview" alt="Large inspection photo" />
+     <div class="driver-status-strip driver-start-metrics">
+      <article>
+       <strong>01</strong>
+       <span data-i18n="checkIn">Driver check-in</span>
+      </article>
+      <article>
+       <strong>09</strong>
+       <span data-i18n="guidedViews">Guided views</span>
+      </article>
+      <article>
+       <strong>PDF</strong>
+       <span data-i18n="reportReady">Report ready</span>
+      </article>
+     </div>
     </div>
 
-    <div id="saveToast" class="save-toast hidden" role="status" aria-live="polite"></div>
+    <div class="driver-entry-grid">
+     <form id="startForm" class="start-card driver-card driver-entry-card driver-login-card">
+      <div class="form-heading">
+       <span data-i18n="dailyInspection">Daily vehicle inspection</span>
+       <strong data-i18n="checkIn">Driver check-in</strong>
+      </div>
 
-    <script src="/i18n.js?v=50"></script>
-    <script src="/vehicles.js?v=50"></script>
-    <script src="/app.js?v=50"></script>
-  </body>
+      <div class="driver-form-fields">
+       <label>
+        <span>Site</span>
+        <select id="siteSelect" name="site" required>
+         <option value="">Select site</option>
+         <option value="DRP3">DRP3</option>
+         <option value="DSU1">DSU1</option>
+        </select>
+       </label>
+       <label>
+        <span data-i18n="driverName">Driver name</span>
+        <input id="driverName" name="driverName" autocomplete="name" placeholder="Example: John Smith" data-i18n-placeholder="driverPlaceholder" required />
+       </label>
+       <label>
+        <span data-i18n="registrationNumber">Registration number</span>
+        <select id="vehiclePlate" name="vehiclePlate" required>
+         <option value="" data-i18n="selectRegistration">Select registration</option>
+        </select>
+       </label>
+      </div>
+
+      <button type="submit" class="driver-primary-action" data-i18n="startPhotos">Start photos</button>
+     </form>
+
+     <aside class="driver-process-card driver-help-card" aria-label="Inspection process">
+      <div>
+       <strong data-i18n="captureStep">Capture step</strong>
+       <span data-i18n="placeVehicle">Place the vehicle in frame and press Capture.</span>
+      </div>
+      <div>
+       <strong data-i18n="inspectionStatus">Inspection status</strong>
+       <span data-i18n="cloudSync">Cloud sync</span>
+      </div>
+     </aside>
+    </div>
+   </section>
+
+   <section id="captureScreen" class="capture-screen driver-photo-screen hidden">
+    <div class="driver-photo-app">
+     <header class="photo-command-bar">
+      <div>
+       <span class="capture-kicker" data-i18n="captureStep">Capture step</span>
+       <h2 id="stepTitle">Front</h2>
+       <p id="sessionMeta"></p>
+       <small id="stepHelp" class="step-help" data-i18n="placeVehicle">Place the vehicle in frame and press Capture.</small>
+      </div>
+      <div class="photo-command-meta">
+       <span id="photoCounter" class="photo-counter">0 / 9</span>
+       <button id="resetSession" class="ghost" type="button" data-i18n="newReport">New report</button>
+      </div>
+     </header>
+
+     <div class="photo-progress-rail" aria-label="Inspection photo progress">
+      <span id="stepProgressFill"></span>
+     </div>
+
+     <div class="photo-workspace">
+      <section class="photo-stage">
+       <div id="cameraPickerControl" class="camera-picker-control hidden">
+        <span data-i18n="cameraLens">Camera</span>
+        <select id="cameraPicker" aria-label="Camera lens"></select>
+       </div>
+       <div class="photo-guide-card">
+        <span id="currentStepNumber">01</span>
+        <div>
+         <strong id="photoGuideTitle">Front</strong>
+         <p id="photoGuideText" data-i18n="placeVehicle">Place the vehicle in frame and press Capture.</p>
+        </div>
+       </div>
+       <div class="camera-frame photo-camera-frame">
+        <video id="cameraVideo" playsinline autoplay muted></video>
+        <img id="capturedPreview" alt="Captured photo" data-i18n-aria="capturedPhoto" />
+        <div id="cameraEmpty" class="camera-empty">
+         <strong data-i18n="cameraPending">Camera pending</strong>
+         <span data-i18n="allowCamera">Allow camera access to start the inspection.</span>
+        </div>
+        <div id="cameraZoomControl" class="camera-zoom-control hidden">
+         <span data-i18n="cameraZoom">Zoom</span>
+         <button id="cameraZoom" class="camera-zoom-slider" type="button" aria-label="Camera zoom">
+          <span id="cameraZoomFill"></span>
+          <i id="cameraZoomThumb"></i>
+         </button>
+         <strong id="cameraZoomValue">1.0x</strong>
+        </div>
+        <div class="camera-corners" aria-hidden="true"></div>
+       </div>
+
+       <div class="photo-action-dock">
+        <button id="previousPhoto" class="secondary photo-small-action" type="button" data-i18n="previousPhoto">Back</button>
+        <button id="capturePhoto" class="photo-main-action" type="button" data-i18n="capture">Capture</button>
+        <button id="retakePhoto" class="secondary photo-small-action hidden" type="button" data-i18n="retakePhoto">Retake</button>
+        <button id="zoomPhoto" class="secondary photo-small-action hidden" type="button" data-i18n="zoomPhoto">Zoom</button>
+       </div>
+      </section>
+
+      <aside class="photo-control-panel">
+       <div class="photo-panel-card photo-session-card">
+        <span>Vehículo</span>
+        <strong id="photoSessionVehicle">--</strong>
+        <small id="photoSessionDriver">--</small>
+       </div>
+
+       <div class="photo-panel-card photo-status-card">
+        <strong data-i18n="inspectionStatus">Inspection status</strong>
+        <p id="aiStatus" data-i18n="aiInitial">Capture all views to save and review the inspection.</p>
+       </div>
+
+       <div class="photo-panel-card photo-quality-card">
+        <strong data-i18n="photoQuality">Photo quality</strong>
+        <p id="qualityStatus" data-i18n="qualityWaiting">Waiting for the first photo.</p>
+       </div>
+
+       <div class="photo-panel-card photo-sync-card">
+        <strong data-i18n="syncStatus">Sync status</strong>
+        <p id="syncStatus" data-i18n="syncReady">Ready to save online.</p>
+        <button id="retryPending" class="secondary hidden" type="button" data-i18n="retryPending">Retry pending uploads</button>
+       </div>
+
+       <div class="photo-panel-card">
+        <div class="driver-panel-header">
+         <strong data-i18n="guidedViews">Guided views</strong>
+         <span data-i18n="dailyInspection">Daily vehicle inspection</span>
+        </div>
+        <div id="progressList" class="progress-list photo-step-list"></div>
+       </div>
+
+       <label class="photo-panel-card notes-field photo-notes-card">
+        <span data-i18n="driverNotes">Driver notes</span>
+        <textarea id="driverNotes" placeholder="Visible damage, incidents, mileage..." data-i18n-placeholder="notesPlaceholder"></textarea>
+       </label>
+      </aside>
+     </div>
+    </div>
+   </section>
+
+  </main>
+
+  <div id="photoModal" class="photo-modal hidden" role="dialog" aria-modal="true" aria-labelledby="photoModalTitle">
+   <div class="photo-modal-bar">
+    <strong id="photoModalTitle">Photo</strong>
+    <button id="closePhotoModal" type="button" aria-label="Close">×</button>
+   </div>
+   <img id="zoomPreview" alt="Large inspection photo" />
+  </div>
+
+  <div id="saveToast" class="save-toast hidden" role="status" aria-live="polite"></div>
+
+  <script src="/i18n.js?v=52"></script>
+  <script src="/vehicles.js?v=52"></script>
+  <script src="/app.js?v=52"></script>
+ </body>
 </html>
