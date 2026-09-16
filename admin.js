@@ -74,6 +74,16 @@ const nodes = {
   metricPhotos: document.querySelector("#metricPhotos"),
   metricAlerts: document.querySelector("#metricAlerts"),
   metricToday: document.querySelector("#metricToday"),
+  savedInspectionCount: document.querySelector("#savedInspectionCount"),
+  savedInspectionMeta: document.querySelector("#savedInspectionMeta"),
+  savedPhotoCount: document.querySelector("#savedPhotoCount"),
+  savedPhotoMeta: document.querySelector("#savedPhotoMeta"),
+  activeDriverCount: document.querySelector("#activeDriverCount"),
+  activeDriverMeta: document.querySelector("#activeDriverMeta"),
+  aiWorkQueueCount: document.querySelector("#aiWorkQueueCount"),
+  aiWorkQueueMeta: document.querySelector("#aiWorkQueueMeta"),
+  lastUploadTime: document.querySelector("#lastUploadTime"),
+  lastUploadMeta: document.querySelector("#lastUploadMeta"),
   widgetAlertCount: document.querySelector("#widgetAlertCount"),
   todayCompletion: document.querySelector("#todayCompletion"),
   todayCompletionMeta: document.querySelector("#todayCompletionMeta"),
@@ -369,6 +379,7 @@ function renderDashboard() {
   renderControlRoom(siteItems);
   renderSiteOverview();
   renderOperationsBoard(siteItems);
+  renderDataCommandCenter(siteItems);
   renderAlerts(items.length ? items : siteItems);
   renderVehicleSummary(allGroups);
   renderDailyVehicleControl();
@@ -418,6 +429,30 @@ function renderDashboard() {
       </div>
     </section>
   `).join("");
+}
+
+function renderDataCommandCenter(items) {
+  const today = localDateKey(new Date());
+  const todayItems = items.filter((item) => localDateKey(new Date(item.finishedAt || item.startedAt || 0)) === today);
+  const photos = items.reduce((sum, item) => sum + (item.photos?.length || 0), 0);
+  const todayPhotos = todayItems.reduce((sum, item) => sum + (item.photos?.length || 0), 0);
+  const drivers = new Set(items.map((item) => String(item.driverName || "").trim()).filter(Boolean));
+  const todayDrivers = new Set(todayItems.map((item) => String(item.driverName || "").trim()).filter(Boolean));
+  const aiQueue = items.filter((item) => ["queued", "failed"].includes(getAiStatus(item).key));
+  const latest = [...items].sort((a, b) => new Date(b.finishedAt || b.startedAt || 0) - new Date(a.finishedAt || a.startedAt || 0))[0];
+
+  nodes.savedInspectionCount.textContent = String(items.length);
+  nodes.savedInspectionMeta.textContent = `${todayItems.length} hoy · tabla inspections`;
+  nodes.savedPhotoCount.textContent = String(photos);
+  nodes.savedPhotoMeta.textContent = `${todayPhotos} hoy · bucket fleetinspect`;
+  nodes.activeDriverCount.textContent = String(drivers.size);
+  nodes.activeDriverMeta.textContent = `${todayDrivers.size} hoy · conductores`;
+  nodes.aiWorkQueueCount.textContent = String(aiQueue.length);
+  nodes.aiWorkQueueMeta.textContent = aiQueue.length ? "pendiente de revisar" : "IA al día";
+  nodes.lastUploadTime.textContent = latest ? formatTime(new Date(latest.finishedAt || latest.startedAt)) : "--";
+  nodes.lastUploadMeta.textContent = latest
+    ? `${latest.plate || t("noRegistration")} · ${latest.photos?.length || 0} fotos`
+    : "sin inspecciones";
 }
 
 function applyRoleUi() {

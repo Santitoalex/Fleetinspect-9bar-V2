@@ -256,6 +256,63 @@
   margin: 8px 0 10px !important;
 }
 
+.admin-compact-v50 .data-command-center {
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  margin: 8px 0 10px !important;
+}
+
+.admin-compact-v50 .data-command-center article {
+  min-height: 82px !important;
+  padding: 11px 12px !important;
+  border: 1px solid var(--c50-line) !important;
+  border-left: 4px solid var(--c50-blue) !important;
+  border-radius: 6px !important;
+  background: #fff !important;
+  box-shadow: var(--c50-shadow) !important;
+}
+
+.admin-compact-v50 .data-command-center article:nth-child(2) {
+  border-left-color: var(--c50-teal) !important;
+}
+
+.admin-compact-v50 .data-command-center article:nth-child(3) {
+  border-left-color: var(--c50-orange) !important;
+}
+
+.admin-compact-v50 .data-command-center article:nth-child(4) {
+  border-left-color: var(--c50-red) !important;
+}
+
+.admin-compact-v50 .data-command-center article:nth-child(5) {
+  border-left-color: #7c3aed !important;
+}
+
+.admin-compact-v50 .data-command-center span {
+  display: block !important;
+  color: var(--c50-muted) !important;
+  font-size: 10px !important;
+  font-weight: 950 !important;
+  text-transform: uppercase !important;
+}
+
+.admin-compact-v50 .data-command-center strong {
+  display: block !important;
+  margin-top: 7px !important;
+  color: var(--c50-blue) !important;
+  font-size: 26px !important;
+  line-height: 1 !important;
+}
+
+.admin-compact-v50 .data-command-center small {
+  display: block !important;
+  margin-top: 6px !important;
+  color: var(--c50-muted) !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+}
+
 .admin-compact-v50 .metrics article {
   min-height: 78px !important;
   padding: 10px 12px !important;
@@ -683,6 +740,7 @@
   .admin-compact-v50 .admin-filter-panel,
   .admin-compact-v50 .control-room-strip,
   .admin-compact-v50 .metrics,
+  .admin-compact-v50 .data-command-center,
   .admin-compact-v50 .route-plan-card {
     grid-template-columns: 1fr !important;
   }
