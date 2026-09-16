@@ -7,6 +7,7 @@ let deferredAdminInstallPrompt = null;
 let currentAdminUser = null;
 let dispatcherUsers = [];
 let routePlans = {};
+let auditEvents = [];
 const FLEET_SITES = ["DRP3", "DSU1"];
 const FALLBACK_SITE = "UNASSIGNED";
 
@@ -38,6 +39,9 @@ const nodes = {
   searchReports: document.querySelector("#searchReports"),
   siteFilter: document.querySelector("#siteFilter"),
   siteOverview: document.querySelector("#siteOverview"),
+  operationsBoard: document.querySelector("#operationsBoard"),
+  auditWidget: document.querySelector("#auditWidget"),
+  auditTimeline: document.querySelector("#auditTimeline"),
   statusFilter: document.querySelector("#statusFilter"),
   dateFilter: document.querySelector("#dateFilter"),
   exportCsv: document.querySelector("#exportCsv"),
@@ -325,6 +329,15 @@ async function loadDashboard() {
     }
     systemConfig = await statusResponse.json();
     dashboardItems = await inspectionsResponse.json();
+    if (canManageUsers()) {
+      const auditResponse = await fetch("/api/admin/audit").catch(() => null);
+      if (auditResponse?.ok) {
+        const auditResult = await auditResponse.json();
+        auditEvents = auditResult.events || [];
+      }
+    } else {
+      auditEvents = [];
+    }
     await Promise.all([
       loadRoutePlanForDate(localDateKey(new Date())),
       loadRoutePlanForDate(nodes.vehicleControlDate.value || localDateKey(new Date())),
@@ -355,6 +368,7 @@ function renderDashboard() {
 
   renderControlRoom(siteItems);
   renderSiteOverview();
+  renderOperationsBoard(siteItems);
   renderAlerts(items.length ? items : siteItems);
   renderVehicleSummary(allGroups);
   renderDailyVehicleControl();
@@ -364,6 +378,7 @@ function renderDashboard() {
   renderVehicleHistory();
   renderSystemStatus(siteItems);
   renderRecentActivity(siteItems);
+  renderAuditTimeline();
 
   if (!items.length) {
     nodes.reportList.innerHTML = `<p>${t("noReports")}</p>`;
@@ -608,6 +623,48 @@ function renderSiteOverview() {
       renderDashboard();
     });
   });
+}
+
+function renderOperationsBoard(items) {
+  if (!nodes.operationsBoard) return;
+  const today = localDateKey(new Date());
+  const sites = [...FLEET_SITES, FALLBACK_SITE];
+  const selectedSite = getSelectedSite();
+  const visibleSites = selectedSite === "all" ? sites : sites.filter((site) => site === selectedSite);
+
+  nodes.operationsBoard.innerHTML = visibleSites.map((site) => {
+    const siteItems = items.filter((item) => {
+      return getItemSite(item) === site && localDateKey(new Date(item.finishedAt || item.startedAt || 0)) === today;
+    });
+    const planned = getRoutePlan(today, site);
+    const done = siteItems.length;
+    const pending = planned ? Math.max(planned - done, 0) : 0;
+    const percent = planned ? Math.min(100, Math.round((done / planned) * 100)) : 0;
+    const aiPending = siteItems.filter((item) => ["queued", "pending"].includes(getAiStatus(item).key)).length;
+    const aiFailed = siteItems.filter((item) => getAiStatus(item).key === "failed").length;
+    const alerts = siteItems.filter((item) => item.ai?.newDamageDetected).length;
+    const latest = [...siteItems].sort((a, b) => new Date(b.finishedAt || b.startedAt || 0) - new Date(a.finishedAt || a.startedAt || 0))[0];
+
+    return `
+      <article class="ops-site-card ${alerts ? "has-alert" : ""}">
+        <header>
+          <div>
+            <span>Site</span>
+            <strong>${escapeHtml(siteLabel(site))}</strong>
+          </div>
+          <em>${planned ? `${percent}%` : "Plan abierto"}</em>
+        </header>
+        <div class="ops-progress" aria-hidden="true"><i style="width:${planned ? percent : 0}%"></i></div>
+        <div class="ops-site-metrics">
+          <span><b>${done}</b> hechas</span>
+          <span><b>${pending}</b> pendientes</span>
+          <span><b>${alerts}</b> alertas</span>
+          <span><b>${aiPending + aiFailed}</b> IA revisión</span>
+        </div>
+        <small>${latest ? `${escapeHtml(latest.plate || "")} · ${escapeHtml(latest.driverName || "")} · ${formatTime(new Date(latest.finishedAt || latest.startedAt))}` : "Sin actividad hoy"}</small>
+      </article>
+    `;
+  }).join("");
 }
 
 function renderAlertState(item) {
@@ -1070,6 +1127,43 @@ function renderRecentActivity(items) {
       <time>${formatDate(item.finishedAt || item.startedAt)}</time>
     </article>
   `).join("");
+}
+
+function renderAuditTimeline() {
+  if (!nodes.auditWidget || !nodes.auditTimeline) return;
+  const canSee = canManageUsers();
+  nodes.auditWidget.classList.toggle("hidden", !canSee);
+  if (!canSee) return;
+
+  const events = auditEvents.slice(0, 10);
+  if (!events.length) {
+    nodes.auditTimeline.innerHTML = `<article class="empty-state">Sin eventos de auditoría todavía.</article>`;
+    return;
+  }
+
+  nodes.auditTimeline.innerHTML = events.map((event) => `
+    <article class="activity-row audit-row">
+      <div>
+        <strong>${escapeHtml(auditActionLabel(event.action))}</strong>
+        <span>${escapeHtml(event.actor || "system")} · ${escapeHtml(siteLabel(event.site || "all"))}${event.plate ? ` · ${escapeHtml(event.plate)}` : ""}</span>
+      </div>
+      <time>${formatDate(event.created_at || event.createdAt)}</time>
+    </article>
+  `).join("");
+}
+
+function auditActionLabel(action) {
+  const key = String(action || "").trim();
+  const labels = {
+    login: "Inicio de sesión",
+    login_failed: "Login fallido",
+    dispatcher_registered: "Cuenta creada",
+    role_updated: "Rol actualizado",
+    route_plan_saved: "Rutas guardadas",
+    route_plan_deleted: "Rutas borradas",
+    inspection_saved: "Inspección guardada",
+  };
+  return labels[key] || key;
 }
 
 function getFilteredItems() {

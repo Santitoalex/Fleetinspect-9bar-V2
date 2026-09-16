@@ -28,6 +28,12 @@ const nodes = {
   sessionMeta: document.querySelector("#sessionMeta"),
   stepTitle: document.querySelector("#stepTitle"),
   stepHelp: document.querySelector("#stepHelp"),
+  stepProgressFill: document.querySelector("#stepProgressFill"),
+  currentStepNumber: document.querySelector("#currentStepNumber"),
+  photoGuideTitle: document.querySelector("#photoGuideTitle"),
+  photoGuideText: document.querySelector("#photoGuideText"),
+  photoSessionVehicle: document.querySelector("#photoSessionVehicle"),
+  photoSessionDriver: document.querySelector("#photoSessionDriver"),
   photoCounter: document.querySelector("#photoCounter"),
   cameraVideo: document.querySelector("#cameraVideo"),
   capturedPreview: document.querySelector("#capturedPreview"),
@@ -556,6 +562,17 @@ function updateCaptureUI() {
   nodes.sessionMeta.textContent = `${session.site} - ${session.driverName} - ${session.plate}`;
   nodes.photoCounter.textContent = `${completedCount} / ${STEPS.length}`;
   nodes.stepHelp.textContent = photo ? t("photoSavedNext") : t("placeVehicle");
+  nodes.captureScreen.dataset.captureState = photo ? "review" : "camera";
+  nodes.captureScreen.dataset.step = step.id;
+  if (nodes.currentStepNumber) nodes.currentStepNumber.textContent = String(stepIndex + 1).padStart(2, "0");
+  if (nodes.photoGuideTitle) nodes.photoGuideTitle.textContent = getStepLabel(step);
+  if (nodes.photoGuideText) nodes.photoGuideText.textContent = photo ? t("photoSavedNext") : t("placeVehicle");
+  if (nodes.photoSessionVehicle) nodes.photoSessionVehicle.textContent = `${session.site} - ${session.plate}`;
+  if (nodes.photoSessionDriver) nodes.photoSessionDriver.textContent = session.driverName;
+  if (nodes.stepProgressFill) {
+    const ratio = Math.max(completedCount / STEPS.length, (stepIndex + 1) / STEPS.length);
+    nodes.stepProgressFill.style.width = `${Math.round(ratio * 100)}%`;
+  }
 
   if (photo) {
     nodes.capturedPreview.src = photo.url;

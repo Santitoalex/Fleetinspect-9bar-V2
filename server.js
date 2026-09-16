@@ -24,6 +24,7 @@ const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 const SUPABASE_BUCKET = process.env.SUPABASE_BUCKET || "fleetinspect-photos";
 const SUPABASE_TABLE = process.env.SUPABASE_TABLE || "inspections";
 const ROUTE_PLAN_TABLE = process.env.ROUTE_PLAN_TABLE || "route_plans";
+const AUDIT_TABLE = process.env.AUDIT_TABLE || "audit_events";
 const SIGNED_URL_SECONDS = 60 * 60 * 24 * 7;
 const FLEET_SITES = ["DRP3", "DSU1"];
 const FALLBACK_SITE = "UNASSIGNED";
@@ -33,6 +34,8 @@ const dispatchersDir = path.join(DATA_DIR, "dispatchers");
 const dispatchersFile = path.join(dispatchersDir, "accounts.json");
 const routePlansDir = path.join(DATA_DIR, "route-plans");
 const routePlansFile = path.join(routePlansDir, "plans.json");
+const auditDir = path.join(DATA_DIR, "audit");
+const auditFile = path.join(auditDir, "events.json");
 const supabaseEnabled = Boolean(SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY && SUPABASE_BUCKET);
 const supabase = supabaseEnabled
   ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
@@ -53,6 +56,7 @@ app.use(express.static(process.cwd(), {
 await fs.mkdir(inspectionsDir, { recursive: true });
 await fs.mkdir(dispatchersDir, { recursive: true });
 await fs.mkdir(routePlansDir, { recursive: true });
+await fs.mkdir(auditDir, { recursive: true });
 
 function parseDispatcherAccounts() {
   if (!DISPATCHER_ACCOUNTS.trim()) {
@@ -429,28 +433,29 @@ app.get(["/admin", "/admin/"], (_request, response) => {
   response.sendFile(path.join(process.cwd(), "admin.html"));
 });
 
-app.post("/api/admin/login", (request, response) => {
+app.post("/api/admin/login", async (request, response) => {
   const email = normalizeEmail(request.body?.email || request.body?.username || "");
   const password = String(request.body?.password || "");
 
-  findDispatcherAccount(email)
-    .then((account) => {
-      if (!account || !verifyPassword(account, password)) {
-        return response.status(401).json({ ok: false, error: "Email o contrasena incorrectos." });
-      }
+  try {
+    const account = await findDispatcherAccount(email);
+    if (!account || !verifyPassword(account, password)) {
+      await logAuditEvent({ actor: email, action: "login_failed", details: { email } }).catch(() => {});
+      return response.status(401).json({ ok: false, error: "Email o contrasena incorrectos." });
+    }
 
-      setAdminSessionCookie(request, response, {
-        username: account.username || account.email,
-        email: account.email || account.username,
-        name: account.name,
-        role: account.role,
-      });
-      response.json({ ok: true, user: publicDispatcher(account) });
-    })
-    .catch((error) => {
-      console.error(error);
-      response.status(500).json({ ok: false, error: "No se pudo comprobar la cuenta." });
+    setAdminSessionCookie(request, response, {
+      username: account.username || account.email,
+      email: account.email || account.username,
+      name: account.name,
+      role: account.role,
     });
+    await logAuditEvent({ actor: account.email || account.username, action: "login", details: { role: getEffectiveRole(account) } }).catch(() => {});
+    response.json({ ok: true, user: publicDispatcher(account) });
+  } catch (error) {
+    console.error(error);
+    response.status(500).json({ ok: false, error: "No se pudo comprobar la cuenta." });
+  }
 });
 
 app.post("/api/admin/register", async (request, response) => {
@@ -491,6 +496,7 @@ app.post("/api/admin/register", async (request, response) => {
 
   try {
     await saveStoredDispatcher(account);
+    await logAuditEvent({ actor: email, action: "dispatcher_registered", details: { role: account.role } }).catch(() => {});
   } catch (error) {
     console.error(error);
     return response.status(500).json({ ok: false, error: error.message });
@@ -519,10 +525,24 @@ app.patch("/api/admin/dispatchers/:email", requireOwner, async (request, respons
   try {
     const role = normalizeRole(request.body?.role || "");
     const account = await updateStoredDispatcherRole(request.params.email, role);
+    await logAuditEvent({
+      actor: request.adminUser?.email || request.adminUser?.username || "owner",
+      action: "role_updated",
+      details: { email: normalizeEmail(request.params.email), role },
+    }).catch(() => {});
     response.json({ ok: true, user: publicDispatcher(account) });
   } catch (error) {
     console.error(error);
     response.status(400).json({ ok: false, error: error.message });
+  }
+});
+
+app.get("/api/admin/audit", requireOwner, async (_request, response) => {
+  try {
+    response.json({ ok: true, events: await listAuditEvents(120) });
+  } catch (error) {
+    console.error(error);
+    response.status(500).json({ ok: false, error: "No se pudo cargar la auditoria." });
   }
 });
 
@@ -573,6 +593,12 @@ app.put("/api/route-plans/:date", requireOperationsEditor, async (request, respo
       plannedRoutes,
       updatedBy: request.adminUser?.email || request.adminUser?.username || "admin",
     });
+    await logAuditEvent({
+      actor: request.adminUser?.email || request.adminUser?.username || "admin",
+      action: "route_plan_saved",
+      site,
+      details: { date, plannedRoutes },
+    }).catch(() => {});
     response.json({ ok: true, plan });
   } catch (error) {
     console.error(error);
@@ -586,6 +612,12 @@ app.delete("/api/route-plans/:date", requireOperationsEditor, async (request, re
     const site = normalizeSite(request.query.site || "all");
     if (!date) return response.status(400).json({ ok: false, error: "Fecha no valida." });
     await deleteRoutePlanRecord(date, site);
+    await logAuditEvent({
+      actor: request.adminUser?.email || request.adminUser?.username || "admin",
+      action: "route_plan_deleted",
+      site,
+      details: { date },
+    }).catch(() => {});
     response.json({ ok: true });
   } catch (error) {
     console.error(error);
@@ -604,16 +636,33 @@ app.get("/api/admin/export/:date", requireAdmin, async (request, response) => {
   const items = (await listAllInspectionRecords()).filter((item) => {
     return normalizeDateKey(item.finishedAt || item.startedAt) === date;
   });
-  const plan = await readRoutePlan(date).catch(() => emptyRoutePlan(date));
+  const sitePlans = await Promise.all(["all", ...FLEET_SITES, FALLBACK_SITE].map((site) => {
+    return readRoutePlan(date, site).catch(() => emptyRoutePlan(date, site));
+  }));
+  const plan = sitePlans.find((item) => item.site === "all") || emptyRoutePlan(date, "all");
+  const siteTotals = ["all", ...FLEET_SITES, FALLBACK_SITE].map((site) => {
+    const siteItems = site === "all" ? items : items.filter((item) => normalizeSite(item.site || FALLBACK_SITE) === site);
+    const sitePlan = sitePlans.find((item) => item.site === site) || emptyRoutePlan(date, site);
+    return {
+      site,
+      plannedRoutes: sitePlan.plannedRoutes || 0,
+      completedInspections: siteItems.length,
+      pendingRoutes: Math.max((sitePlan.plannedRoutes || 0) - siteItems.length, 0),
+      vehicles: [...new Set(siteItems.map((item) => item.plate).filter(Boolean))].length,
+      photos: siteItems.reduce((sum, item) => sum + (item.photos?.length || 0), 0),
+      aiAlerts: siteItems.filter((item) => item.ai?.newDamageDetected).length,
+    };
+  });
   const payload = {
     date,
     generatedAt: new Date().toISOString(),
-    plannedRoutes: plan.plannedRoutes,
+    plannedRoutes: plan.plannedRoutes || siteTotals.filter((item) => item.site !== "all").reduce((sum, item) => sum + item.plannedRoutes, 0),
     completedInspections: items.length,
-    pendingRoutes: Math.max((plan.plannedRoutes || 0) - items.length, 0),
+    pendingRoutes: Math.max((plan.plannedRoutes || siteTotals.filter((item) => item.site !== "all").reduce((sum, item) => sum + item.plannedRoutes, 0)) - items.length, 0),
     vehicles: [...new Set(items.map((item) => item.plate).filter(Boolean))].length,
     photos: items.reduce((sum, item) => sum + (item.photos?.length || 0), 0),
     aiAlerts: items.filter((item) => item.ai?.newDamageDetected).length,
+    siteTotals,
     inspections: items,
   };
 
@@ -667,6 +716,13 @@ app.post("/api/inspections", async (request, response) => {
   }
 
   await fs.writeFile(path.join(inspectionsDir, `${id}.json`), JSON.stringify(item, null, 2));
+  await logAuditEvent({
+    actor: item.driverName,
+    action: "inspection_saved",
+    site: item.site,
+    plate: item.plate,
+    details: { id: item.id, photos: item.photos.length },
+  }).catch(() => {});
   queueAiAnalysis(item);
   response.json({ ok: true, item });
 });
@@ -950,6 +1006,59 @@ function emptyRoutePlan(date, site = "all") {
     updatedAt: "",
     updatedBy: "",
   };
+}
+
+async function logAuditEvent(event) {
+  const item = {
+    id: safeName(event.id || `audit-${Date.now()}-${crypto.randomBytes(5).toString("hex")}`),
+    created_at: new Date().toISOString(),
+    actor: normalizeEmail(event.actor || "") || String(event.actor || "system").trim() || "system",
+    action: String(event.action || "event").trim(),
+    site: normalizeSite(event.site || "all"),
+    plate: String(event.plate || "").trim().toUpperCase(),
+    details: event.details && typeof event.details === "object" ? event.details : {},
+  };
+
+  if (supabase) {
+    const { error } = await supabase
+      .from(AUDIT_TABLE)
+      .insert(item);
+
+    if (error) throw new Error(`Supabase Audit: ${error.message}`);
+    return item;
+  }
+
+  const events = await readLocalAuditEvents();
+  events.unshift(item);
+  await fs.writeFile(auditFile, JSON.stringify(events.slice(0, 1000), null, 2));
+  return item;
+}
+
+async function listAuditEvents(limit = 100) {
+  const safeLimit = Math.min(500, Math.max(1, Number(limit) || 100));
+
+  if (supabase) {
+    const { data, error } = await supabase
+      .from(AUDIT_TABLE)
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(safeLimit);
+
+    if (error) throw new Error(`Supabase Audit: ${error.message}`);
+    return data || [];
+  }
+
+  return (await readLocalAuditEvents()).slice(0, safeLimit);
+}
+
+async function readLocalAuditEvents() {
+  try {
+    const raw = await fs.readFile(auditFile, "utf8");
+    const events = JSON.parse(raw);
+    return Array.isArray(events) ? events : [];
+  } catch {
+    return [];
+  }
 }
 
 function routePlanKey(date, site = "all") {

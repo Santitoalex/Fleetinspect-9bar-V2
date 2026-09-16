@@ -58,8 +58,109 @@
   box-shadow: inset 5px 0 0 #0f766e, 0 16px 34px rgba(15, 118, 110, 0.16);
 }
 
+.operations-board {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 18px 0 20px;
+}
+
+.ops-site-card {
+  border: 1px solid #dbe7f3;
+  border-radius: 18px;
+  background: #ffffff;
+  padding: 18px;
+  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.07);
+}
+
+.ops-site-card header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.ops-site-card span,
+.ops-site-card small {
+  color: #64748b;
+  font-weight: 800;
+}
+
+.ops-site-card header span {
+  display: block;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ops-site-card strong {
+  display: block;
+  margin-top: 4px;
+  color: #0f172a;
+  font-size: 1.55rem;
+  line-height: 1;
+}
+
+.ops-site-card header em {
+  border-radius: 999px;
+  background: #ecfdf5;
+  color: #0f766e;
+  padding: 8px 10px;
+  font-style: normal;
+  font-weight: 950;
+}
+
+.ops-site-card.has-alert header em {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.ops-progress {
+  height: 10px;
+  margin: 18px 0 14px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e5edf6;
+}
+
+.ops-progress i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #0f766e, #2563eb);
+}
+
+.ops-site-card.has-alert .ops-progress i {
+  background: linear-gradient(90deg, #f59e0b, #dc2626);
+}
+
+.ops-site-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.ops-site-metrics span {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 10px;
+  background: #f8fafc;
+}
+
+.ops-site-metrics b {
+  display: block;
+  color: #123c69;
+  font-size: 1.3rem;
+}
+
+.audit-row strong {
+  color: #123c69;
+}
+
 @media (max-width: 900px) {
-  .site-overview-grid {
+  .site-overview-grid,
+  .operations-board {
     grid-template-columns: 1fr;
   }
 }
@@ -5404,5 +5505,1589 @@ body.driver-pro {
 
   .admin-premium .fleet-nav {
     grid-template-columns: 1fr;
+  }
+}
+
+/* v45 enterprise interface */
+.admin-enterprise-v45,
+.driver-enterprise-v45 {
+  --v45-ink: #111827;
+  --v45-muted: #64748b;
+  --v45-subtle: #8a97a8;
+  --v45-line: #dbe5ef;
+  --v45-soft-line: #e7edf4;
+  --v45-bg: #eef3f8;
+  --v45-panel: #ffffff;
+  --v45-navy: #0b1f33;
+  --v45-blue: #16466f;
+  --v45-teal: #0f766e;
+  --v45-gold: #f59e0b;
+  --v45-red: #dc2626;
+  --v45-violet: #6d28d9;
+  --v45-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+  color: var(--v45-ink);
+  background: var(--v45-bg);
+}
+
+.admin-enterprise-v45 * ,
+.driver-enterprise-v45 * {
+  letter-spacing: 0;
+}
+
+.admin-enterprise-v45 .admin-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 248px minmax(0, 1fr);
+  background:
+    linear-gradient(180deg, rgba(22, 70, 111, 0.07), transparent 360px),
+    var(--v45-bg);
+}
+
+.admin-enterprise-v45 .fleet-sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  background: #071827;
+  padding: 18px 14px;
+  color: #ffffff;
+}
+
+.admin-enterprise-v45 .fleet-logo {
+  gap: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 12px;
+}
+
+.admin-enterprise-v45 .admin-product-logo {
+  width: 124px;
+  height: 52px;
+  border-radius: 7px;
+  object-fit: contain;
+  background: #ffffff;
+  padding: 6px;
+}
+
+.admin-enterprise-v45 .fleet-logo p {
+  margin: 8px 0 0;
+  color: #bfdbfe;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.admin-enterprise-v45 .fleet-nav {
+  display: grid;
+  gap: 6px;
+  margin-top: 18px;
+}
+
+.admin-enterprise-v45 .fleet-nav a {
+  min-height: 42px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  color: #dbeafe;
+  padding: 10px 11px;
+  text-decoration: none;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.admin-enterprise-v45 .fleet-nav a span {
+  width: 24px;
+  color: #f59e0b;
+  font-size: 15px;
+}
+
+.admin-enterprise-v45 .fleet-nav a b {
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.admin-enterprise-v45 .fleet-nav a:hover,
+.admin-enterprise-v45 .fleet-nav a.active {
+  border-color: rgba(245, 158, 11, 0.36);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.admin-enterprise-v45 .admin-workspace {
+  min-width: 0;
+}
+
+.admin-enterprise-v45 .fleet-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  min-height: 72px;
+  border-bottom: 1px solid var(--v45-line);
+  background: rgba(255, 255, 255, 0.95);
+  padding: 12px 24px;
+  backdrop-filter: blur(14px);
+}
+
+.admin-enterprise-v45 .topbar-left,
+.admin-enterprise-v45 .topbar-actions {
+  gap: 10px;
+}
+
+.admin-enterprise-v45 .topbar-company-logo {
+  width: 126px;
+  height: 44px;
+  border: 1px solid var(--v45-line);
+  border-radius: 7px;
+  object-fit: contain;
+  background: #ffffff;
+  padding: 5px;
+}
+
+.admin-enterprise-v45 .menu-button,
+.admin-enterprise-v45 .icon-button,
+.admin-enterprise-v45 .admin-language,
+.admin-enterprise-v45 .user-chip,
+.admin-enterprise-v45 .role-chip,
+.admin-enterprise-v45 .sync-chip,
+.admin-enterprise-v45 .user-admin-link {
+  min-height: 40px;
+  border: 1px solid var(--v45-line);
+  border-radius: 7px;
+  background: #ffffff;
+  color: var(--v45-blue);
+  padding: 9px 12px;
+  font-size: 13px;
+  font-weight: 850;
+  box-shadow: none;
+}
+
+.admin-enterprise-v45 .role-chip {
+  border-color: #fed7aa;
+  background: #fff7ed;
+  color: #9a3412;
+}
+
+.admin-enterprise-v45 .global-search {
+  width: min(520px, 42vw);
+  min-height: 46px;
+  border: 1px solid var(--v45-line);
+  border-radius: 8px;
+  background: #f8fafc;
+  padding: 0 14px;
+  box-shadow: none;
+}
+
+.admin-enterprise-v45 .global-search input {
+  color: var(--v45-ink);
+  font-size: 14px;
+  font-weight: 760;
+}
+
+.admin-enterprise-v45 .dashboard-main {
+  max-width: 1680px;
+  margin: 0 auto;
+  padding: 24px 28px 56px;
+}
+
+.admin-enterprise-v45 .admin-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(360px, 0.8fr);
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.admin-enterprise-v45 .admin-hero-copy,
+.admin-enterprise-v45 .hero-status-grid article {
+  border: 1px solid var(--v45-line);
+  border-radius: 8px;
+  background: var(--v45-panel);
+  box-shadow: var(--v45-shadow);
+}
+
+.admin-enterprise-v45 .admin-hero-copy {
+  min-height: 156px;
+  padding: 24px 28px;
+  overflow: hidden;
+}
+
+.admin-enterprise-v45 .admin-hero-copy::after {
+  width: 260px;
+  height: 260px;
+  right: -80px;
+  top: -64px;
+  border-radius: 50%;
+  background: rgba(245, 158, 11, 0.12);
+}
+
+.admin-enterprise-v45 .eyebrow,
+.admin-enterprise-v45 .admin-filter-panel label span,
+.admin-enterprise-v45 .admin-filter-panel article span,
+.admin-enterprise-v45 .control-room-strip span,
+.admin-enterprise-v45 .control-room-strip small,
+.admin-enterprise-v45 .metrics span,
+.admin-enterprise-v45 .dashboard-widget header span,
+.admin-enterprise-v45 .route-plan-card label span,
+.admin-enterprise-v45 .vehicle-control-tools span,
+.admin-enterprise-v45 .vehicle-control-summary span {
+  color: var(--v45-muted);
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.admin-enterprise-v45 .admin-hero h1 {
+  margin: 10px 0 8px;
+  color: var(--v45-navy);
+  font-size: clamp(30px, 3vw, 44px);
+  line-height: 1.02;
+}
+
+.admin-enterprise-v45 .admin-hero span {
+  color: #526174;
+  font-size: 15px;
+  font-weight: 720;
+}
+
+.admin-enterprise-v45 .hero-status-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.admin-enterprise-v45 .hero-status-grid article {
+  min-height: 156px;
+  border-left: 5px solid var(--v45-teal);
+  padding: 22px;
+}
+
+.admin-enterprise-v45 .hero-status-grid article:nth-child(2) {
+  border-left-color: var(--v45-gold);
+}
+
+.admin-enterprise-v45 .hero-status-grid strong {
+  display: inline-flex;
+  margin-top: 16px;
+  border-radius: 999px;
+  background: #dcfce7;
+  color: #166534;
+  padding: 8px 14px;
+  font-size: 14px;
+}
+
+.admin-enterprise-v45 .hero-dashboard,
+.admin-enterprise-v45 .dashboard-widget,
+.admin-enterprise-v45 .admin-auth-card,
+.admin-enterprise-v45 .admin-install-panel {
+  border: 1px solid var(--v45-line);
+  border-radius: 8px;
+  background: var(--v45-panel);
+  box-shadow: var(--v45-shadow);
+}
+
+.admin-enterprise-v45 .admin-command-header {
+  gap: 18px;
+  border-bottom: 1px solid var(--v45-soft-line);
+  padding: 22px 24px;
+}
+
+.admin-enterprise-v45 .admin-command-header h2,
+.admin-enterprise-v45 .dashboard-widget h3,
+.admin-enterprise-v45 .admin-auth-card h3 {
+  color: var(--v45-navy);
+  font-size: 22px;
+  line-height: 1.1;
+}
+
+.admin-enterprise-v45 .dashboard-actions {
+  gap: 9px;
+}
+
+.admin-enterprise-v45 .dashboard-actions .ghost,
+.admin-enterprise-v45 .admin-auth button,
+.admin-enterprise-v45 .route-plan-actions button,
+.admin-enterprise-v45 .user-management-widget .ghost,
+.admin-enterprise-v45 .admin-install-actions button {
+  min-height: 42px;
+  border: 1px solid var(--v45-line);
+  border-radius: 7px;
+  background: #ffffff;
+  color: var(--v45-navy);
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 850;
+  box-shadow: none;
+}
+
+.admin-enterprise-v45 .dashboard-actions .strong-action,
+.admin-enterprise-v45 .route-plan-actions button:first-child,
+.admin-enterprise-v45 .admin-auth button {
+  border-color: transparent;
+  background: var(--v45-gold);
+  color: #111827;
+}
+
+.admin-enterprise-v45 #dashboardContent {
+  padding: 22px 24px 26px;
+}
+
+.admin-enterprise-v45 .admin-filter-panel {
+  display: grid;
+  grid-template-columns: minmax(280px, 1.4fr) minmax(230px, 1fr) minmax(190px, 0.75fr) minmax(130px, 0.42fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.admin-enterprise-v45 .admin-filter-panel label,
+.admin-enterprise-v45 .admin-filter-panel article,
+.admin-enterprise-v45 .control-room-strip article,
+.admin-enterprise-v45 .metrics article,
+.admin-enterprise-v45 .vehicle-control-summary article,
+.admin-enterprise-v45 .site-overview-card,
+.admin-enterprise-v45 .ops-site-card {
+  border: 1px solid var(--v45-line);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: none;
+}
+
+.admin-enterprise-v45 .admin-filter-panel label,
+.admin-enterprise-v45 .admin-filter-panel article {
+  min-height: 76px;
+  padding: 12px 14px;
+}
+
+.admin-enterprise-v45 .admin-filter-panel select {
+  min-height: 34px;
+  color: var(--v45-navy);
+  font-size: 15px;
+  font-weight: 850;
+}
+
+.admin-enterprise-v45 .control-room-strip,
+.admin-enterprise-v45 .metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.admin-enterprise-v45 .metrics {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin: 16px 0;
+}
+
+.admin-enterprise-v45 .control-room-strip article,
+.admin-enterprise-v45 .metrics article {
+  min-height: 112px;
+  padding: 16px 18px;
+}
+
+.admin-enterprise-v45 .control-room-strip article {
+  border-left: 5px solid var(--v45-gold);
+}
+
+.admin-enterprise-v45 .control-room-strip article:nth-child(1) {
+  border-left-color: var(--v45-teal);
+}
+
+.admin-enterprise-v45 .control-room-strip article:nth-child(3) {
+  border-left-color: var(--v45-blue);
+}
+
+.admin-enterprise-v45 .control-room-strip article:nth-child(4) {
+  border-left-color: var(--v45-violet);
+}
+
+.admin-enterprise-v45 .control-room-strip strong,
+.admin-enterprise-v45 .metrics strong {
+  display: block;
+  margin-top: 11px;
+  color: var(--v45-navy);
+  font-size: 32px;
+  line-height: 1;
+  font-weight: 950;
+}
+
+.admin-enterprise-v45 .metrics article::before {
+  width: 48px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--v45-gold);
+}
+
+.admin-enterprise-v45 .metrics article:nth-child(2)::before {
+  background: var(--v45-blue);
+}
+
+.admin-enterprise-v45 .metrics article:nth-child(3)::before {
+  background: var(--v45-teal);
+}
+
+.admin-enterprise-v45 .metrics article:nth-child(4)::before {
+  background: var(--v45-red);
+}
+
+.admin-enterprise-v45 .metrics article:nth-child(5)::before {
+  background: var(--v45-violet);
+}
+
+.admin-enterprise-v45 .site-overview-grid,
+.admin-enterprise-v45 .operations-board {
+  gap: 12px;
+}
+
+.admin-enterprise-v45 .site-overview-card,
+.admin-enterprise-v45 .ops-site-card {
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.admin-enterprise-v45 .site-overview-card.active {
+  border-color: var(--v45-teal);
+  box-shadow: inset 4px 0 0 var(--v45-teal);
+}
+
+.admin-enterprise-v45 .ops-site-card header em {
+  border-radius: 999px;
+  background: #ecfdf5;
+  color: #047857;
+  padding: 7px 10px;
+}
+
+.admin-enterprise-v45 .ops-progress {
+  height: 8px;
+  background: #e8eef5;
+}
+
+.admin-enterprise-v45 .ops-site-metrics span {
+  border-radius: 7px;
+  background: #f8fafc;
+}
+
+.admin-enterprise-v45 .dashboard-card-grid {
+  display: grid;
+  grid-template-columns: minmax(360px, 0.95fr) minmax(520px, 1.35fr) minmax(300px, 0.8fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.admin-enterprise-v45 .dashboard-widget {
+  min-width: 0;
+  padding: 0;
+}
+
+.admin-enterprise-v45 .dashboard-widget > header {
+  min-height: 72px;
+  border-bottom: 1px solid var(--v45-soft-line);
+  padding: 16px 18px;
+}
+
+.admin-enterprise-v45 .dashboard-widget header strong {
+  border-radius: 8px;
+  background: #fff7ed;
+  color: #9a3412;
+  padding: 10px 14px;
+  font-size: 24px;
+}
+
+.admin-enterprise-v45 .primary-widget,
+.admin-enterprise-v45 .vehicle-control-widget {
+  border-top: 4px solid var(--v45-red);
+}
+
+.admin-enterprise-v45 .vehicle-control-widget {
+  grid-column: 1 / -1;
+  border-top-color: var(--v45-gold);
+}
+
+.admin-enterprise-v45 .dashboard-widget.wide-widget:not(.vehicle-control-widget) {
+  grid-column: span 2;
+}
+
+.admin-enterprise-v45 .status-widget {
+  min-height: 240px;
+}
+
+.admin-enterprise-v45 .vehicle-control-tools,
+.admin-enterprise-v45 .vehicle-control-summary {
+  gap: 10px;
+}
+
+.admin-enterprise-v45 .vehicle-control-tools label,
+.admin-enterprise-v45 .history-selector {
+  border: 1px solid var(--v45-line);
+  border-radius: 7px;
+  background: #f8fafc;
+  padding: 10px;
+}
+
+.admin-enterprise-v45 .vehicle-control-tools input,
+.admin-enterprise-v45 .vehicle-control-tools select,
+.admin-enterprise-v45 .history-selector select,
+.admin-enterprise-v45 .admin-auth input,
+.admin-enterprise-v45 .admin-signup input,
+.admin-enterprise-v45 .route-plan-card input,
+.admin-enterprise-v45 .route-plan-card textarea {
+  border: 1px solid var(--v45-line);
+  border-radius: 7px;
+  background: #ffffff;
+  color: var(--v45-navy);
+  min-height: 42px;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-weight: 760;
+  outline: none;
+}
+
+.admin-enterprise-v45 .route-plan-card {
+  grid-template-columns: minmax(230px, 0.55fr) minmax(220px, 0.38fr) minmax(320px, 1fr);
+  gap: 14px;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  background: #fffaf2;
+  padding: 14px;
+}
+
+.admin-enterprise-v45 .route-plan-card input {
+  max-width: 190px;
+  font-size: 24px;
+  font-weight: 950;
+}
+
+.admin-enterprise-v45 .route-plan-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.admin-enterprise-v45 .route-plan-card p {
+  color: #7c2d12;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.admin-enterprise-v45 .alert-card,
+.admin-enterprise-v45 .vehicle-tile,
+.admin-enterprise-v45 .report-card,
+.admin-enterprise-v45 .vehicle-control-row,
+.admin-enterprise-v45 .status-row,
+.admin-enterprise-v45 .activity-row,
+.admin-enterprise-v45 .driver-summary-row,
+.admin-enterprise-v45 .dispatcher-row,
+.admin-enterprise-v45 .audit-row {
+  border: 1px solid var(--v45-soft-line);
+  border-radius: 7px;
+  background: #ffffff;
+  box-shadow: none;
+}
+
+.admin-enterprise-v45 .alert-card,
+.admin-enterprise-v45 .vehicle-tile,
+.admin-enterprise-v45 .report-card {
+  padding: 14px;
+}
+
+.admin-enterprise-v45 .alert-card strong,
+.admin-enterprise-v45 .vehicle-tile strong,
+.admin-enterprise-v45 .report-card strong,
+.admin-enterprise-v45 .vehicle-control-row strong,
+.admin-enterprise-v45 .driver-summary-row strong {
+  color: var(--v45-navy);
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.admin-enterprise-v45 .alert-card span,
+.admin-enterprise-v45 .vehicle-tile span,
+.admin-enterprise-v45 .vehicle-tile small,
+.admin-enterprise-v45 .report-card span,
+.admin-enterprise-v45 .report-card small,
+.admin-enterprise-v45 .vehicle-control-row span,
+.admin-enterprise-v45 .vehicle-control-row small,
+.admin-enterprise-v45 .activity-row span {
+  color: var(--v45-muted);
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.admin-enterprise-v45 .report-card a,
+.admin-enterprise-v45 .alert-card a,
+.admin-enterprise-v45 .vehicle-control-row a {
+  color: var(--v45-blue);
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.admin-enterprise-v45 .status-row {
+  border-left: 4px solid var(--v45-gold);
+  padding: 14px;
+}
+
+.admin-enterprise-v45 .status-row.ready {
+  border-left-color: var(--v45-teal);
+}
+
+.admin-enterprise-v45 .admin-auth {
+  grid-template-columns: minmax(280px, 1fr) minmax(280px, 1fr);
+  gap: 16px;
+  padding: 22px;
+}
+
+.admin-enterprise-v45 .admin-auth-card {
+  padding: 18px;
+}
+
+.admin-enterprise-v45 .admin-lock,
+.admin-enterprise-v45 .admin-signup {
+  gap: 10px;
+}
+
+.admin-enterprise-v45 .role-help-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.admin-enterprise-v45 .role-help-grid article {
+  border: 1px solid var(--v45-soft-line);
+  border-radius: 7px;
+  background: #f8fafc;
+}
+
+.admin-enterprise-v45 .dispatcher-row {
+  grid-template-columns: minmax(0, 1.2fr) minmax(150px, 0.55fr) minmax(170px, 0.55fr);
+  padding: 12px;
+}
+
+.driver-enterprise-v45 {
+  min-height: 100vh;
+  background:
+    linear-gradient(180deg, #0b1f33 0, #0b1f33 84px, #eef3f8 84px, #eef3f8 100%);
+}
+
+.driver-enterprise-v45 .driver-app-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  min-height: 76px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: #0b1f33;
+  padding: 12px max(16px, env(safe-area-inset-left)) 12px max(16px, env(safe-area-inset-right));
+  box-shadow: none;
+}
+
+.driver-enterprise-v45 .brand-logo {
+  width: 116px;
+  height: 48px;
+  border-radius: 7px;
+  object-fit: contain;
+  background: #ffffff;
+  padding: 5px;
+}
+
+.driver-enterprise-v45 .header-brand h1 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 19px;
+  line-height: 1;
+}
+
+.driver-enterprise-v45 .header-brand p {
+  margin: 5px 0 0;
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: 720;
+}
+
+.driver-enterprise-v45 .language-select,
+.driver-enterprise-v45 .admin-link {
+  min-height: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
+  padding: 9px 11px;
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.driver-enterprise-v45 .driver-main {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 22px 16px 54px;
+}
+
+.driver-enterprise-v45 .driver-install-card,
+.driver-enterprise-v45 .driver-hero-card,
+.driver-enterprise-v45 .driver-card,
+.driver-enterprise-v45 .driver-process-card,
+.driver-enterprise-v45 .driver-photo-app,
+.driver-enterprise-v45 .photo-panel-card {
+  border: 1px solid var(--v45-line);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: var(--v45-shadow);
+}
+
+.driver-enterprise-v45 .driver-start-pro {
+  gap: 16px;
+}
+
+.driver-enterprise-v45 .driver-hero-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.75fr);
+  gap: 18px;
+  padding: 22px;
+}
+
+.driver-enterprise-v45 .driver-kicker,
+.driver-enterprise-v45 .form-heading span,
+.driver-enterprise-v45 .capture-kicker,
+.driver-enterprise-v45 .photo-panel-card > strong,
+.driver-enterprise-v45 .driver-panel-header span,
+.driver-enterprise-v45 .driver-form-fields label span,
+.driver-enterprise-v45 .notes-field span {
+  color: var(--v45-muted);
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.driver-enterprise-v45 .driver-hero-copy h2 {
+  max-width: 780px;
+  margin: 8px 0 10px;
+  color: var(--v45-navy);
+  font-size: clamp(30px, 5vw, 52px);
+  line-height: 1.02;
+}
+
+.driver-enterprise-v45 .driver-hero-copy p {
+  color: #526174;
+  font-size: 16px;
+  font-weight: 720;
+}
+
+.driver-enterprise-v45 .driver-status-strip {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.driver-enterprise-v45 .driver-status-strip article {
+  border: 1px solid var(--v45-soft-line);
+  border-left: 4px solid var(--v45-gold);
+  border-radius: 7px;
+  background: #f8fafc;
+  padding: 14px;
+}
+
+.driver-enterprise-v45 .driver-status-strip article:nth-child(2) {
+  border-left-color: var(--v45-teal);
+}
+
+.driver-enterprise-v45 .driver-status-strip article:nth-child(3) {
+  border-left-color: var(--v45-blue);
+}
+
+.driver-enterprise-v45 .driver-status-strip strong {
+  color: var(--v45-navy);
+  font-size: 24px;
+}
+
+.driver-enterprise-v45 .driver-status-strip span {
+  color: var(--v45-muted);
+  font-size: 12px;
+  font-weight: 780;
+}
+
+.driver-enterprise-v45 .driver-entry-grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.75fr) minmax(260px, 0.45fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.driver-enterprise-v45 .driver-entry-card,
+.driver-enterprise-v45 .driver-help-card {
+  padding: 18px;
+}
+
+.driver-enterprise-v45 .form-heading strong {
+  color: var(--v45-navy);
+  font-size: 22px;
+}
+
+.driver-enterprise-v45 .driver-form-fields {
+  gap: 12px;
+}
+
+.driver-enterprise-v45 .driver-form-fields input,
+.driver-enterprise-v45 .driver-form-fields select,
+.driver-enterprise-v45 .photo-notes-card textarea {
+  min-height: 48px;
+  border: 1px solid var(--v45-line);
+  border-radius: 7px;
+  background: #ffffff;
+  color: var(--v45-navy);
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 760;
+}
+
+.driver-enterprise-v45 .driver-primary-action,
+.driver-enterprise-v45 .install-actions button {
+  min-height: 50px;
+  border: 0;
+  border-radius: 7px;
+  background: var(--v45-blue);
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.driver-enterprise-v45 .driver-primary-action {
+  margin-top: 4px;
+}
+
+.driver-enterprise-v45 .driver-help-card {
+  display: grid;
+  gap: 12px;
+}
+
+.driver-enterprise-v45 .driver-help-card div {
+  border: 1px solid var(--v45-soft-line);
+  border-radius: 7px;
+  background: #f8fafc;
+  padding: 14px;
+}
+
+.driver-enterprise-v45 .driver-help-card strong {
+  color: var(--v45-navy);
+}
+
+.driver-enterprise-v45 .driver-help-card span {
+  color: var(--v45-muted);
+  font-size: 13px;
+  font-weight: 720;
+}
+
+.driver-enterprise-v45 .driver-photo-screen {
+  padding: 0;
+}
+
+.driver-enterprise-v45 .driver-photo-app {
+  overflow: hidden;
+}
+
+.driver-enterprise-v45 .photo-command-bar {
+  min-height: 90px;
+  border-bottom: 1px solid var(--v45-soft-line);
+  background: #ffffff;
+  padding: 16px 18px;
+}
+
+.driver-enterprise-v45 .photo-command-bar h2 {
+  color: var(--v45-navy);
+  font-size: 24px;
+}
+
+.driver-enterprise-v45 .photo-command-bar p,
+.driver-enterprise-v45 .step-help {
+  color: var(--v45-muted);
+  font-size: 13px;
+  font-weight: 720;
+}
+
+.driver-enterprise-v45 .photo-command-bar .ghost {
+  min-height: 40px;
+  border: 1px solid var(--v45-line);
+  border-radius: 7px;
+  color: var(--v45-blue);
+  padding: 8px 12px;
+}
+
+.driver-enterprise-v45 .photo-counter {
+  min-height: 40px;
+  border-radius: 7px;
+  background: #eff6ff;
+  color: var(--v45-blue);
+  padding: 10px 12px;
+}
+
+.driver-enterprise-v45 .photo-workspace {
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 0;
+  background: #f8fafc;
+}
+
+.driver-enterprise-v45 .photo-stage {
+  border-right: 1px solid var(--v45-soft-line);
+  background: #0f172a;
+  padding: 16px;
+}
+
+.driver-enterprise-v45 .photo-camera-frame {
+  min-height: min(68vh, 720px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  background: #020617;
+  box-shadow: none;
+}
+
+.driver-enterprise-v45 .photo-camera-frame::before {
+  background: linear-gradient(180deg, rgba(2, 6, 23, 0.1), rgba(2, 6, 23, 0.55));
+}
+
+.driver-enterprise-v45 .camera-corners::before,
+.driver-enterprise-v45 .camera-corners::after {
+  border-color: rgba(255, 255, 255, 0.78);
+}
+
+.driver-enterprise-v45 .camera-picker-control,
+.driver-enterprise-v45 .camera-zoom-control {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 7px;
+  background: rgba(15, 23, 42, 0.86);
+  color: #ffffff;
+}
+
+.driver-enterprise-v45 .camera-zoom-slider {
+  border-radius: 999px;
+}
+
+.driver-enterprise-v45 .photo-action-dock {
+  gap: 10px;
+  padding: 14px 0 0;
+}
+
+.driver-enterprise-v45 .photo-action-dock button {
+  min-height: 48px;
+  border-radius: 7px;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.driver-enterprise-v45 .photo-main-action {
+  background: var(--v45-gold);
+  color: #111827;
+}
+
+.driver-enterprise-v45 .photo-small-action {
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.driver-enterprise-v45 .photo-control-panel {
+  max-height: calc(100vh - 168px);
+  overflow: auto;
+  gap: 10px;
+  background: #ffffff;
+  padding: 14px;
+}
+
+.driver-enterprise-v45 .photo-panel-card {
+  border-radius: 7px;
+  box-shadow: none;
+  padding: 14px;
+}
+
+.driver-enterprise-v45 .photo-status-card {
+  background: #eff6ff;
+}
+
+.driver-enterprise-v45 .photo-status-card strong,
+.driver-enterprise-v45 .photo-quality-card strong,
+.driver-enterprise-v45 .photo-sync-card strong {
+  color: var(--v45-navy);
+}
+
+.driver-enterprise-v45 .photo-status-card p,
+.driver-enterprise-v45 .photo-quality-card p,
+.driver-enterprise-v45 .photo-sync-card p {
+  color: #475569;
+  font-size: 13px;
+  font-weight: 720;
+}
+
+.driver-enterprise-v45 .photo-step-list {
+  gap: 8px;
+}
+
+.driver-enterprise-v45 .photo-step-list .progress-item {
+  min-height: 50px;
+  border: 1px solid var(--v45-soft-line);
+  border-radius: 7px;
+  background: #f8fafc;
+  padding: 10px;
+}
+
+.driver-enterprise-v45 .photo-notes-card textarea {
+  min-height: 116px;
+  resize: vertical;
+}
+
+.driver-enterprise-v45 .photo-modal {
+  background: rgba(2, 6, 23, 0.88);
+}
+
+.driver-enterprise-v45 .photo-modal-bar {
+  background: #0b1f33;
+  color: #ffffff;
+}
+
+.driver-enterprise-v45 .save-toast {
+  border-radius: 8px;
+  background: #0b1f33;
+  color: #ffffff;
+}
+
+@media (max-width: 1280px) {
+  .admin-enterprise-v45 .admin-shell {
+    grid-template-columns: 218px minmax(0, 1fr);
+  }
+
+  .admin-enterprise-v45 .admin-hero,
+  .admin-enterprise-v45 .dashboard-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-enterprise-v45 .dashboard-widget,
+  .admin-enterprise-v45 .dashboard-widget.wide-widget,
+  .admin-enterprise-v45 .vehicle-control-widget {
+    grid-column: 1;
+  }
+
+  .driver-enterprise-v45 .photo-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .driver-enterprise-v45 .photo-stage {
+    border-right: 0;
+  }
+
+  .driver-enterprise-v45 .photo-control-panel {
+    max-height: none;
+  }
+}
+
+@media (max-width: 920px) {
+  .admin-enterprise-v45 .admin-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-enterprise-v45 .fleet-sidebar {
+    position: static;
+    height: auto;
+  }
+
+  .admin-enterprise-v45 .fleet-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-enterprise-v45 .fleet-topbar {
+    position: static;
+    align-items: stretch;
+    flex-direction: column;
+    padding: 12px;
+  }
+
+  .admin-enterprise-v45 .topbar-left,
+  .admin-enterprise-v45 .topbar-actions {
+    flex-wrap: wrap;
+  }
+
+  .admin-enterprise-v45 .global-search {
+    width: 100%;
+    order: 4;
+  }
+
+  .admin-enterprise-v45 .dashboard-main {
+    padding: 14px 12px 42px;
+  }
+
+  .admin-enterprise-v45 .hero-status-grid,
+  .admin-enterprise-v45 .admin-filter-panel,
+  .admin-enterprise-v45 .control-room-strip,
+  .admin-enterprise-v45 .metrics,
+  .admin-enterprise-v45 .vehicle-control-tools,
+  .admin-enterprise-v45 .vehicle-control-summary,
+  .admin-enterprise-v45 .route-plan-card,
+  .admin-enterprise-v45 .admin-auth,
+  .admin-enterprise-v45 .role-help-grid,
+  .admin-enterprise-v45 .dispatcher-row,
+  .driver-enterprise-v45 .driver-hero-card,
+  .driver-enterprise-v45 .driver-entry-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .driver-enterprise-v45 .driver-main {
+    padding: 14px 12px 42px;
+  }
+}
+
+@media (max-width: 560px) {
+  .admin-enterprise-v45 .topbar-company-logo {
+    display: none;
+  }
+
+  .admin-enterprise-v45 .fleet-nav {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-enterprise-v45 .dashboard-actions,
+  .admin-enterprise-v45 .route-plan-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .driver-enterprise-v45 .driver-app-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .driver-enterprise-v45 .header-actions {
+    margin-left: 0;
+  }
+
+  .driver-enterprise-v45 .driver-hero-copy h2 {
+    font-size: 32px;
+  }
+
+  .driver-enterprise-v45 .photo-stage {
+    padding: 10px;
+  }
+
+  .driver-enterprise-v45 .photo-action-dock {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* v46 professional driver photo capture */
+.driver-photo-pro-v46 .driver-photo-screen {
+  max-width: none;
+}
+
+.driver-photo-pro-v46 .driver-photo-app {
+  border: 0;
+  border-radius: 10px;
+  background: #0b1220;
+  box-shadow: 0 22px 60px rgba(2, 6, 23, 0.24);
+}
+
+.driver-photo-pro-v46 .photo-command-bar {
+  min-height: 76px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.24);
+  background: #0b1220;
+  color: #ffffff;
+  padding: 14px 18px;
+}
+
+.driver-photo-pro-v46 .photo-command-bar h2 {
+  color: #ffffff;
+  font-size: 22px;
+}
+
+.driver-photo-pro-v46 .capture-kicker,
+.driver-photo-pro-v46 .step-help {
+  color: #93c5fd;
+}
+
+.driver-photo-pro-v46 .photo-command-bar p {
+  color: #cbd5e1;
+}
+
+.driver-photo-pro-v46 .photo-command-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.driver-photo-pro-v46 .photo-counter {
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  background: rgba(37, 99, 235, 0.2);
+  color: #bfdbfe;
+}
+
+.driver-photo-pro-v46 .photo-command-bar .ghost {
+  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+}
+
+.driver-photo-pro-v46 .photo-progress-rail {
+  height: 4px;
+  background: rgba(148, 163, 184, 0.22);
+}
+
+.driver-photo-pro-v46 .photo-progress-rail span {
+  display: block;
+  width: 11%;
+  height: 100%;
+  background: linear-gradient(90deg, #f59e0b, #22c55e);
+  transition: width 0.25s ease;
+}
+
+.driver-photo-pro-v46 .photo-workspace {
+  grid-template-columns: minmax(0, 1fr) 360px;
+  min-height: calc(100vh - 150px);
+  background: #0b1220;
+}
+
+.driver-photo-pro-v46 .photo-stage {
+  position: relative;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 12px;
+  border-right: 1px solid rgba(148, 163, 184, 0.2);
+  background:
+    radial-gradient(circle at 50% 0, rgba(37, 99, 235, 0.16), transparent 36%),
+    #050b16;
+  padding: 14px;
+}
+
+.driver-photo-pro-v46 .photo-guide-card {
+  position: absolute;
+  left: 28px;
+  top: 28px;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  width: min(520px, calc(100% - 56px));
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.82);
+  padding: 12px 14px;
+  color: #ffffff;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 18px 40px rgba(2, 6, 23, 0.22);
+}
+
+.driver-photo-pro-v46 .photo-guide-card > span {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 9px;
+  background: #f59e0b;
+  color: #111827;
+  font-size: 17px;
+  font-weight: 950;
+}
+
+.driver-photo-pro-v46 .photo-guide-card strong {
+  display: block;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.driver-photo-pro-v46 .photo-guide-card p {
+  margin: 3px 0 0;
+  color: #cbd5e1;
+  font-size: 13px;
+  font-weight: 720;
+}
+
+.driver-photo-pro-v46 .photo-camera-frame {
+  min-height: min(74vh, 760px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  background: #020617;
+  overflow: hidden;
+}
+
+.driver-photo-pro-v46 .photo-camera-frame video,
+.driver-photo-pro-v46 .photo-camera-frame img {
+  object-fit: cover;
+}
+
+.driver-photo-pro-v46 .photo-camera-frame::before {
+  background:
+    linear-gradient(180deg, rgba(2, 6, 23, 0.24), transparent 22%, transparent 72%, rgba(2, 6, 23, 0.5)),
+    linear-gradient(90deg, rgba(2, 6, 23, 0.34), transparent 18%, transparent 82%, rgba(2, 6, 23, 0.34));
+}
+
+.driver-photo-pro-v46 .camera-corners {
+  inset: 22px;
+}
+
+.driver-photo-pro-v46 .camera-corners::before,
+.driver-photo-pro-v46 .camera-corners::after {
+  width: 72px;
+  height: 72px;
+  border-color: rgba(255, 255, 255, 0.86);
+}
+
+.driver-photo-pro-v46 .camera-empty {
+  background: rgba(2, 6, 23, 0.72);
+  color: #ffffff;
+}
+
+.driver-photo-pro-v46 .camera-empty span {
+  color: #cbd5e1;
+}
+
+.driver-photo-pro-v46 .camera-picker-control {
+  left: auto;
+  right: 28px;
+  top: 28px;
+  z-index: 5;
+}
+
+.driver-photo-pro-v46 .camera-zoom-control {
+  left: 28px;
+  right: 28px;
+  bottom: 112px;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  padding: 12px 14px;
+}
+
+.driver-photo-pro-v46 .camera-zoom-slider {
+  height: 28px;
+  border: 0;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.driver-photo-pro-v46 .camera-zoom-slider span {
+  background: linear-gradient(90deg, #60a5fa, #f59e0b);
+}
+
+.driver-photo-pro-v46 .camera-zoom-slider i {
+  width: 30px;
+  height: 30px;
+  border: 3px solid #0b1220;
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgba(2, 6, 23, 0.26);
+}
+
+.driver-photo-pro-v46 .photo-action-dock {
+  position: relative;
+  z-index: 6;
+  display: grid;
+  grid-template-columns: minmax(92px, 0.28fr) minmax(170px, 1fr) minmax(92px, 0.28fr) minmax(92px, 0.28fr);
+  gap: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.88);
+  padding: 10px;
+  backdrop-filter: blur(14px);
+}
+
+.driver-photo-pro-v46 .photo-action-dock button {
+  min-height: 56px;
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+.driver-photo-pro-v46 .photo-main-action {
+  border: 0;
+  background: #22c55e;
+  color: #052e16;
+  font-size: 17px;
+  box-shadow: 0 14px 30px rgba(34, 197, 94, 0.22);
+}
+
+.driver-photo-pro-v46 [data-capture-state="review"] .photo-main-action {
+  background: #f59e0b;
+  color: #111827;
+}
+
+.driver-photo-pro-v46 .photo-small-action {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.driver-photo-pro-v46 .photo-control-panel {
+  max-height: calc(100vh - 150px);
+  border-left: 0;
+  background: #f8fafc;
+  padding: 14px;
+}
+
+.driver-photo-pro-v46 .photo-panel-card {
+  border: 1px solid #dbe5ef;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 14px;
+}
+
+.driver-photo-pro-v46 .photo-session-card {
+  border-left: 5px solid #16466f;
+}
+
+.driver-photo-pro-v46 .photo-session-card span {
+  display: block;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.driver-photo-pro-v46 .photo-session-card strong {
+  display: block;
+  margin-top: 6px;
+  color: #0b1f33;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.driver-photo-pro-v46 .photo-session-card small {
+  display: block;
+  margin-top: 7px;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 760;
+}
+
+.driver-photo-pro-v46 .photo-status-card {
+  border-left: 5px solid #22c55e;
+  background: #f0fdf4;
+}
+
+.driver-photo-pro-v46 .photo-quality-card {
+  border-left: 5px solid #f59e0b;
+}
+
+.driver-photo-pro-v46 .photo-sync-card {
+  border-left: 5px solid #2563eb;
+}
+
+.driver-photo-pro-v46 .photo-panel-card strong,
+.driver-photo-pro-v46 .driver-panel-header strong {
+  color: #0b1f33;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.driver-photo-pro-v46 .photo-status-card p,
+.driver-photo-pro-v46 .photo-quality-card p,
+.driver-photo-pro-v46 .photo-sync-card p {
+  color: #475569;
+  font-size: 13px;
+  line-height: 1.38;
+}
+
+.driver-photo-pro-v46 .photo-step-list {
+  display: grid;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.driver-photo-pro-v46 .photo-step-list .progress-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  min-height: 44px;
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 9px 10px;
+}
+
+.driver-photo-pro-v46 .photo-step-list .progress-item.active {
+  border-color: #93c5fd;
+  border-left-color: #2563eb;
+  background: #eff6ff;
+}
+
+.driver-photo-pro-v46 .photo-step-list .progress-item.done {
+  border-left-color: #22c55e;
+  background: #f0fdf4;
+}
+
+.driver-photo-pro-v46 .photo-step-list .progress-item strong {
+  color: #0b1f33;
+  font-size: 13px;
+}
+
+.driver-photo-pro-v46 .photo-step-list .progress-item span {
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #475569;
+  padding: 5px 8px;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.driver-photo-pro-v46 .photo-step-list .progress-item.done span {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.driver-photo-pro-v46 .photo-step-list .progress-item.active span {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.driver-photo-pro-v46 .photo-notes-card textarea {
+  min-height: 128px;
+  border-color: #dbe5ef;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.driver-photo-pro-v46 .photo-modal-bar {
+  min-height: 60px;
+}
+
+@media (max-width: 1180px) {
+  .driver-photo-pro-v46 .photo-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .driver-photo-pro-v46 .photo-control-panel {
+    max-height: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .driver-photo-pro-v46 .photo-command-bar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .driver-photo-pro-v46 .photo-command-meta {
+    justify-content: space-between;
+  }
+
+  .driver-photo-pro-v46 .photo-stage {
+    padding: 10px;
+  }
+
+  .driver-photo-pro-v46 .photo-guide-card {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: 100%;
+    margin-bottom: 0;
+  }
+
+  .driver-photo-pro-v46 .photo-camera-frame {
+    min-height: 54vh;
+  }
+
+  .driver-photo-pro-v46 .camera-picker-control {
+    position: relative;
+    right: auto;
+    top: auto;
+    margin-bottom: 8px;
+  }
+
+  .driver-photo-pro-v46 .camera-zoom-control {
+    left: 18px;
+    right: 18px;
+    bottom: 96px;
+  }
+
+  .driver-photo-pro-v46 .photo-action-dock {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .driver-photo-pro-v46 .photo-main-action {
+    grid-column: 1 / -1;
+    order: -1;
   }
 }

@@ -12,9 +12,9 @@
     <link rel="manifest" href="/admin.webmanifest" />
     <link rel="apple-touch-icon" href="/admin-apple-touch-icon.png" />
     <link rel="icon" href="/admin-icon-192.png" sizes="192x192" />
-    <link rel="stylesheet" href="/styles.css?v=42" />
+    <link rel="stylesheet" href="/styles.css?v=46" />
   </head>
-  <body class="admin-body admin-premium">
+  <body class="admin-body admin-premium admin-enterprise-v45">
     <div class="admin-shell">
       <aside class="fleet-sidebar">
         <div class="fleet-logo">
@@ -190,6 +190,8 @@
 
               <section id="siteOverview" class="site-overview-grid" aria-label="Sites"></section>
 
+              <section id="operationsBoard" class="operations-board" aria-label="Operations board"></section>
+
               <div class="metrics">
                 <article><span data-i18n="inspections">Inspections</span><strong id="metricInspections">0</strong></article>
                 <article><span data-i18n="vehicles">Vehicles</span><strong id="metricVehicles">0</strong></article>
@@ -323,6 +325,16 @@
                   <div id="recentActivity" class="activity-list"></div>
                 </article>
 
+                <article id="auditWidget" class="dashboard-widget status-widget hidden">
+                  <header>
+                    <div>
+                      <h3>Auditoría</h3>
+                      <span>Últimas acciones del sistema</span>
+                    </div>
+                  </header>
+                  <div id="auditTimeline" class="activity-list audit-timeline"></div>
+                </article>
+
                 <article class="dashboard-widget wide-widget">
                   <header>
                     <div>
@@ -353,8 +365,8 @@
       </div>
     </div>
 
-    <script src="/vehicles.js?v=2"></script>
-    <script src="/i18n.js?v=15"></script>
-    <script src="/admin.js?v=26"></script>
+    <script src="/vehicles.js?v=46"></script>
+    <script src="/i18n.js?v=46"></script>
+    <script src="/admin.js?v=46"></script>
   </body>
 </html>

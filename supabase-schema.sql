@@ -57,3 +57,21 @@ create index if not exists route_plans_date_site_idx
 on public.route_plans (date desc, site);
 
 alter table public.route_plans enable row level security;
+
+create table if not exists public.audit_events (
+  id text primary key,
+  created_at timestamptz default now(),
+  actor text,
+  action text not null,
+  site text,
+  plate text,
+  details jsonb
+);
+
+create index if not exists audit_events_created_idx
+on public.audit_events (created_at desc);
+
+create index if not exists audit_events_site_created_idx
+on public.audit_events (site, created_at desc);
+
+alter table public.audit_events enable row level security;
