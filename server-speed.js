@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
-const FRONTEND_VERSION = "55";
+const FRONTEND_VERSION = "56";
 const sourcePath = path.join(process.cwd(), "server.js");
 const runtimeDir = path.join(process.cwd(), ".runtime");
 const runtimePath = path.join(runtimeDir, "server.optimized.mjs");
@@ -116,7 +116,7 @@ app.use(express.static(process.cwd(), {`,
 );
 
 function patchAdminHtml(html) {
-  let patched = html.replaceAll("?v=54", `?v=${FRONTEND_VERSION}`);
+  let patched = html.replace(/\?v=\d+/g, `?v=${FRONTEND_VERSION}`);
 
   patched = patched.replace(
     /<span data-i18n="pendingToday">Pending today<\/span>\s*<strong id="todayPendingCount">0<\/strong>\s*<small data-i18n="dailyVehicleControl">Daily vehicle control<\/small>/,
@@ -185,6 +185,80 @@ function patchAdminHtml(html) {
    }
    .admin-body.admin-compact-v54 .ops-site-metrics.compact {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+   }
+   .admin-body.admin-compact-v54 .site-overview-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    align-items: stretch;
+   }
+   .admin-body.admin-compact-v54 .site-overview-card {
+    display: block !important;
+    text-align: left !important;
+    height: auto !important;
+   }
+   .admin-body.admin-compact-v54 .site-overview-head {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4px 10px;
+    align-items: end;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+   }
+   .admin-body.admin-compact-v54 .site-overview-head span,
+   .admin-body.admin-compact-v54 .site-overview-head small {
+    grid-column: 1 / -1;
+   }
+   .admin-body.admin-compact-v54 .site-vehicle-report-list {
+    display: grid;
+    gap: 5px;
+    margin-top: 8px;
+    max-height: 210px;
+    overflow: auto;
+    padding-right: 2px;
+   }
+   .admin-body.admin-compact-v54 .site-vehicle-report-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+    padding: 6px 7px;
+    border: 1px solid #dbe6f0;
+    border-radius: 7px;
+    background: #fff;
+    color: #0f172a;
+    text-decoration: none;
+   }
+   .admin-body.admin-compact-v54 .site-vehicle-report-row:hover {
+    border-color: #1f6b9d;
+    background: #f5fbff;
+   }
+   .admin-body.admin-compact-v54 .site-vehicle-report-row strong,
+   .admin-body.admin-compact-v54 .site-vehicle-report-row small {
+    display: block;
+   }
+   .admin-body.admin-compact-v54 .site-vehicle-report-row em {
+    flex: 0 0 auto;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 900;
+    color: #1f6b9d;
+    text-transform: uppercase;
+   }
+   .admin-body.admin-compact-v54 .site-vehicle-report-row.alert {
+    border-color: #fed7aa;
+    background: #fff7ed;
+   }
+   .admin-body.admin-compact-v54 .empty-site-report {
+    display: block;
+    padding: 8px;
+    border: 1px dashed #d8e3ee;
+    border-radius: 7px;
+    color: #607089;
+    font-weight: 800;
    }
    .admin-body.admin-compact-v54 .daily-control-note {
     margin: 6px 0 8px;
@@ -272,15 +346,28 @@ function patchAdminJs(adminJs) {
       "    const todayItems = dashboardItems.filter((item) => {",
       "      return getItemSite(item) === site && localDateKey(new Date(item.finishedAt || item.startedAt || 0)) === today;",
       "    });",
-      "    const vehicles = new Set(todayItems.map((item) => normalizePlate(item.plate || \"\")).filter(Boolean)).size;",
+      "    const latestByPlate = Object.values(todayItems.reduce((groups, item) => {",
+      "      const plate = normalizePlate(item.plate || \"\");",
+      "      if (!plate) return groups;",
+      "      if (!groups[plate] || new Date(item.finishedAt || item.startedAt || 0) > new Date(groups[plate].finishedAt || groups[plate].startedAt || 0)) {",
+      "        groups[plate] = item;",
+      "      }",
+      "      return groups;",
+      "    }, {})).sort((a, b) => normalizePlate(a.plate || \"\").localeCompare(normalizePlate(b.plate || \"\")));",
+      "    const vehicles = latestByPlate.length;",
       "    const alerts = todayItems.filter((item) => item.ai?.newDamageDetected).length;",
       "    const active = getSelectedSite() === site;",
       "    return `",
-      "      <button class=\"site-overview-card ${active ? \"active\" : \"\"}\" type=\"button\" data-site-jump=\"${escapeHtml(site)}\">",
-      "        <span>${escapeHtml(siteLabel(site))}</span>",
-      "        <strong>${todayItems.length}</strong>",
-      "        <small>${vehicles} vehiculos · ${alerts} alertas hoy</small>",
-      "      </button>",
+      "      <article class=\"site-overview-card ${active ? \"active\" : \"\"}\">",
+      "        <button class=\"site-overview-head\" type=\"button\" data-site-jump=\"${escapeHtml(site)}\">",
+      "          <span>${escapeHtml(siteLabel(site))}</span>",
+      "          <strong>${todayItems.length}</strong>",
+      "          <small>${vehicles} vehiculos · ${alerts} alertas hoy</small>",
+      "        </button>",
+      "        <div class=\"site-vehicle-report-list\">",
+      "          ${latestByPlate.length ? latestByPlate.map(renderSiteVehicleReportRow).join(\"\") : `<span class=\"empty-site-report\">Sin inspecciones hoy</span>`}",
+      "        </div>",
+      "      </article>",
       "    `;",
       "  }).join(\"\");",
       "",
@@ -290,6 +377,19 @@ function patchAdminJs(adminJs) {
       "      renderDashboard();",
       "    });",
       "  });",
+      "}",
+      "",
+      "function renderSiteVehicleReportRow(item) {",
+      "  const status = getAiStatus(item);",
+      "  const plate = normalizePlate(item.plate || t(\"noRegistration\"));",
+      "  const driver = item.driverName || t(\"noDriver\");",
+      "  const time = formatTime(new Date(item.finishedAt || item.startedAt || 0));",
+      "  return `",
+      "    <a class=\"site-vehicle-report-row ${item.ai?.newDamageDetected ? \"alert\" : status.className}\" href=\"/report.html?id=${encodeURIComponent(item.id)}\" target=\"_blank\" rel=\"noopener\">",
+      "      <span><strong>${escapeHtml(plate)}</strong><small>${escapeHtml(driver)} · ${escapeHtml(time)}</small></span>",
+      "      <em>Reporte</em>",
+      "    </a>",
+      "  `;",
       "}",
       "",
       "function renderOperationsBoard",
@@ -425,7 +525,7 @@ function patchAdminJs(adminJs) {
 function patchServiceWorker(serviceWorker) {
   return serviceWorker
     .replace(/fleetinspect-driver-v\d+/g, `fleetinspect-driver-v${FRONTEND_VERSION}`)
-    .replaceAll("?v=54", `?v=${FRONTEND_VERSION}`);
+    .replace(/\?v=\d+/g, `?v=${FRONTEND_VERSION}`);
 }
 
 await fs.mkdir(runtimeDir, { recursive: true });
