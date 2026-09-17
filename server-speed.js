@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
-const FRONTEND_VERSION = "57";
+const FRONTEND_VERSION = "58";
 const sourcePath = path.join(process.cwd(), "server.js");
 const runtimeDir = path.join(process.cwd(), ".runtime");
 const runtimePath = path.join(runtimeDir, "server.optimized.mjs");
@@ -150,6 +150,13 @@ function patchAdminHtml(html) {
     '<select id="vehicleHistoryPlate"></select>',
     '<input id="vehicleHistoryPlate" list="vehicleHistoryPlateOptions" type="search" placeholder="Buscar matricula" autocomplete="off" />\n           <datalist id="vehicleHistoryPlateOptions"></datalist>'
   );
+
+  patched = patched
+    .replace('<h3 data-i18n="dailyVehicleControl">Daily vehicle control</h3>', '<h3>Historial por vehiculo</h3>')
+    .replace('<span data-i18n="dailyVehicleControlSubtitle">Choose a date and verify every registration in the fleet</span>', '<span>Busca una matricula y revisa todo su historial de inspecciones</span>')
+    .replace('<span data-i18n="controlDate">Control date</span>', '<span>Fecha</span>')
+    .replace('<span data-i18n="registrationNumber">Registration number</span>', '<span>Matricula</span>')
+    .replace('placeholder="M AZ 1003"', 'placeholder="Buscar matricula"');
 
   const extraCss = `
    .admin-body.admin-compact-v54 .route-plan-card { display: none !important; }
@@ -372,12 +379,14 @@ function patchAdminHtml(html) {
     font-size: 11px;
     font-weight: 800;
    }
+   .admin-body.admin-compact-v54 .vehicle-control-tools label:has(#vehicleControlDate),
    .admin-body.admin-compact-v54 .vehicle-control-tools label:has(#vehicleControlView),
    .admin-body.admin-compact-v54 .vehicle-control-summary article:nth-child(3) {
     display: none !important;
    }
    .admin-body.admin-compact-v54 .vehicle-control-tools {
-    grid-template-columns: 180px minmax(220px, 1fr) !important;
+    grid-template-columns: minmax(260px, 1fr) !important;
+    max-width: 520px;
    }
    .admin-body.admin-compact-v54 .vehicle-control-summary {
     grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
@@ -717,12 +726,11 @@ function patchAdminJs(adminJs) {
     /function renderDailyVehicleControl\(\) \{[\s\S]*?\n\}\n\nfunction renderRoutePendingSection/,
     [
       "function renderDailyVehicleControl() {",
-      "  const selectedDate = nodes.vehicleControlDate.value || localDateKey(new Date());",
-      "  const search = nodes.vehicleControlSearch.value.trim().toLowerCase();",
-      "  const inspectionsByPlate = getSiteScopedItems(dashboardItems).reduce((groups, item) => {",
+      "  const query = normalizePlate(nodes.vehicleControlSearch.value || \"\");",
+      "  const siteItems = getSiteScopedItems(dashboardItems).filter((item) => normalizePlate(item.plate || \"\"));",
+      "  const inspectionsByPlate = siteItems.reduce((groups, item) => {",
       "    const plate = normalizePlate(item.plate || \"\");",
-      "    const inspectionDate = localDateKey(new Date(item.finishedAt || item.startedAt || 0));",
-      "    if (inspectionDate !== selectedDate || !plate) return groups;",
+      "    if (!plate) return groups;",
       "    if (!groups[plate]) groups[plate] = [];",
       "    groups[plate].push(item);",
       "    return groups;",
@@ -743,7 +751,7 @@ function patchAdminJs(adminJs) {
       "        hasAlert: inspections.some((item) => item.ai?.newDamageDetected),",
       "      };",
       "    })",
-      "    .filter((vehicle) => vehicle.normalized.toLowerCase().includes(search));",
+      "    .filter((vehicle) => !query || vehicle.normalized.includes(query));",
       "",
       "  const doneVehicles = vehicles.filter((vehicle) => vehicle.inspected);",
       "  const totalInspections = vehicles.reduce((sum, vehicle) => sum + vehicle.inspections.length, 0);",
@@ -754,14 +762,74 @@ function patchAdminJs(adminJs) {
       "  nodes.controlInspectedVehicles.textContent = String(doneVehicles.length);",
       "  nodes.controlMissingVehicles.textContent = String(aiReviewCount);",
       "  nodes.controlAlertVehicles.textContent = String(alertCount);",
-      "  if (nodes.routePlanStatus) nodes.routePlanStatus.textContent = `${totalInspections} inspecciones en ${siteLabel(getSelectedSite())} · ${selectedDate}`;",
+      "  if (nodes.routePlanStatus) nodes.routePlanStatus.textContent = query",
+      "    ? `${totalInspections} inspecciones encontradas para ${query} · ${siteLabel(getSelectedSite())}`",
+      "    : `Escribe una matricula para ver todo el historial · ${doneVehicles.length} vehiculos con inspecciones`;",
       "",
       "  if (!vehicles.length) {",
-      "    nodes.vehicleControlList.innerHTML = `<article class=\"empty-state\">${escapeHtml(t(\"noVehiclesFound\"))}</article>`;",
+      "    nodes.vehicleControlList.innerHTML = `<article class=\"empty-state\">Sin historial para esa matricula</article>`;",
       "    return;",
       "  }",
       "",
-      "  nodes.vehicleControlList.innerHTML = renderVehicleControlSection(\"Vehiculos inspeccionados\", doneVehicles, selectedDate, \"priority\");",
+      "  if (!query) {",
+      "    nodes.vehicleControlList.innerHTML = renderVehicleControlSection(\"Vehiculos con historial\", doneVehicles.slice(0, 80), \"Historial\", \"priority\");",
+      "    return;",
+      "  }",
+      "",
+      "  const historyItems = vehicles",
+      "    .flatMap((vehicle) => vehicle.inspections)",
+      "    .sort((a, b) => new Date(b.finishedAt || b.startedAt) - new Date(a.finishedAt || a.startedAt));",
+      "  nodes.vehicleControlList.innerHTML = renderVehicleFullHistory(query, historyItems);",
+      "}",
+      "",
+      "function renderVehicleFullHistory(query, items) {",
+      "  return `",
+      "    <section class=\"vehicle-control-section priority\">",
+      "      <header>",
+      "        <div>",
+      "          <strong>Historial completo ${escapeHtml(query)}</strong>",
+      "          <span>${items.length} inspecciones guardadas</span>",
+      "        </div>",
+      "      </header>",
+      "      <div class=\"vehicle-control-table\">",
+      "        ${items.length ? items.map(renderVehicleHistoryControlRow).join(\"\") : `<article class=\"empty-state\">Sin historial para esa matricula</article>`}",
+      "      </div>",
+      "    </section>",
+      "  `;",
+      "}",
+      "",
+      "function renderVehicleHistoryControlRow(item) {",
+      "  const status = getAiStatus(item);",
+      "  const date = formatDate(item.finishedAt || item.startedAt);",
+      "  const time = formatTime(new Date(item.finishedAt || item.startedAt || 0));",
+      "  const hasAlert = Boolean(item.ai?.newDamageDetected);",
+      "  return `",
+      "    <article class=\"vehicle-control-row ${hasAlert ? \"alert\" : status.className}\">",
+      "      <div>",
+      "        <strong>${escapeHtml(normalizePlate(item.plate || \"\"))}</strong>",
+      "        <span>Matricula</span>",
+      "      </div>",
+      "      <div>",
+      "        <strong>${escapeHtml(date)}</strong>",
+      "        <span>${escapeHtml(time)}</span>",
+      "      </div>",
+      "      <div>",
+      "        <strong>${escapeHtml(item.driverName || t(\"noDriver\"))}</strong>",
+      "        <span>Conductor</span>",
+      "      </div>",
+      "      <div>",
+      "        <strong>${item.photos?.length || 0}</strong>",
+      "        <span>${escapeHtml(t(\"photos\"))}</span>",
+      "      </div>",
+      "      <div>",
+      "        <strong>${escapeHtml(status.label)}</strong>",
+      "        <span>Estado IA</span>",
+      "      </div>",
+      "      <div class=\"vehicle-control-actions\">",
+      "        <a href=\"/report.html?id=${encodeURIComponent(item.id)}\" target=\"_blank\" rel=\"noopener\">Reporte</a>",
+      "      </div>",
+      "    </article>",
+      "  `;",
       "}",
       "",
       "function renderRoutePendingSection",
