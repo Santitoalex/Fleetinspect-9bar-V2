@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
-const FRONTEND_VERSION = "56";
+const FRONTEND_VERSION = "57";
 const sourcePath = path.join(process.cwd(), "server.js");
 const runtimeDir = path.join(process.cwd(), ".runtime");
 const runtimePath = path.join(runtimeDir, "server.optimized.mjs");
@@ -146,8 +146,100 @@ function patchAdminHtml(html) {
     '\n         <p id="routePlanStatus" class="daily-control-note">Vista basada solo en inspecciones reales guardadas.</p>'
   );
 
+  patched = patched.replace(
+    '<select id="vehicleHistoryPlate"></select>',
+    '<input id="vehicleHistoryPlate" list="vehicleHistoryPlateOptions" type="search" placeholder="Buscar matricula" autocomplete="off" />\n           <datalist id="vehicleHistoryPlateOptions"></datalist>'
+  );
+
   const extraCss = `
    .admin-body.admin-compact-v54 .route-plan-card { display: none !important; }
+   .admin-body.admin-compact-v54 {
+    background: #f4f7fb !important;
+   }
+   .admin-body.admin-compact-v54 .fleet-topbar {
+    min-height: 58px !important;
+   }
+   .admin-body.admin-compact-v54 .dashboard-main {
+    padding: 18px !important;
+   }
+   .admin-body.admin-compact-v54 .admin-hero,
+   .admin-body.admin-compact-v54 .hero-status-grid,
+   .admin-body.admin-compact-v54 .control-room-strip,
+   .admin-body.admin-compact-v54 .metrics,
+   .admin-body.admin-compact-v54 .dashboard-card-grid {
+    gap: 10px !important;
+   }
+   .admin-body.admin-compact-v54 .admin-hero {
+    display: none !important;
+   }
+   .admin-body.admin-compact-v54 .dashboard-actions,
+   .admin-body.admin-compact-v54 #operationsBoard,
+   .admin-body.admin-compact-v54 .data-command-center,
+   .admin-body.admin-compact-v54 #auditWidget,
+   .admin-body.admin-compact-v54 .dashboard-widget.status-widget:has(#systemStatus) {
+    display: none !important;
+   }
+   .admin-body.admin-compact-v54 .admin-filter-panel {
+    grid-template-columns: minmax(160px, 220px) minmax(220px, 1fr) minmax(180px, 260px) 100px !important;
+    gap: 8px !important;
+   }
+   .admin-body.admin-compact-v54 .admin-filter-panel label,
+   .admin-body.admin-compact-v54 .admin-filter-panel article,
+   .admin-body.admin-compact-v54 .vehicle-control-tools label,
+   .admin-body.admin-compact-v54 .history-selector {
+    min-height: 54px !important;
+    padding: 9px 11px !important;
+    border-radius: 9px !important;
+   }
+   .admin-body.admin-compact-v54 .admin-filter-panel span,
+   .admin-body.admin-compact-v54 .vehicle-control-tools span,
+   .admin-body.admin-compact-v54 .history-selector span,
+   .admin-body.admin-compact-v54 .control-room-strip span,
+   .admin-body.admin-compact-v54 .metrics span {
+    font-size: 10px !important;
+    letter-spacing: .02em !important;
+   }
+   .admin-body.admin-compact-v54 select,
+   .admin-body.admin-compact-v54 input,
+   .admin-body.admin-compact-v54 button {
+    font-size: 13px !important;
+   }
+   .admin-body.admin-compact-v54 .system-health-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 36px;
+    padding: 0 12px;
+    border: 1px solid #9ee6bf;
+    border-radius: 9px;
+    background: #ecfdf5;
+    color: #146c43;
+    font-size: 12px;
+    font-weight: 900;
+    white-space: nowrap;
+   }
+   .admin-body.admin-compact-v54 .system-health-pill::before {
+    content: "";
+    width: 9px;
+    height: 9px;
+    border-radius: 999px;
+    background: #16a34a;
+    box-shadow: 0 0 0 4px rgba(22, 163, 74, .14);
+   }
+   .admin-body.admin-compact-v54 .system-health-pill.offline {
+    border-color: #fecaca;
+    background: #fff1f2;
+    color: #b91c1c;
+   }
+   .admin-body.admin-compact-v54 .system-health-pill.offline::before {
+    background: #dc2626;
+    box-shadow: 0 0 0 4px rgba(220, 38, 38, .14);
+   }
+   .admin-body.admin-compact-v54 .system-health-pill .muted {
+    color: inherit;
+    opacity: .7;
+    font-weight: 800;
+   }
    .admin-body.admin-compact-v54 .site-day-grid {
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
@@ -214,9 +306,9 @@ function patchAdminHtml(html) {
    }
    .admin-body.admin-compact-v54 .site-vehicle-report-list {
     display: grid;
-    gap: 5px;
-    margin-top: 8px;
-    max-height: 210px;
+    gap: 4px;
+    margin-top: 7px;
+    max-height: 180px;
     overflow: auto;
     padding-right: 2px;
    }
@@ -225,7 +317,7 @@ function patchAdminHtml(html) {
     justify-content: space-between;
     gap: 10px;
     align-items: center;
-    padding: 6px 7px;
+    padding: 5px 7px;
     border: 1px solid #dbe6f0;
     border-radius: 7px;
     background: #fff;
@@ -239,6 +331,20 @@ function patchAdminHtml(html) {
    .admin-body.admin-compact-v54 .site-vehicle-report-row strong,
    .admin-body.admin-compact-v54 .site-vehicle-report-row small {
     display: block;
+   }
+   .admin-body.admin-compact-v54 .site-vehicle-report-row strong,
+   .admin-body.admin-compact-v54 .vehicle-control-row strong,
+   .admin-body.admin-compact-v54 .history-row strong,
+   .admin-body.admin-compact-v54 .vehicle-summary strong {
+    font-size: 12px !important;
+    line-height: 1.1 !important;
+   }
+   .admin-body.admin-compact-v54 .site-vehicle-report-row small,
+   .admin-body.admin-compact-v54 .vehicle-control-row span,
+   .admin-body.admin-compact-v54 .history-row span,
+   .admin-body.admin-compact-v54 .vehicle-summary span {
+    font-size: 10px !important;
+    line-height: 1.2 !important;
    }
    .admin-body.admin-compact-v54 .site-vehicle-report-row em {
     flex: 0 0 auto;
@@ -265,6 +371,50 @@ function patchAdminHtml(html) {
     color: #607089;
     font-size: 11px;
     font-weight: 800;
+   }
+   .admin-body.admin-compact-v54 .vehicle-control-tools label:has(#vehicleControlView),
+   .admin-body.admin-compact-v54 .vehicle-control-summary article:nth-child(3) {
+    display: none !important;
+   }
+   .admin-body.admin-compact-v54 .vehicle-control-tools {
+    grid-template-columns: 180px minmax(220px, 1fr) !important;
+   }
+   .admin-body.admin-compact-v54 .vehicle-control-summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+   }
+   .admin-body.admin-compact-v54 .vehicle-control-list,
+   .admin-body.admin-compact-v54 .vehicle-history-list,
+   .admin-body.admin-compact-v54 .report-list,
+   .admin-body.admin-compact-v54 .vehicle-summary {
+    gap: 6px !important;
+   }
+   .admin-body.admin-compact-v54 .vehicle-control-row,
+   .admin-body.admin-compact-v54 .history-row,
+   .admin-body.admin-compact-v54 .report-row,
+   .admin-body.admin-compact-v54 .vehicle-summary article {
+    padding: 8px 10px !important;
+    border-radius: 8px !important;
+   }
+   .admin-body.admin-compact-v54 .dashboard-widget {
+    border-radius: 10px !important;
+   }
+   .admin-body.admin-compact-v54 .dashboard-widget > header {
+    padding: 12px 14px !important;
+   }
+   .admin-body.admin-compact-v54 .dashboard-widget > header h3 {
+    font-size: 16px !important;
+   }
+   .admin-body.admin-compact-v54 .dashboard-widget > header span {
+    font-size: 10px !important;
+   }
+   .admin-body.admin-compact-v54 .history-selector input {
+    width: min(260px, 34vw);
+    border: 0;
+    outline: none;
+    background: transparent;
+    color: #0f172a;
+    font-weight: 900;
    }`;
 
   return patched.replace("</style>\n </head>", `${extraCss}\n  </style>\n </head>`);
@@ -293,6 +443,11 @@ function patchAdminJs(adminJs) {
   js = js.replace(
     'nodes.saveRoutePlan.addEventListener("click", saveRoutePlan);\n  nodes.clearRoutePlan.addEventListener("click", clearRoutePlan);',
     'nodes.saveRoutePlan?.addEventListener("click", saveRoutePlan);\n  nodes.clearRoutePlan?.addEventListener("click", clearRoutePlan);'
+  );
+
+  js = js.replace(
+    'nodes.vehicleHistoryPlate.addEventListener("change", renderVehicleHistory);',
+    'nodes.vehicleHistoryPlate.addEventListener("change", renderVehicleHistory);\n  nodes.vehicleHistoryPlate.addEventListener("input", renderVehicleHistory);'
   );
 
   js = js.replace(
@@ -333,6 +488,106 @@ function patchAdminJs(adminJs) {
       "}",
       "",
       "function renderSiteOverview",
+    ].join("\n")
+  );
+
+  js = js.replace(
+    /function renderStatusPills\(\) \{[\s\S]*?\n\}\n\nfunction renderPhotoStrip/,
+    [
+      "function renderStatusPills() {",
+      "  const storageReady = Boolean(systemConfig.supabaseConfigured || systemConfig.cloudStorageConfigured || systemConfig.driveConfigured);",
+      "  const aiReady = Boolean(systemConfig.aiConfigured);",
+      "  const ready = storageReady && aiReady;",
+      "  nodes.storagePill.textContent = storageReady ? t(\"ready\") : t(\"needsSetup\");",
+      "  nodes.aiPill.textContent = aiReady ? t(\"ready\") : t(\"needsSetup\");",
+      "  nodes.storagePill.className = storageReady ? \"ready\" : \"warn\";",
+      "  nodes.aiPill.className = aiReady ? \"ready\" : \"warn\";",
+      "",
+      "  const topbar = document.querySelector(\".topbar-actions\");",
+      "  let healthPill = document.querySelector(\"#systemHealthPill\");",
+      "  if (!healthPill && topbar) {",
+      "    healthPill = document.createElement(\"span\");",
+      "    healthPill.id = \"systemHealthPill\";",
+      "    topbar.insertBefore(healthPill, nodes.logoutAdmin || null);",
+      "  }",
+      "  if (healthPill) {",
+      "    healthPill.className = `system-health-pill ${ready ? \"online\" : \"offline\"}`;",
+      "    healthPill.innerHTML = ready ? \"Operativa\" : \"Revisar\";",
+      "    healthPill.title = ready ? \"Supabase e IA operativas\" : \"Revisar conexion cloud o IA\";",
+      "  }",
+      "}",
+      "",
+      "function renderPhotoStrip",
+    ].join("\n")
+  );
+
+  js = js.replace(
+    /function renderVehicleHistoryPicker\(\) \{[\s\S]*?\n\}\n\nfunction renderVehicleHistory/,
+    [
+      "function renderVehicleHistoryPicker() {",
+      "  const selected = nodes.vehicleHistoryPlate.value;",
+      "  const plates = [...new Set(dashboardItems.map((item) => normalizePlate(item.plate || \"\")).filter(Boolean))]",
+      "    .sort((a, b) => a.localeCompare(b));",
+      "  const datalist = document.querySelector(\"#vehicleHistoryPlateOptions\");",
+      "  if (datalist) {",
+      "    datalist.innerHTML = plates.map((plate) => `<option value=\"${escapeHtml(plate)}\"></option>`).join(\"\");",
+      "    nodes.vehicleHistoryPlate.placeholder = \"Buscar matricula\";",
+      "    if (selected && plates.includes(normalizePlate(selected))) nodes.vehicleHistoryPlate.value = normalizePlate(selected);",
+      "    return;",
+      "  }",
+      "  nodes.vehicleHistoryPlate.innerHTML = [",
+      "    `<option value=\"\">${escapeHtml(t(\"selectVehicle\"))}</option>`,",
+      "    ...plates.map((plate) => `<option value=\"${escapeHtml(plate)}\">${escapeHtml(plate)}</option>`),",
+      "  ].join(\"\");",
+      "  if (plates.includes(selected)) nodes.vehicleHistoryPlate.value = selected;",
+      "}",
+      "",
+      "function renderVehicleHistory",
+    ].join("\n")
+  );
+
+  js = js.replace(
+    /function renderVehicleHistory\(\) \{[\s\S]*?\n\}\n\nfunction renderSystemStatus/,
+    [
+      "function renderVehicleHistory() {",
+      "  const query = normalizePlate(nodes.vehicleHistoryPlate.value || \"\");",
+      "  if (!query) {",
+      "    nodes.vehicleHistoryList.innerHTML = `<article class=\"empty-state\">Escribe o selecciona una matricula</article>`;",
+      "    return;",
+      "  }",
+      "",
+      "  const items = dashboardItems",
+      "    .filter((item) => normalizePlate(item.plate || \"\").includes(query))",
+      "    .sort((a, b) => new Date(b.finishedAt || b.startedAt) - new Date(a.finishedAt || a.startedAt));",
+      "",
+      "  if (!items.length) {",
+      "    nodes.vehicleHistoryList.innerHTML = `<article class=\"empty-state\">Sin historial para ${escapeHtml(query)}</article>`;",
+      "    return;",
+      "  }",
+      "",
+      "  const limitedItems = items.slice(0, VEHICLE_HISTORY_LIMIT);",
+      "  nodes.vehicleHistoryList.innerHTML = limitedItems.map((item) => `",
+      "    <article class=\"history-row ${item.ai?.newDamageDetected ? \"alert\" : \"\"}\">",
+      "      <div>",
+      "        <strong>${escapeHtml(normalizePlate(item.plate || query))}</strong>",
+      "        <span>${formatDate(item.finishedAt || item.startedAt)} · ${escapeHtml(item.driverName || t(\"noDriver\"))}</span>",
+      "      </div>",
+      "      <div>",
+      "        ${renderAiBadge(item)}",
+      "        <span>${escapeHtml(item.ai?.label || t(\"aiPending\"))}</span>",
+      "      </div>",
+      "      <div>",
+      "        <strong>${item.photos?.length || 0}</strong>",
+      "        <span>${escapeHtml(t(\"photos\"))}</span>",
+      "      </div>",
+      "      <a href=\"/report.html?id=${encodeURIComponent(item.id)}\" target=\"_blank\" rel=\"noopener\">${escapeHtml(t(\"viewPdf\"))}</a>",
+      "    </article>",
+      "  `).join(\"\") + (items.length > limitedItems.length",
+      "    ? `<p class=\"list-limit-note\">${escapeHtml(t(\"filtered\"))}: ${limitedItems.length} / ${items.length}</p>`",
+      "    : \"\");",
+      "}",
+      "",
+      "function renderSystemStatus",
     ].join("\n")
   );
 
@@ -490,7 +745,6 @@ function patchAdminJs(adminJs) {
       "    })",
       "    .filter((vehicle) => vehicle.normalized.toLowerCase().includes(search));",
       "",
-      "  const viewMode = nodes.vehicleControlView.value;",
       "  const doneVehicles = vehicles.filter((vehicle) => vehicle.inspected);",
       "  const totalInspections = vehicles.reduce((sum, vehicle) => sum + vehicle.inspections.length, 0);",
       "  const aiReviewCount = vehicles.filter((vehicle) => vehicle.latest && [\"queued\", \"failed\"].includes(getAiStatus(vehicle.latest).key)).length;",
@@ -507,12 +761,7 @@ function patchAdminJs(adminJs) {
       "    return;",
       "  }",
       "",
-      "  if (viewMode === \"missing\") {",
-      "    nodes.vehicleControlList.innerHTML = renderVehicleControlSection(\"IA pendiente/fallo\", doneVehicles.filter((vehicle) => vehicle.latest && [\"queued\", \"failed\"].includes(getAiStatus(vehicle.latest).key)), selectedDate);",
-      "    return;",
-      "  }",
-      "",
-      "  nodes.vehicleControlList.innerHTML = renderVehicleControlSection(t(\"inspectedVehicles\"), doneVehicles, selectedDate, \"priority\");",
+      "  nodes.vehicleControlList.innerHTML = renderVehicleControlSection(\"Vehiculos inspeccionados\", doneVehicles, selectedDate, \"priority\");",
       "}",
       "",
       "function renderRoutePendingSection",
