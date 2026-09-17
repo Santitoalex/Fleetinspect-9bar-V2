@@ -12,346 +12,353 @@
   <link rel="manifest" href="/admin.webmanifest" />
   <link rel="apple-touch-icon" href="/admin-apple-touch-icon.png" />
   <link rel="icon" href="/admin-icon-192.png" sizes="192x192" />
-  <link rel="stylesheet" href="/styles.css?v=53" />
+  <link rel="stylesheet" href="/styles.css?v=54" />
   <style>
-   .admin-body.admin-dedicated-v47 {
+   .admin-body.admin-compact-v54 {
+    --compact-border: #d8e3ee;
+    --compact-muted: #607089;
     background: #edf3f8;
     color: #0f172a;
-    font-size: 13px;
-   }
-
-   .admin-body.admin-dedicated-v47 .admin-shell {
-    grid-template-columns: 74px minmax(0, 1fr);
-   }
-
-   .admin-body.admin-dedicated-v47 .fleet-sidebar {
-    width: 74px;
-    padding: 10px 8px;
-    gap: 10px;
-   }
-
-   .admin-body.admin-dedicated-v47 .fleet-logo {
-    padding: 0;
-    gap: 6px;
-   }
-
-   .admin-body.admin-dedicated-v47 .fleet-logo img {
-    width: 48px;
-    height: 32px;
-    object-fit: contain;
-   }
-
-   .admin-body.admin-dedicated-v47 .fleet-logo p,
-   .admin-body.admin-dedicated-v47 .fleet-nav b {
-    display: none;
-   }
-
-   .admin-body.admin-dedicated-v47 .fleet-nav {
-    gap: 6px;
-   }
-
-   .admin-body.admin-dedicated-v47 .fleet-nav a {
-    width: 42px;
-    height: 42px;
-    margin: 0 auto;
-    padding: 0;
-    justify-content: center;
-    border-radius: 12px;
-   }
-
-   .admin-body.admin-dedicated-v47 .fleet-nav span {
-    font-size: 17px;
-   }
-
-   .admin-body.admin-dedicated-v47 .fleet-topbar {
-    min-height: 58px;
-    padding: 8px 14px;
-    gap: 12px;
-    border-bottom: 1px solid #d9e4ef;
-   }
-
-   .admin-body.admin-dedicated-v47 .topbar-left,
-   .admin-body.admin-dedicated-v47 .topbar-actions {
-    gap: 8px;
-   }
-
-   .admin-body.admin-dedicated-v47 .topbar-company-logo {
-    width: 92px;
-    height: 36px;
-    object-fit: contain;
-   }
-
-   .admin-body.admin-dedicated-v47 .global-search {
-    width: min(520px, 42vw);
-    min-height: 40px;
-    padding: 0 12px;
-    border-radius: 12px;
-    box-shadow: none;
-   }
-
-   .admin-body.admin-dedicated-v47 .global-search input {
-    font-size: 14px;
-   }
-
-   .admin-body.admin-dedicated-v47 .sync-chip,
-   .admin-body.admin-dedicated-v47 .user-chip,
-   .admin-body.admin-dedicated-v47 .role-chip,
-   .admin-body.admin-dedicated-v47 .language-select,
-   .admin-body.admin-dedicated-v47 .icon-button,
-   .admin-body.admin-dedicated-v47 .user-admin-link {
-    min-height: 38px;
-    padding: 8px 10px;
-    border-radius: 12px;
     font-size: 12px;
-    box-shadow: none;
    }
 
-   .admin-body.admin-dedicated-v47 .dashboard-main {
-    max-width: 1760px;
-    padding: 14px 18px 28px;
-    gap: 12px;
+   .admin-body.admin-compact-v54 .admin-shell {
+    grid-template-columns: 58px minmax(0, 1fr) !important;
    }
 
-   .admin-body.admin-dedicated-v47 .admin-hero {
-    grid-template-columns: minmax(420px, 1.25fr) minmax(360px, .75fr);
-    gap: 12px;
-    margin-bottom: 0;
+   .admin-body.admin-compact-v54 .fleet-sidebar {
+    width: 58px !important;
+    padding: 8px 6px !important;
+    gap: 8px !important;
+    border-right: 1px solid var(--compact-border);
    }
 
-   .admin-body.admin-dedicated-v47 .admin-hero-copy {
-    min-height: 112px;
-    padding: 16px 20px;
-    border-radius: 12px;
+   .admin-body.admin-compact-v54 .fleet-logo {
+    padding: 0 !important;
+    gap: 4px !important;
    }
 
-   .admin-body.admin-dedicated-v47 .eyebrow,
-   .admin-body.admin-dedicated-v47 label span,
-   .admin-body.admin-dedicated-v47 article > span,
-   .admin-body.admin-dedicated-v47 small {
-    letter-spacing: .02em;
+   .admin-body.admin-compact-v54 .fleet-logo img {
+    width: 42px !important;
+    height: 28px !important;
+    object-fit: contain !important;
    }
 
-   .admin-body.admin-dedicated-v47 .admin-hero h1 {
-    margin: 4px 0 6px;
-    font-size: clamp(28px, 2.4vw, 42px);
-    line-height: 1.03;
+   .admin-body.admin-compact-v54 .fleet-logo p,
+   .admin-body.admin-compact-v54 .fleet-nav b {
+    display: none !important;
    }
 
-   .admin-body.admin-dedicated-v47 .admin-hero-copy > span {
-    font-size: 14px;
+   .admin-body.admin-compact-v54 .fleet-nav {
+    gap: 5px !important;
    }
 
-   .admin-body.admin-dedicated-v47 .hero-status-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
+   .admin-body.admin-compact-v54 .fleet-nav a {
+    width: 36px !important;
+    height: 36px !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    justify-content: center !important;
+    border-radius: 10px !important;
    }
 
-   .admin-body.admin-dedicated-v47 .hero-status-grid article {
-    min-height: 112px;
-    padding: 16px;
-    border-radius: 12px;
-    box-shadow: none;
+   .admin-body.admin-compact-v54 .fleet-topbar {
+    min-height: 48px !important;
+    padding: 6px 12px !important;
+    gap: 8px !important;
+    border-bottom: 1px solid var(--compact-border) !important;
    }
 
-   .admin-body.admin-dedicated-v47 .hero-status-grid strong {
-    width: fit-content;
-    margin-top: 10px;
-    padding: 6px 12px;
-    font-size: 14px;
+   .admin-body.admin-compact-v54 .topbar-left,
+   .admin-body.admin-compact-v54 .topbar-actions {
+    gap: 7px !important;
    }
 
-   .admin-body.admin-dedicated-v47 .dashboard.hero-dashboard {
-    border-radius: 14px;
-    box-shadow: 0 14px 36px rgba(15, 23, 42, .08);
+   .admin-body.admin-compact-v54 .topbar-company-logo {
+    width: 76px !important;
+    height: 30px !important;
+    object-fit: contain !important;
    }
 
-   .admin-body.admin-dedicated-v47 .dashboard-header {
-    padding: 14px 18px;
-    gap: 12px;
+   .admin-body.admin-compact-v54 .global-search {
+    min-height: 34px !important;
+    width: min(430px, 35vw) !important;
+    padding: 0 10px !important;
+    border-radius: 9px !important;
+    box-shadow: none !important;
    }
 
-   .admin-body.admin-dedicated-v47 .dashboard-header h2 {
-    font-size: 26px;
-    line-height: 1.05;
+   .admin-body.admin-compact-v54 .global-search input {
+    font-size: 12px !important;
    }
 
-   .admin-body.admin-dedicated-v47 .dashboard-actions {
-    gap: 8px;
+   .admin-body.admin-compact-v54 .sync-chip,
+   .admin-body.admin-compact-v54 .user-chip,
+   .admin-body.admin-compact-v54 .role-chip,
+   .admin-body.admin-compact-v54 .language-select,
+   .admin-body.admin-compact-v54 .icon-button,
+   .admin-body.admin-compact-v54 .user-admin-link {
+    min-height: 32px !important;
+    padding: 6px 9px !important;
+    border-radius: 9px !important;
+    font-size: 11px !important;
+    box-shadow: none !important;
    }
 
-   .admin-body.admin-dedicated-v47 button,
-   .admin-body.admin-dedicated-v47 .ghost,
-   .admin-body.admin-dedicated-v47 select,
-   .admin-body.admin-dedicated-v47 input {
-    min-height: 38px;
-    border-radius: 10px;
-    font-size: 13px;
+   .admin-body.admin-compact-v54 .dashboard-main {
+    max-width: 1760px !important;
+    padding: 8px 12px 18px !important;
+    gap: 8px !important;
    }
 
-   .admin-body.admin-dedicated-v47 .dashboard-actions button {
-    padding: 9px 12px;
-    font-size: 13px;
+   .admin-body.admin-compact-v54 .admin-hero,
+   .admin-body.admin-compact-v54 .admin-install-panel {
+    display: none !important;
    }
 
-   .admin-body.admin-dedicated-v47 #dashboardContent {
-    padding: 14px 18px 18px;
+   .admin-body.admin-compact-v54 .dashboard.hero-dashboard {
+    border-radius: 10px !important;
+    box-shadow: none !important;
+    border: 1px solid var(--compact-border) !important;
    }
 
-   .admin-body.admin-dedicated-v47 .admin-filter-panel {
-    display: grid;
-    grid-template-columns: minmax(280px, 1.3fr) minmax(240px, 1fr) minmax(190px, .75fr) 128px;
-    gap: 10px;
-    margin-bottom: 12px;
+   .admin-body.admin-compact-v54 .dashboard-header {
+    padding: 9px 12px !important;
+    min-height: 46px !important;
+    gap: 8px !important;
+    border-bottom: 1px solid var(--compact-border) !important;
    }
 
-   .admin-body.admin-dedicated-v47 .admin-filter-panel label,
-   .admin-body.admin-dedicated-v47 .admin-filter-panel article {
-    min-height: 58px;
-    padding: 8px 12px;
-    border-radius: 12px;
-    box-shadow: none;
+   .admin-body.admin-compact-v54 .dashboard-header .eyebrow {
+    display: none !important;
    }
 
-   .admin-body.admin-dedicated-v47 .admin-filter-panel select {
-    min-height: 26px;
-    padding: 0;
-    font-size: 14px;
+   .admin-body.admin-compact-v54 .dashboard-header h2 {
+    font-size: 20px !important;
+    line-height: 1 !important;
    }
 
-   .admin-body.admin-dedicated-v47 .admin-filter-panel strong {
-    font-size: 24px;
+   .admin-body.admin-compact-v54 .dashboard-actions {
+    gap: 6px !important;
    }
 
-   .admin-body.admin-dedicated-v47 .control-room-strip,
-   .admin-body.admin-dedicated-v47 .metrics,
-   .admin-body.admin-dedicated-v47 .site-overview-grid {
-    gap: 10px;
-    margin-bottom: 12px;
+   .admin-body.admin-compact-v54 button,
+   .admin-body.admin-compact-v54 .ghost,
+   .admin-body.admin-compact-v54 select,
+   .admin-body.admin-compact-v54 input {
+    min-height: 32px !important;
+    border-radius: 8px !important;
+    font-size: 12px !important;
    }
 
-   .admin-body.admin-dedicated-v47 .control-room-strip article,
-   .admin-body.admin-dedicated-v47 .metrics article,
-   .admin-body.admin-dedicated-v47 .site-card {
-    min-height: 82px;
-    padding: 12px 14px;
-    border-radius: 12px;
-    box-shadow: none;
+   .admin-body.admin-compact-v54 .dashboard-actions button {
+    padding: 7px 10px !important;
    }
 
-   .admin-body.admin-dedicated-v47 .control-room-strip strong,
-   .admin-body.admin-dedicated-v47 .metrics strong {
-    margin: 4px 0 2px;
-    font-size: 30px;
-    line-height: 1;
+   .admin-body.admin-compact-v54 #dashboardContent {
+    padding: 10px 12px 12px !important;
    }
 
-   .admin-body.admin-dedicated-v47 .operations-board {
-    gap: 10px;
-    margin-bottom: 12px;
+   .admin-body.admin-compact-v54 .admin-filter-panel {
+    display: grid !important;
+    grid-template-columns: 1.1fr 1.1fr .8fr 90px !important;
+    gap: 7px !important;
+    margin-bottom: 8px !important;
    }
 
-   .admin-body.admin-dedicated-v47 .route-plan-card {
-    padding: 12px;
-    border-radius: 12px;
-    gap: 10px;
+   .admin-body.admin-compact-v54 .admin-filter-panel label,
+   .admin-body.admin-compact-v54 .admin-filter-panel article {
+    min-height: 46px !important;
+    padding: 6px 9px !important;
+    border-radius: 9px !important;
+    border: 1px solid var(--compact-border) !important;
+    box-shadow: none !important;
    }
 
-   .admin-body.admin-dedicated-v47 .route-plan-card input {
-    max-width: 140px;
-    font-size: 18px;
+   .admin-body.admin-compact-v54 .admin-filter-panel select {
+    min-height: 24px !important;
+    padding: 0 !important;
+    font-size: 13px !important;
    }
 
-   .admin-body.admin-dedicated-v47 .dashboard-card-grid {
-    grid-template-columns: minmax(320px, .85fr) minmax(460px, 1.15fr);
-    gap: 12px;
+   .admin-body.admin-compact-v54 .admin-filter-panel span,
+   .admin-body.admin-compact-v54 .control-room-strip span,
+   .admin-body.admin-compact-v54 .metrics span,
+   .admin-body.admin-compact-v54 .dashboard-widget header span,
+   .admin-body.admin-compact-v54 small {
+    color: var(--compact-muted) !important;
+    font-size: 10px !important;
+    letter-spacing: .03em !important;
    }
 
-   .admin-body.admin-dedicated-v47 .dashboard-widget {
-    border-radius: 13px;
-    box-shadow: none;
+   .admin-body.admin-compact-v54 .control-room-strip,
+   .admin-body.admin-compact-v54 .metrics,
+   .admin-body.admin-compact-v54 .site-overview-grid,
+   .admin-body.admin-compact-v54 .operations-board {
+    gap: 7px !important;
+    margin-bottom: 8px !important;
    }
 
-   .admin-body.admin-dedicated-v47 .dashboard-widget > header {
-    min-height: 56px;
-    padding: 12px 14px;
+   .admin-body.admin-compact-v54 .control-room-strip article,
+   .admin-body.admin-compact-v54 .metrics article,
+   .admin-body.admin-compact-v54 .site-overview-card,
+   .admin-body.admin-compact-v54 .ops-site-card {
+    min-height: 58px !important;
+    padding: 8px 10px !important;
+    border-radius: 9px !important;
+    border: 1px solid var(--compact-border) !important;
+    box-shadow: none !important;
    }
 
-   .admin-body.admin-dedicated-v47 .dashboard-widget h3 {
-    font-size: 21px;
+   .admin-body.admin-compact-v54 .control-room-strip strong,
+   .admin-body.admin-compact-v54 .metrics strong {
+    margin: 2px 0 !important;
+    font-size: 23px !important;
+    line-height: 1 !important;
    }
 
-   .admin-body.admin-dedicated-v47 .scroll-panel,
-   .admin-body.admin-dedicated-v47 .report-list,
-   .admin-body.admin-dedicated-v47 .vehicle-summary-list,
-   .admin-body.admin-dedicated-v47 .alert-list {
-    gap: 8px;
-    padding: 10px;
+   .admin-body.admin-compact-v54 .metrics {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
    }
 
-   .admin-body.admin-dedicated-v47 .report-card,
-   .admin-body.admin-dedicated-v47 .vehicle-card,
-   .admin-body.admin-dedicated-v47 .vehicle-summary-card,
-   .admin-body.admin-dedicated-v47 .alert-card,
-   .admin-body.admin-dedicated-v47 .driver-card,
-   .admin-body.admin-dedicated-v47 .pending-card,
-   .admin-body.admin-dedicated-v47 .completed-card {
-    padding: 10px 12px;
-    border-radius: 11px;
-    box-shadow: none;
+   .admin-body.admin-compact-v54 .dashboard-card-grid {
+    display: grid !important;
+    grid-template-columns: minmax(360px, .9fr) minmax(520px, 1.1fr) !important;
+    gap: 8px !important;
+    align-items: start !important;
    }
 
-   .admin-body.admin-dedicated-v47 .report-card h3,
-   .admin-body.admin-dedicated-v47 .vehicle-card h3,
-   .admin-body.admin-dedicated-v47 .vehicle-summary-card h3 {
-    font-size: 17px;
+   .admin-body.admin-compact-v54 .dashboard-widget {
+    min-height: auto !important;
+    border-radius: 10px !important;
+    border: 1px solid var(--compact-border) !important;
+    box-shadow: none !important;
    }
 
-   .admin-body.admin-dedicated-v47 .photo-grid,
-   .admin-body.admin-dedicated-v47 .report-photos {
-    gap: 8px;
+   .admin-body.admin-compact-v54 .dashboard-widget > header {
+    min-height: 42px !important;
+    padding: 8px 10px !important;
    }
 
-   .admin-body.admin-dedicated-v47 .photo-grid img,
-   .admin-body.admin-dedicated-v47 .report-photos img {
-    border-radius: 9px;
+   .admin-body.admin-compact-v54 .dashboard-widget h3 {
+    font-size: 16px !important;
+    line-height: 1.1 !important;
    }
 
-   .admin-body.admin-dedicated-v47 .admin-auth {
-    gap: 12px;
-    padding: 16px 18px 18px;
+   .admin-body.admin-compact-v54 .vehicle-control-widget {
+    grid-column: 1 / -1 !important;
+    order: 1 !important;
    }
 
-   .admin-body.admin-dedicated-v47 .admin-auth-card {
-    padding: 16px;
-    border-radius: 12px;
+   .admin-body.admin-compact-v54 .primary-widget {
+    order: 2 !important;
    }
 
-   .admin-body.admin-dedicated-v47 .admin-auth-card h3 {
-    font-size: 23px;
+   .admin-body.admin-compact-v54 .status-widget {
+    order: 4 !important;
+   }
+
+   .admin-body.admin-compact-v54 .user-management-widget {
+    order: 20 !important;
+    display: none !important;
+   }
+
+   .admin-body.admin-compact-v54 .user-management-widget:target {
+    display: block !important;
+    grid-column: 1 / -1 !important;
+   }
+
+   .admin-body.admin-compact-v54 .dashboard-widget.wide-widget:not(.vehicle-control-widget):not(.user-management-widget) {
+    order: 15 !important;
+    grid-column: 1 / -1 !important;
+   }
+
+   .admin-body.admin-compact-v54 .route-plan-card {
+    grid-template-columns: 220px 180px 1fr !important;
+    gap: 8px !important;
+    padding: 8px !important;
+    border-radius: 9px !important;
+   }
+
+   .admin-body.admin-compact-v54 .route-plan-card input {
+    max-width: 110px !important;
+    height: 34px !important;
+    font-size: 16px !important;
+   }
+
+   .admin-body.admin-compact-v54 .vehicle-control-summary article {
+    min-height: 46px !important;
+    padding: 7px 9px !important;
+   }
+
+   .admin-body.admin-compact-v54 .vehicle-control-list,
+   .admin-body.admin-compact-v54 .report-list,
+   .admin-body.admin-compact-v54 .vehicle-summary,
+   .admin-body.admin-compact-v54 .alert-list,
+   .admin-body.admin-compact-v54 .driver-summary-list,
+   .admin-body.admin-compact-v54 .status-list,
+   .admin-body.admin-compact-v54 .activity-list,
+   .admin-body.admin-compact-v54 .dispatcher-list,
+   .admin-body.admin-compact-v54 .vehicle-history-list {
+    max-height: 330px !important;
+    min-height: 0 !important;
+    padding: 8px !important;
+    gap: 6px !important;
+   }
+
+   .admin-body.admin-compact-v54 .vehicle-history-list {
+    max-height: 220px !important;
+   }
+
+   .admin-body.admin-compact-v54 .vehicle-history-list .empty-state {
+    min-height: 38px !important;
+    padding: 10px !important;
+   }
+
+   .admin-body.admin-compact-v54 .report-card,
+   .admin-body.admin-compact-v54 .vehicle-tile,
+   .admin-body.admin-compact-v54 .alert-card,
+   .admin-body.admin-compact-v54 .dispatcher-row,
+   .admin-body.admin-compact-v54 .activity-row,
+   .admin-body.admin-compact-v54 .status-row,
+   .admin-body.admin-compact-v54 .vehicle-control-row,
+   .admin-body.admin-compact-v54 .history-row {
+    padding: 7px 9px !important;
+    border-radius: 8px !important;
+    min-height: 38px !important;
+   }
+
+   .admin-body.admin-compact-v54 .report-card strong,
+   .admin-body.admin-compact-v54 .vehicle-tile strong,
+   .admin-body.admin-compact-v54 .alert-card strong,
+   .admin-body.admin-compact-v54 .dispatcher-row strong,
+   .admin-body.admin-compact-v54 .history-row strong {
+    font-size: 13px !important;
+   }
+
+   .admin-body.admin-compact-v54 .report-photo-strip,
+   .admin-body.admin-compact-v54 .ai-findings {
+    display: none !important;
    }
 
    @media (max-width: 980px) {
-    .admin-body.admin-dedicated-v47 .admin-shell {
-     grid-template-columns: 1fr;
+    .admin-body.admin-compact-v54 .admin-shell,
+    .admin-body.admin-compact-v54 .dashboard-card-grid,
+    .admin-body.admin-compact-v54 .admin-filter-panel {
+     grid-template-columns: 1fr !important;
     }
 
-    .admin-body.admin-dedicated-v47 .fleet-sidebar {
-     display: none;
+    .admin-body.admin-compact-v54 .metrics {
+     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     }
 
-    .admin-body.admin-dedicated-v47 .admin-hero,
-    .admin-body.admin-dedicated-v47 .dashboard-card-grid,
-    .admin-body.admin-dedicated-v47 .admin-filter-panel {
-     grid-template-columns: 1fr;
-    }
-
-    .admin-body.admin-dedicated-v47 .global-search {
-     width: 100%;
+    .admin-body.admin-compact-v54 .route-plan-card {
+     grid-template-columns: 1fr !important;
     }
    }
   </style>
  </head>
- <body class="admin-body admin-premium admin-enterprise-v45 admin-dedicated-v47 ">
+ <body class="admin-body admin-premium admin-enterprise-v45 admin-dedicated-v47 admin-compact-v54">
   <div class="admin-shell">
    <aside class="fleet-sidebar">
     <div class="fleet-logo">
@@ -728,8 +735,8 @@
    </div>
   </div>
 
-  <script src="/vehicles.js?v=53"></script>
-  <script src="/i18n.js?v=53"></script>
-  <script src="/admin.js?v=53"></script>
+  <script src="/vehicles.js?v=54"></script>
+  <script src="/i18n.js?v=54"></script>
+  <script src="/admin.js?v=54"></script>
  </body>
 </html>
