@@ -1,400 +1,398 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#0b1220" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-title" content="FleetInspect Admin" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <title>9Bar Fleet Dashboard</title>
-    <link rel="manifest" href="/admin.webmanifest" />
-    <link rel="apple-touch-icon" href="/admin-apple-touch-icon.png" />
-    <link rel="icon" href="/admin-icon-192.png" sizes="192x192" />
-    <link rel="stylesheet" href="/styles.css?v=48" />
-    <link rel="stylesheet" href="/theme-v49.css?v=49" />
-    <link rel="stylesheet" href="/theme-v50.css?v=50" />
-  </head>
-  <body class="admin-body admin-premium admin-enterprise-v45 admin-dedicated-v47 admin-redesign-v48 admin-compact-v50">
-    <div class="admin-shell">
-      <aside class="fleet-sidebar">
-        <div class="fleet-logo">
-          <img class="admin-product-logo" src="/9bar-logo.png" alt="9Bar Solutions GmbH" />
-          <p>FleetInspect Control</p>
-        </div>
-        <nav class="fleet-nav" aria-label="Admin navigation">
-          <a class="active" href="/admin"><span>▦</span><b data-i18n="dashboard">Dashboard</b></a>
-          <a href="#alertList"><span>△</span><b data-i18n="aiAlerts">AI alerts</b></a>
-          <a href="#dailyVehicleControl"><span>◫</span><b data-i18n="dailyVehicleControl">Daily control</b></a>
-          <a href="#vehicleSummary"><span>▤</span><b data-i18n="vehicles">Vehicles</b></a>
-          <a id="userManagementNav" class="hidden" href="#userManagement"><span>◉</span><b data-i18n="userManagement">Users</b></a>
-          <a href="#reportList"><span>▧</span><b data-i18n="reports">Reports</b></a>
-        </nav>
-      </aside>
-
-      <div class="admin-workspace">
-        <header class="fleet-topbar">
-          <div class="topbar-left">
-            <button class="menu-button" type="button" aria-label="Menu">☰</button>
-            <img class="topbar-company-logo" src="/9bar-logo.png" alt="9Bar Solutions GmbH" />
-            <label class="global-search">
-              <span>⌕</span>
-              <input id="searchReports" placeholder="Search vehicle, driver or registration" data-i18n-placeholder="searchPlaceholder" />
-            </label>
-          </div>
-          <div class="topbar-actions">
-            <span id="lastSync" class="sync-chip">--</span>
-            <select class="language-select admin-language" data-language-select aria-label="Language">
-              <option value="en">EN</option>
-              <option value="es">ES</option>
-              <option value="de">DE</option>
-              <option value="ro">RO</option>
-            </select>
-            <button id="refreshDashboard" type="button" class="icon-button" aria-label="Refresh" data-i18n-aria="refresh">↻</button>
-            <button id="installAdminApp" type="button" class="icon-button install-admin-button hidden" aria-label="Install admin app" data-i18n-aria="installAdminApp">⬇</button>
-            <span id="currentUserChip" class="user-chip">Admin</span>
-            <span id="currentRoleChip" class="role-chip hidden">Dispatcher</span>
-            <a id="userManagementTopLink" class="user-admin-link hidden" href="#userManagement" data-i18n="userManagement">Users</a>
-            <button id="logoutAdmin" type="button" class="icon-button hidden" aria-label="Logout" data-i18n-aria="logout">⇥</button>
-          </div>
-        </header>
-
-        <main class="dashboard-main">
-          <section class="admin-hero">
-            <div class="admin-hero-copy">
-              <p class="eyebrow" data-i18n="fleetControl">Fleet control center</p>
-              <h1 data-i18n="inspectionDashboard">Inspection dashboard</h1>
-              <span data-i18n="controlRoom">Professional inspection control room for 9Bar Solutions GmbH.</span>
-            </div>
-            <div class="hero-status-grid">
-              <article>
-                <span data-i18n="cloudSync">Cloud sync</span>
-                <strong id="storagePill">--</strong>
-              </article>
-              <article>
-                <span data-i18n="aiDamageDetection">AI damage detection</span>
-                <strong id="aiPill">--</strong>
-              </article>
-            </div>
-          </section>
-
-          <section id="adminInstallPanel" class="admin-install-panel hidden">
-            <div>
-              <strong data-i18n="installAdminApp">Install admin panel</strong>
-              <p id="adminInstallPanelText" data-i18n="installAdminHint">Open the browser menu and add the admin panel to the home screen.</p>
-            </div>
-            <div class="admin-install-actions">
-              <button id="installAdminPanelButton" type="button" data-i18n="installApp">Install</button>
-              <button id="dismissAdminInstallPanel" type="button" class="ghost" data-i18n="notNow">Not now</button>
-            </div>
-          </section>
-
-          <section class="dashboard hero-dashboard">
-            <div class="dashboard-header admin-command-header">
-              <div>
-                <p class="eyebrow" data-i18n="operationsOverview">Operations overview</p>
-                <h2 data-i18n="reports">Reports</h2>
-              </div>
-              <div class="dashboard-actions">
-                <button id="exportCsv" type="button" class="ghost" data-i18n="exportCsv">Export CSV</button>
-                <button id="exportDay" type="button" class="ghost" data-i18n="exportDay">Export day</button>
-                <button id="backupDay" type="button" class="ghost" data-i18n="backupDay">Backup day</button>
-                <button id="closeDay" type="button" class="ghost strong-action" data-i18n="closeDay">Close day</button>
-                <button id="printDashboard" type="button" class="ghost" data-i18n="print">Print</button>
-              </div>
-            </div>
-
-            <div id="adminLock" class="admin-auth">
-              <article class="admin-auth-card">
-                <p class="eyebrow" data-i18n="dispatcherAccess">Dispatcher access</p>
-                <h3 data-i18n="login">Login</h3>
-                <div class="admin-lock">
-                  <input id="dispatcherEmail" type="email" autocomplete="email" placeholder="Email" data-i18n-placeholder="dispatcherEmail" />
-                  <input id="dispatcherPassword" type="password" autocomplete="current-password" placeholder="Password" data-i18n-placeholder="dispatcherPassword" />
-                  <button id="unlockAdmin" type="button" data-i18n="login">Login</button>
-                </div>
-              </article>
-
-              <article class="admin-auth-card">
-                <p class="eyebrow" data-i18n="newDispatcher">New dispatcher</p>
-                <h3 data-i18n="createAccount">Create account</h3>
-                <div class="admin-signup">
-                  <input id="signupName" type="text" autocomplete="name" placeholder="Name" data-i18n-placeholder="dispatcherName" />
-                  <input id="signupEmail" type="email" autocomplete="email" placeholder="Email" data-i18n-placeholder="dispatcherEmail" />
-                  <input id="signupPassword" type="password" autocomplete="new-password" placeholder="Password" data-i18n-placeholder="dispatcherPassword" />
-                  <input id="signupCode" type="password" autocomplete="off" placeholder="Company code" data-i18n-placeholder="signupCode" />
-                  <button id="createDispatcherAccount" type="button" data-i18n="createAccount">Create account</button>
-                </div>
-              </article>
-            </div>
-
-            <div id="dashboardContent" class="hidden">
-              <section class="admin-filter-panel" aria-label="Dashboard filters">
-                <label>
-                  <span>Site</span>
-                  <select id="siteFilter">
-                    <option value="all">DRP3 + DSU1</option>
-                    <option value="DRP3">DRP3</option>
-                    <option value="DSU1">DSU1</option>
-                    <option value="UNASSIGNED">Sin site</option>
-                  </select>
-                </label>
-                <label>
-                  <span data-i18n="allInspections">All inspections</span>
-                  <select id="statusFilter">
-                    <option value="all" data-i18n="allInspections">All inspections</option>
-                    <option value="alerts" data-i18n="aiAlertsOnly">AI alerts only</option>
-                    <option value="pending" data-i18n="aiQueued">AI queued</option>
-                    <option value="failed" data-i18n="aiFailed">AI failed</option>
-                    <option value="clean" data-i18n="noNewDamage">No new damage</option>
-                  </select>
-                </label>
-                <label>
-                  <span data-i18n="dateRange">Date range</span>
-                  <select id="dateFilter">
-                    <option value="all" data-i18n="allDates">All dates</option>
-                    <option value="today" data-i18n="today">Today</option>
-                    <option value="7" data-i18n="last7Days">Last 7 days</option>
-                    <option value="30" data-i18n="last30Days">Last 30 days</option>
-                  </select>
-                </label>
-                <article>
-                  <span data-i18n="filtered">Filtered</span>
-                  <strong id="activeFilterCount">0</strong>
-                </article>
-              </section>
-
-              <section class="control-room-strip" aria-label="Control room">
-                <article>
-                  <span data-i18n="completedToday">Completed today</span>
-                  <strong id="todayCompletion">0 / 0</strong>
-                  <small id="todayCompletionMeta">0%</small>
-                </article>
-                <article>
-                  <span data-i18n="pendingToday">Pending today</span>
-                  <strong id="todayPendingCount">0</strong>
-                  <small data-i18n="dailyVehicleControl">Daily vehicle control</small>
-                </article>
-                <article>
-                  <span data-i18n="latestInspection">Latest inspection</span>
-                  <strong id="latestInspectionTime">--</strong>
-                  <small id="latestInspectionMeta">--</small>
-                </article>
-                <article>
-                  <span data-i18n="liveOperations">Live operations</span>
-                  <strong id="liveAiState">--</strong>
-                  <small><b id="liveDriver">--</b> · <b id="livePlate">--</b></small>
-                </article>
-              </section>
-
-              <section id="siteOverview" class="site-overview-grid" aria-label="Sites"></section>
-
-              <section id="operationsBoard" class="operations-board" aria-label="Operations board"></section>
-
-              <section class="data-command-center" aria-label="Saved inspections and photos">
-                <article>
-                  <span>Inspecciones guardadas</span>
-                  <strong id="savedInspectionCount">0</strong>
-                  <small id="savedInspectionMeta">Supabase inspections</small>
-                </article>
-                <article>
-                  <span>Fotos guardadas</span>
-                  <strong id="savedPhotoCount">0</strong>
-                  <small id="savedPhotoMeta">Supabase Storage</small>
-                </article>
-                <article>
-                  <span>Conductores activos</span>
-                  <strong id="activeDriverCount">0</strong>
-                  <small id="activeDriverMeta">con inspecciones</small>
-                </article>
-                <article>
-                  <span>IA pendiente/fallo</span>
-                  <strong id="aiWorkQueueCount">0</strong>
-                  <small id="aiWorkQueueMeta">revisar análisis</small>
-                </article>
-                <article>
-                  <span>Última subida</span>
-                  <strong id="lastUploadTime">--</strong>
-                  <small id="lastUploadMeta">--</small>
-                </article>
-              </section>
-
-              <div class="metrics">
-                <article><span data-i18n="inspections">Inspections</span><strong id="metricInspections">0</strong></article>
-                <article><span data-i18n="vehicles">Vehicles</span><strong id="metricVehicles">0</strong></article>
-                <article><span data-i18n="photos">Photos</span><strong id="metricPhotos">0</strong></article>
-                <article><span data-i18n="aiAlerts">AI alerts</span><strong id="metricAlerts">0</strong></article>
-                <article><span data-i18n="today">Today</span><strong id="metricToday">0</strong></article>
-              </div>
-
-              <section class="dashboard-card-grid">
-                <article class="dashboard-widget primary-widget">
-                  <header>
-                    <div>
-                      <h3 data-i18n="priorityQueue">Priority queue</h3>
-                      <span data-i18n="priorityQueueSubtitle">Inspections that need attention first</span>
-                    </div>
-                    <strong id="widgetAlertCount">0</strong>
-                  </header>
-                  <div id="alertList" class="alert-list"></div>
-                </article>
-
-                <article class="dashboard-widget">
-                  <header>
-                    <div>
-                      <h3 data-i18n="fleetCoverage">Fleet coverage</h3>
-                      <span data-i18n="groupedRegistration">Grouped by registration</span>
-                    </div>
-                  </header>
-                  <div id="vehicleSummary" class="vehicle-summary"></div>
-                </article>
-
-                <article id="dailyVehicleControl" class="dashboard-widget wide-widget vehicle-control-widget">
-                  <header>
-                    <div>
-                      <h3 data-i18n="dailyVehicleControl">Daily vehicle control</h3>
-                      <span data-i18n="dailyVehicleControlSubtitle">Choose a date and verify every registration in the fleet</span>
-                    </div>
-                    <div class="vehicle-control-tools">
-                      <label>
-                        <span data-i18n="controlDate">Control date</span>
-                        <input id="vehicleControlDate" type="date" />
-                      </label>
-                      <label>
-                        <span data-i18n="registrationNumber">Registration number</span>
-                        <input id="vehicleControlSearch" type="search" placeholder="M AZ 1003" />
-                      </label>
-                      <label>
-                        <span data-i18n="viewMode">View</span>
-                        <select id="vehicleControlView">
-                          <option value="split" data-i18n="splitDoneMissing">Done / missing</option>
-                          <option value="missing" data-i18n="onlyMissing">Only missing</option>
-                          <option value="done" data-i18n="onlyDone">Only done</option>
-                          <option value="all" data-i18n="allVehicles">All vehicles</option>
-                        </select>
-                      </label>
-                    </div>
-                  </header>
-                  <div class="vehicle-control-summary">
-                    <article><span data-i18n="plannedRoutesShort">Planned routes</span><strong id="controlTotalVehicles">0</strong></article>
-                    <article><span data-i18n="inspected">Inspected</span><strong id="controlInspectedVehicles">0</strong></article>
-                    <article><span data-i18n="missing">Missing</span><strong id="controlMissingVehicles">0</strong></article>
-                    <article><span data-i18n="aiAlerts">AI alerts</span><strong id="controlAlertVehicles">0</strong></article>
-                  </div>
-                  <div class="route-plan-card">
-                    <label>
-                      <span data-i18n="plannedRoutes">Planned routes for this day</span>
-                      <input id="plannedRoutesInput" type="number" min="0" step="1" inputmode="numeric" placeholder="28" />
-                    </label>
-                    <div class="route-plan-actions">
-                      <button id="saveRoutePlan" type="button" data-i18n="saveRoutePlan">Save route plan</button>
-                      <button id="clearRoutePlan" type="button" class="ghost" data-i18n="clearRoutePlan">Clear</button>
-                    </div>
-                    <p id="routePlanStatus" data-i18n="routePlanHelp">Pending is calculated from planned routes minus inspections saved that day.</p>
-                  </div>
-                  <div id="vehicleControlList" class="vehicle-control-list"></div>
-                </article>
-
-                <article class="dashboard-widget status-widget">
-                  <header>
-                    <div>
-                      <h3 data-i18n="systemStatus">System status</h3>
-                      <span data-i18n="operationalHealth">Operational health</span>
-                    </div>
-                  </header>
-                  <div id="systemStatus" class="status-list"></div>
-                </article>
-
-                <article class="dashboard-widget status-widget">
-                  <header>
-                    <div>
-                      <h3 data-i18n="aiDamageDetection">AI damage detection</h3>
-                      <span data-i18n="inspectionStatus">Inspection status</span>
-                    </div>
-                  </header>
-                  <div id="aiStatusSummary" class="status-list"></div>
-                </article>
-
-                <article class="dashboard-widget status-widget">
-                  <header>
-                    <div>
-                      <h3 data-i18n="driverPerformance">Drivers</h3>
-                      <span data-i18n="totalByDriver">Total by driver</span>
-                    </div>
-                  </header>
-                  <div id="driverSummary" class="driver-summary-list"></div>
-                </article>
-
-                <article id="userManagement" class="dashboard-widget wide-widget user-management-widget hidden">
-                  <header>
-                    <div>
-                      <h3 data-i18n="userManagement">User management</h3>
-                      <span data-i18n="userManagementSubtitle">Owner control for dispatcher access and roles</span>
-                    </div>
-                    <button id="refreshDispatchers" type="button" class="ghost" data-i18n="refreshUsers">Refresh users</button>
-                  </header>
-                  <div class="role-help-grid">
-                    <article><strong data-i18n="roleOwner">Owner</strong><span data-i18n="roleOwnerHelp">Full control and user roles.</span></article>
-                    <article><strong data-i18n="roleSupervisor">Supervisor</strong><span data-i18n="roleSupervisorHelp">Can operate the dashboard.</span></article>
-                    <article><strong data-i18n="roleDispatcher">Dispatcher</strong><span data-i18n="roleDispatcherHelp">Can review daily operations.</span></article>
-                    <article><strong data-i18n="roleReadonly">Read only</strong><span data-i18n="roleReadonlyHelp">Can view reports only.</span></article>
-                  </div>
-                  <div id="dispatcherList" class="dispatcher-list"></div>
-                </article>
-
-                <article class="dashboard-widget status-widget">
-                  <header>
-                    <div>
-                      <h3 data-i18n="recentActivity">Recent activity</h3>
-                      <span data-i18n="latestSubmissions">Latest driver submissions</span>
-                    </div>
-                  </header>
-                  <div id="recentActivity" class="activity-list"></div>
-                </article>
-
-                <article id="auditWidget" class="dashboard-widget status-widget hidden">
-                  <header>
-                    <div>
-                      <h3>Auditoría</h3>
-                      <span>Últimas acciones del sistema</span>
-                    </div>
-                  </header>
-                  <div id="auditTimeline" class="activity-list audit-timeline"></div>
-                </article>
-
-                <article class="dashboard-widget wide-widget">
-                  <header>
-                    <div>
-                      <h3 data-i18n="vehicleHistory">Vehicle history</h3>
-                      <span data-i18n="groupedRegistration">Grouped by registration</span>
-                    </div>
-                    <label class="history-selector">
-                      <span data-i18n="selectVehicle">Select vehicle</span>
-                      <select id="vehicleHistoryPlate"></select>
-                    </label>
-                  </header>
-                  <div id="vehicleHistoryList" class="vehicle-history-list"></div>
-                </article>
-
-                <article class="dashboard-widget wide-widget">
-                  <header>
-                    <div>
-                      <h3 data-i18n="completionQueue">Completion queue</h3>
-                      <span data-i18n="reportsPdfsDrive">Reports, PDFs and Drive folders</span>
-                    </div>
-                  </header>
-                  <div id="reportList" class="report-list"></div>
-                </article>
-              </section>
-            </div>
-          </section>
-        </main>
-      </div>
+ <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1220" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="FleetInspect Admin" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>9Bar Fleet Dashboard</title>
+  <link rel="manifest" href="/admin.webmanifest" />
+  <link rel="apple-touch-icon" href="/admin-apple-touch-icon.png" />
+  <link rel="icon" href="/admin-icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/styles.css?v=52" />
+ </head>
+ <body class="admin-body admin-premium admin-enterprise-v45 admin-dedicated-v47 ">
+  <div class="admin-shell">
+   <aside class="fleet-sidebar">
+    <div class="fleet-logo">
+     <img class="admin-product-logo" src="/9bar-logo.png" alt="9Bar Solutions GmbH" />
+     <p>FleetInspect Control</p>
     </div>
+    <nav class="fleet-nav" aria-label="Admin navigation">
+     <a class="active" href="/admin"><span>▦</span><b data-i18n="dashboard">Dashboard</b></a>
+     <a href="#alertList"><span>△</span><b data-i18n="aiAlerts">AI alerts</b></a>
+     <a href="#dailyVehicleControl"><span>◫</span><b data-i18n="dailyVehicleControl">Daily control</b></a>
+     <a href="#vehicleSummary"><span>▤</span><b data-i18n="vehicles">Vehicles</b></a>
+     <a id="userManagementNav" class="hidden" href="#userManagement"><span>◉</span><b data-i18n="userManagement">Users</b></a>
+     <a href="#reportList"><span>▧</span><b data-i18n="reports">Reports</b></a>
+    </nav>
+   </aside>
 
-    <script src="/vehicles.js?v=50"></script>
-    <script src="/i18n.js?v=50"></script>
-    <script src="/admin.js?v=50"></script>
-  </body>
+   <div class="admin-workspace">
+    <header class="fleet-topbar">
+     <div class="topbar-left">
+      <button class="menu-button" type="button" aria-label="Menu">☰</button>
+      <img class="topbar-company-logo" src="/9bar-logo.png" alt="9Bar Solutions GmbH" />
+      <label class="global-search">
+       <span>⌕</span>
+       <input id="searchReports" placeholder="Search vehicle, driver or registration" data-i18n-placeholder="searchPlaceholder" />
+      </label>
+     </div>
+     <div class="topbar-actions">
+      <span id="lastSync" class="sync-chip">--</span>
+      <select class="language-select admin-language" data-language-select aria-label="Language">
+       <option value="en">EN</option>
+       <option value="es">ES</option>
+       <option value="de">DE</option>
+       <option value="ro">RO</option>
+      </select>
+      <button id="refreshDashboard" type="button" class="icon-button" aria-label="Refresh" data-i18n-aria="refresh">↻</button>
+      <button id="installAdminApp" type="button" class="icon-button install-admin-button hidden" aria-label="Install admin app" data-i18n-aria="installAdminApp">⬇</button>
+      <span id="currentUserChip" class="user-chip">Admin</span>
+      <span id="currentRoleChip" class="role-chip hidden">Dispatcher</span>
+      <a id="userManagementTopLink" class="user-admin-link hidden" href="#userManagement" data-i18n="userManagement">Users</a>
+      <button id="logoutAdmin" type="button" class="icon-button hidden" aria-label="Logout" data-i18n-aria="logout">⇥</button>
+     </div>
+    </header>
+
+    <main class="dashboard-main">
+     <section class="admin-hero">
+      <div class="admin-hero-copy">
+       <p class="eyebrow" data-i18n="fleetControl">Fleet control center</p>
+       <h1 data-i18n="inspectionDashboard">Inspection dashboard</h1>
+       <span data-i18n="controlRoom">Professional inspection control room for 9Bar Solutions GmbH.</span>
+      </div>
+      <div class="hero-status-grid">
+       <article>
+        <span data-i18n="cloudSync">Cloud sync</span>
+        <strong id="storagePill">--</strong>
+       </article>
+       <article>
+        <span data-i18n="aiDamageDetection">AI damage detection</span>
+        <strong id="aiPill">--</strong>
+       </article>
+      </div>
+     </section>
+
+     <section id="adminInstallPanel" class="admin-install-panel hidden">
+      <div>
+       <strong data-i18n="installAdminApp">Install admin panel</strong>
+       <p id="adminInstallPanelText" data-i18n="installAdminHint">Open the browser menu and add the admin panel to the home screen.</p>
+      </div>
+      <div class="admin-install-actions">
+       <button id="installAdminPanelButton" type="button" data-i18n="installApp">Install</button>
+       <button id="dismissAdminInstallPanel" type="button" class="ghost" data-i18n="notNow">Not now</button>
+      </div>
+     </section>
+
+     <section class="dashboard hero-dashboard">
+      <div class="dashboard-header admin-command-header">
+       <div>
+        <p class="eyebrow" data-i18n="operationsOverview">Operations overview</p>
+        <h2 data-i18n="reports">Reports</h2>
+       </div>
+       <div class="dashboard-actions">
+        <button id="exportCsv" type="button" class="ghost" data-i18n="exportCsv">Export CSV</button>
+        <button id="exportDay" type="button" class="ghost" data-i18n="exportDay">Export day</button>
+        <button id="backupDay" type="button" class="ghost" data-i18n="backupDay">Backup day</button>
+        <button id="closeDay" type="button" class="ghost strong-action" data-i18n="closeDay">Close day</button>
+        <button id="printDashboard" type="button" class="ghost" data-i18n="print">Print</button>
+       </div>
+      </div>
+
+      <div id="adminLock" class="admin-auth">
+       <article class="admin-auth-card">
+        <p class="eyebrow" data-i18n="dispatcherAccess">Dispatcher access</p>
+        <h3 data-i18n="login">Login</h3>
+        <div class="admin-lock">
+         <input id="dispatcherEmail" type="email" autocomplete="email" placeholder="Email" data-i18n-placeholder="dispatcherEmail" />
+         <input id="dispatcherPassword" type="password" autocomplete="current-password" placeholder="Password" data-i18n-placeholder="dispatcherPassword" />
+         <button id="unlockAdmin" type="button" data-i18n="login">Login</button>
+        </div>
+       </article>
+
+       <article class="admin-auth-card">
+        <p class="eyebrow" data-i18n="newDispatcher">New dispatcher</p>
+        <h3 data-i18n="createAccount">Create account</h3>
+        <div class="admin-signup">
+         <input id="signupName" type="text" autocomplete="name" placeholder="Name" data-i18n-placeholder="dispatcherName" />
+         <input id="signupEmail" type="email" autocomplete="email" placeholder="Email" data-i18n-placeholder="dispatcherEmail" />
+         <input id="signupPassword" type="password" autocomplete="new-password" placeholder="Password" data-i18n-placeholder="dispatcherPassword" />
+         <input id="signupCode" type="password" autocomplete="off" placeholder="Company code" data-i18n-placeholder="signupCode" />
+         <button id="createDispatcherAccount" type="button" data-i18n="createAccount">Create account</button>
+        </div>
+       </article>
+      </div>
+
+      <div id="dashboardContent" class="hidden">
+       <section class="admin-filter-panel" aria-label="Dashboard filters">
+        <label>
+         <span>Site</span>
+         <select id="siteFilter">
+          <option value="all">DRP3 + DSU1</option>
+          <option value="DRP3">DRP3</option>
+          <option value="DSU1">DSU1</option>
+          <option value="UNASSIGNED">Sin site</option>
+         </select>
+        </label>
+        <label>
+         <span data-i18n="allInspections">All inspections</span>
+         <select id="statusFilter">
+          <option value="all" data-i18n="allInspections">All inspections</option>
+          <option value="alerts" data-i18n="aiAlertsOnly">AI alerts only</option>
+          <option value="pending" data-i18n="aiQueued">AI queued</option>
+          <option value="failed" data-i18n="aiFailed">AI failed</option>
+          <option value="clean" data-i18n="noNewDamage">No new damage</option>
+         </select>
+        </label>
+        <label>
+         <span data-i18n="dateRange">Date range</span>
+         <select id="dateFilter">
+          <option value="all" data-i18n="allDates">All dates</option>
+          <option value="today" data-i18n="today">Today</option>
+          <option value="7" data-i18n="last7Days">Last 7 days</option>
+          <option value="30" data-i18n="last30Days">Last 30 days</option>
+         </select>
+        </label>
+        <article>
+         <span data-i18n="filtered">Filtered</span>
+         <strong id="activeFilterCount">0</strong>
+        </article>
+       </section>
+
+       <section class="control-room-strip" aria-label="Control room">
+        <article>
+         <span data-i18n="completedToday">Completed today</span>
+         <strong id="todayCompletion">0 / 0</strong>
+         <small id="todayCompletionMeta">0%</small>
+        </article>
+        <article>
+         <span data-i18n="pendingToday">Pending today</span>
+         <strong id="todayPendingCount">0</strong>
+         <small data-i18n="dailyVehicleControl">Daily vehicle control</small>
+        </article>
+        <article>
+         <span data-i18n="latestInspection">Latest inspection</span>
+         <strong id="latestInspectionTime">--</strong>
+         <small id="latestInspectionMeta">--</small>
+        </article>
+        <article>
+         <span data-i18n="liveOperations">Live operations</span>
+         <strong id="liveAiState">--</strong>
+         <small><b id="liveDriver">--</b> · <b id="livePlate">--</b></small>
+        </article>
+       </section>
+
+       <section id="siteOverview" class="site-overview-grid" aria-label="Sites"></section>
+
+       <section id="operationsBoard" class="operations-board" aria-label="Operations board"></section>
+
+       <section class="data-command-center hidden" aria-label="Saved inspections and photos">
+        <article>
+         <span>Inspecciones guardadas</span>
+         <strong id="savedInspectionCount">0</strong>
+         <small id="savedInspectionMeta">Supabase inspections</small>
+        </article>
+        <article>
+         <span>Fotos guardadas</span>
+         <strong id="savedPhotoCount">0</strong>
+         <small id="savedPhotoMeta">Supabase Storage</small>
+        </article>
+        <article>
+         <span>Conductores activos</span>
+         <strong id="activeDriverCount">0</strong>
+         <small id="activeDriverMeta">con inspecciones</small>
+        </article>
+        <article>
+         <span>IA pendiente/fallo</span>
+         <strong id="aiWorkQueueCount">0</strong>
+         <small id="aiWorkQueueMeta">revisar análisis</small>
+        </article>
+        <article>
+         <span>Última subida</span>
+         <strong id="lastUploadTime">--</strong>
+         <small id="lastUploadMeta">--</small>
+        </article>
+       </section>
+
+       <div class="metrics">
+        <article><span data-i18n="inspections">Inspections</span><strong id="metricInspections">0</strong></article>
+        <article><span data-i18n="vehicles">Vehicles</span><strong id="metricVehicles">0</strong></article>
+        <article><span data-i18n="photos">Photos</span><strong id="metricPhotos">0</strong></article>
+        <article><span data-i18n="aiAlerts">AI alerts</span><strong id="metricAlerts">0</strong></article>
+        <article><span data-i18n="today">Today</span><strong id="metricToday">0</strong></article>
+       </div>
+
+       <section class="dashboard-card-grid">
+        <article class="dashboard-widget primary-widget">
+         <header>
+          <div>
+           <h3 data-i18n="priorityQueue">Priority queue</h3>
+           <span data-i18n="priorityQueueSubtitle">Inspections that need attention first</span>
+          </div>
+          <strong id="widgetAlertCount">0</strong>
+         </header>
+         <div id="alertList" class="alert-list"></div>
+        </article>
+
+        <article class="dashboard-widget">
+         <header>
+          <div>
+           <h3 data-i18n="fleetCoverage">Fleet coverage</h3>
+           <span data-i18n="groupedRegistration">Grouped by registration</span>
+          </div>
+         </header>
+         <div id="vehicleSummary" class="vehicle-summary"></div>
+        </article>
+
+        <article id="dailyVehicleControl" class="dashboard-widget wide-widget vehicle-control-widget">
+         <header>
+          <div>
+           <h3 data-i18n="dailyVehicleControl">Daily vehicle control</h3>
+           <span data-i18n="dailyVehicleControlSubtitle">Choose a date and verify every registration in the fleet</span>
+          </div>
+          <div class="vehicle-control-tools">
+           <label>
+            <span data-i18n="controlDate">Control date</span>
+            <input id="vehicleControlDate" type="date" />
+           </label>
+           <label>
+            <span data-i18n="registrationNumber">Registration number</span>
+            <input id="vehicleControlSearch" type="search" placeholder="M AZ 1003" />
+           </label>
+           <label>
+            <span data-i18n="viewMode">View</span>
+            <select id="vehicleControlView">
+             <option value="split" data-i18n="splitDoneMissing">Done / missing</option>
+             <option value="missing" data-i18n="onlyMissing">Only missing</option>
+             <option value="done" data-i18n="onlyDone">Only done</option>
+             <option value="all" data-i18n="allVehicles">All vehicles</option>
+            </select>
+           </label>
+          </div>
+         </header>
+         <div class="vehicle-control-summary">
+          <article><span data-i18n="plannedRoutesShort">Planned routes</span><strong id="controlTotalVehicles">0</strong></article>
+          <article><span data-i18n="inspected">Inspected</span><strong id="controlInspectedVehicles">0</strong></article>
+          <article><span data-i18n="missing">Missing</span><strong id="controlMissingVehicles">0</strong></article>
+          <article><span data-i18n="aiAlerts">AI alerts</span><strong id="controlAlertVehicles">0</strong></article>
+         </div>
+         <div class="route-plan-card">
+          <label>
+           <span data-i18n="plannedRoutes">Planned routes for this day</span>
+           <input id="plannedRoutesInput" type="number" min="0" step="1" inputmode="numeric" placeholder="28" />
+          </label>
+          <div class="route-plan-actions">
+           <button id="saveRoutePlan" type="button" data-i18n="saveRoutePlan">Save route plan</button>
+           <button id="clearRoutePlan" type="button" class="ghost" data-i18n="clearRoutePlan">Clear</button>
+          </div>
+          <p id="routePlanStatus" data-i18n="routePlanHelp">Pending is calculated from planned routes minus inspections saved that day.</p>
+         </div>
+         <div id="vehicleControlList" class="vehicle-control-list"></div>
+        </article>
+
+        <article class="dashboard-widget status-widget">
+         <header>
+          <div>
+           <h3 data-i18n="systemStatus">System status</h3>
+           <span data-i18n="operationalHealth">Operational health</span>
+          </div>
+         </header>
+         <div id="systemStatus" class="status-list"></div>
+        </article>
+
+        <article class="dashboard-widget status-widget">
+         <header>
+          <div>
+           <h3 data-i18n="aiDamageDetection">AI damage detection</h3>
+           <span data-i18n="inspectionStatus">Inspection status</span>
+          </div>
+         </header>
+         <div id="aiStatusSummary" class="status-list"></div>
+        </article>
+
+        <article class="dashboard-widget status-widget">
+         <header>
+          <div>
+           <h3 data-i18n="driverPerformance">Drivers</h3>
+           <span data-i18n="totalByDriver">Total by driver</span>
+          </div>
+         </header>
+         <div id="driverSummary" class="driver-summary-list"></div>
+        </article>
+
+        <article id="userManagement" class="dashboard-widget wide-widget user-management-widget hidden">
+         <header>
+          <div>
+           <h3 data-i18n="userManagement">User management</h3>
+           <span data-i18n="userManagementSubtitle">Owner control for dispatcher access and roles</span>
+          </div>
+          <button id="refreshDispatchers" type="button" class="ghost" data-i18n="refreshUsers">Refresh users</button>
+         </header>
+         <div class="role-help-grid">
+          <article><strong data-i18n="roleOwner">Owner</strong><span data-i18n="roleOwnerHelp">Full control and user roles.</span></article>
+          <article><strong data-i18n="roleSupervisor">Supervisor</strong><span data-i18n="roleSupervisorHelp">Can operate the dashboard.</span></article>
+          <article><strong data-i18n="roleDispatcher">Dispatcher</strong><span data-i18n="roleDispatcherHelp">Can review daily operations.</span></article>
+          <article><strong data-i18n="roleReadonly">Read only</strong><span data-i18n="roleReadonlyHelp">Can view reports only.</span></article>
+         </div>
+         <div id="dispatcherList" class="dispatcher-list"></div>
+        </article>
+
+        <article class="dashboard-widget status-widget">
+         <header>
+          <div>
+           <h3 data-i18n="recentActivity">Recent activity</h3>
+           <span data-i18n="latestSubmissions">Latest driver submissions</span>
+          </div>
+         </header>
+         <div id="recentActivity" class="activity-list"></div>
+        </article>
+
+        <article id="auditWidget" class="dashboard-widget status-widget hidden">
+         <header>
+          <div>
+           <h3>Auditoría</h3>
+           <span>Últimas acciones del sistema</span>
+          </div>
+         </header>
+         <div id="auditTimeline" class="activity-list audit-timeline"></div>
+        </article>
+
+        <article class="dashboard-widget wide-widget">
+         <header>
+          <div>
+           <h3 data-i18n="vehicleHistory">Vehicle history</h3>
+           <span data-i18n="groupedRegistration">Grouped by registration</span>
+          </div>
+          <label class="history-selector">
+           <span data-i18n="selectVehicle">Select vehicle</span>
+           <select id="vehicleHistoryPlate"></select>
+          </label>
+         </header>
+         <div id="vehicleHistoryList" class="vehicle-history-list"></div>
+        </article>
+
+        <article class="dashboard-widget wide-widget">
+         <header>
+          <div>
+           <h3 data-i18n="completionQueue">Completion queue</h3>
+           <span data-i18n="reportsPdfsDrive">Reports, PDFs and Drive folders</span>
+          </div>
+         </header>
+         <div id="reportList" class="report-list"></div>
+        </article>
+       </section>
+      </div>
+     </section>
+    </main>
+   </div>
+  </div>
+
+  <script src="/vehicles.js?v=52"></script>
+  <script src="/i18n.js?v=52"></script>
+  <script src="/admin.js?v=52"></script>
+ </body>
 </html>
