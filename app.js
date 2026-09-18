@@ -23,6 +23,8 @@ const nodes = {
   captureScreen: document.querySelector("#captureScreen"),
   startForm: document.querySelector("#startForm"),
   siteSelect: document.querySelector("#siteSelect"),
+  siteError: document.querySelector("#siteError"),
+  startPhotosButton: document.querySelector("#startPhotosButton"),
   driverName: document.querySelector("#driverName"),
   vehiclePlate: document.querySelector("#vehiclePlate"),
   sessionMeta: document.querySelector("#sessionMeta"),
@@ -73,12 +75,14 @@ document.addEventListener("DOMContentLoaded", () => {
   window.FI18N.bindLanguageSelectors();
   window.addEventListener("fleetinspect:language", () => {
     loadVehicleOptions();
+    updateStartFormState();
     renderProgress();
     showInstallPrompt();
     if (session) updateCaptureUI();
   });
   loadVehicleOptions();
   bindEvents();
+  updateStartFormState();
   renderProgress();
   processPendingInspections();
   updateSyncStatus();
@@ -106,6 +110,10 @@ function loadVehicleOptions() {
 
 function bindEvents() {
   nodes.startForm.addEventListener("submit", beginSession);
+  [nodes.siteSelect, nodes.driverName, nodes.vehiclePlate].forEach((node) => {
+    node?.addEventListener("input", () => updateStartFormState());
+    node?.addEventListener("change", () => updateStartFormState());
+  });
   nodes.capturePhoto.addEventListener("click", primaryCaptureAction);
   nodes.previousPhoto.addEventListener("click", previousStep);
   nodes.retakePhoto.addEventListener("click", retakeCurrentPhoto);
@@ -177,7 +185,15 @@ async function beginSession(event) {
   const plate = normalizePlate(nodes.vehiclePlate.value);
   const site = normalizeSite(nodes.siteSelect?.value);
 
-  if (!site || !driverName || !plate) {
+  if (!site) {
+    updateStartFormState(true);
+    nodes.siteSelect?.focus();
+    alert(t("missingSite"));
+    return;
+  }
+
+  if (!driverName || !plate) {
+    updateStartFormState(true);
     alert(t("missingDetails"));
     return;
   }
@@ -550,7 +566,26 @@ function resetSession() {
   nodes.captureScreen.classList.add("hidden");
   nodes.cameraFrame.classList.remove("is-live", "has-photo");
   nodes.qualityStatus.textContent = t("qualityWaiting");
+  updateStartFormState();
   renderProgress();
+}
+
+function updateStartFormState(showErrors = false) {
+  const site = normalizeSite(nodes.siteSelect?.value);
+  const driverName = nodes.driverName?.value.trim();
+  const plate = normalizePlate(nodes.vehiclePlate?.value);
+  const ready = Boolean(site && driverName && plate);
+
+  if (nodes.startPhotosButton) {
+    nodes.startPhotosButton.disabled = !ready;
+    nodes.startPhotosButton.setAttribute("aria-disabled", String(!ready));
+  }
+
+  const siteLabel = nodes.siteSelect?.closest("label");
+  siteLabel?.classList.toggle("field-invalid", Boolean(showErrors && !site));
+  if (nodes.siteError) {
+    nodes.siteError.textContent = showErrors && !site ? t("missingSite") : "";
+  }
 }
 
 function updateCaptureUI() {
