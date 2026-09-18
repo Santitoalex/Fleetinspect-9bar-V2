@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
-const FRONTEND_VERSION = "58";
+const FRONTEND_VERSION = "59";
 const sourcePath = path.join(process.cwd(), "server.js");
 const runtimeDir = path.join(process.cwd(), ".runtime");
 const runtimePath = path.join(runtimeDir, "server.optimized.mjs");
@@ -91,6 +91,27 @@ function compactInspectionRecord(item) {
 
 function getSupabaseBucketUrl`,
   "compact inspection records"
+);
+
+source = replaceOnce(
+  source,
+  /app\.post\("\/api\/inspections", async \(request, response\) => \{\n  const payload = request\.body \|\| \{\};\n  const id = safeName\(payload\.id \|\| `inspection-\$\{Date\.now\(\)\}`\);\n  const dateKey = new Date\(payload\.finishedAt \|\| Date\.now\(\)\)\.toISOString\(\)\.slice\(0, 10\);/,
+  `app.post("/api/inspections", async (request, response) => {
+  const payload = request.body || {};
+  const submittedSite = normalizeSite(payload.site || payload.depot || payload.station || "");
+  if (!FLEET_SITES.includes(submittedSite)) {
+    return response.status(400).json({ ok: false, error: "Selecciona DRP3 o DSU1 antes de guardar la inspeccion." });
+  }
+  const id = safeName(payload.id || \`inspection-\${Date.now()}\`);
+  const dateKey = new Date(payload.finishedAt || Date.now()).toISOString().slice(0, 10);`,
+  "require valid inspection site"
+);
+
+source = replaceOnce(
+  source,
+  /    site: normalizeSite\(payload\.site \|\| payload\.depot \|\| payload\.station \|\| FALLBACK_SITE\),/,
+  "    site: submittedSite,",
+  "store submitted inspection site"
 );
 
 source = replaceOnce(
@@ -606,7 +627,11 @@ function patchAdminJs(adminJs) {
       "function renderSiteOverview() {",
       "  if (!nodes.siteOverview) return;",
       "  const today = localDateKey(new Date());",
-      "  nodes.siteOverview.innerHTML = FLEET_SITES.map((site) => {",
+      "  const todayUnassigned = dashboardItems.some((item) => {",
+      "    return getItemSite(item) === FALLBACK_SITE && localDateKey(new Date(item.finishedAt || item.startedAt || 0)) === today;",
+      "  });",
+      "  const visibleOverviewSites = todayUnassigned ? [...FLEET_SITES, FALLBACK_SITE] : FLEET_SITES;",
+      "  nodes.siteOverview.innerHTML = visibleOverviewSites.map((site) => {",
       "    const todayItems = dashboardItems.filter((item) => {",
       "      return getItemSite(item) === site && localDateKey(new Date(item.finishedAt || item.startedAt || 0)) === today;",
       "    });",
