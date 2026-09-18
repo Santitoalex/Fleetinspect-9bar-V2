@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
-const FRONTEND_VERSION = "59";
+const FRONTEND_VERSION = "60";
 const sourcePath = path.join(process.cwd(), "server.js");
 const runtimeDir = path.join(process.cwd(), ".runtime");
 const runtimePath = path.join(runtimeDir, "server.optimized.mjs");
