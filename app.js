@@ -188,7 +188,7 @@ async function beginSession(event) {
   if (!site) {
     updateStartFormState(true);
     nodes.siteSelect?.focus();
-    alert(t("missingSite"));
+    alert(siteRequiredMessage());
     return;
   }
 
@@ -584,8 +584,12 @@ function updateStartFormState(showErrors = false) {
   const siteLabel = nodes.siteSelect?.closest("label");
   siteLabel?.classList.toggle("field-invalid", Boolean(showErrors && !site));
   if (nodes.siteError) {
-    nodes.siteError.textContent = showErrors && !site ? t("missingSite") : "";
+    nodes.siteError.textContent = showErrors && !site ? siteRequiredMessage() : "";
   }
+}
+
+function siteRequiredMessage() {
+  return "Selecciona DRP3 o DSU1 antes de empezar la inspeccion.";
 }
 
 function updateCaptureUI() {
