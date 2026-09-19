@@ -75,3 +75,24 @@ create index if not exists audit_events_site_created_idx
 on public.audit_events (site, created_at desc);
 
 alter table public.audit_events enable row level security;
+
+create table if not exists public.fleet_vehicles (
+  plate text primary key,
+  site text not null default 'all',
+  active boolean not null default true,
+  updated_at timestamptz default now(),
+  updated_by text
+);
+
+alter table public.fleet_vehicles add column if not exists site text not null default 'all';
+alter table public.fleet_vehicles add column if not exists active boolean not null default true;
+alter table public.fleet_vehicles add column if not exists updated_at timestamptz default now();
+alter table public.fleet_vehicles add column if not exists updated_by text;
+
+create index if not exists fleet_vehicles_active_plate_idx
+on public.fleet_vehicles (active, plate);
+
+create index if not exists fleet_vehicles_site_plate_idx
+on public.fleet_vehicles (site, plate);
+
+alter table public.fleet_vehicles enable row level security;
