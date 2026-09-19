@@ -7,6 +7,7 @@ const APP_SHELL = [
   "/admin.html",
   "/styles.css?v=74",
   "/driver-v74.css?v=74",
+  "/driver-v72.css?v=72",
   "/app.js?v=74",
   "/admin.js?v=74",
   "/i18n.js?v=74",
