@@ -1,0 +1,446 @@
+/* Driver v70: compact professional driver app */
+.driver-v70 {
+  background: #f4f6f8 !important;
+  color: #101828 !important;
+}
+
+.driver-v70 .driver-app-header {
+  min-height: 62px !important;
+  padding: 8px 14px !important;
+  border-bottom: 1px solid #dbe4ed !important;
+  background: rgba(255, 255, 255, 0.96) !important;
+  color: #101828 !important;
+  box-shadow: 0 10px 26px rgba(16, 24, 40, 0.08) !important;
+}
+
+.driver-v70 .driver-app-header::before,
+.driver-v70 .driver-app-header::after,
+.driver-v70 .driver-login-card::before {
+  display: none !important;
+}
+
+.driver-v70 .brand-logo {
+  width: 112px !important;
+  height: 40px !important;
+  border: 1px solid #d9e2ec !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+  box-shadow: none !important;
+  object-fit: contain !important;
+}
+
+.driver-v70 .app-header h1 {
+  color: #101828 !important;
+  font-size: 17px !important;
+  line-height: 1.05 !important;
+}
+
+.driver-v70 .app-header p {
+  color: #667085 !important;
+  font-size: 12px !important;
+}
+
+.driver-v70 .language-select {
+  min-height: 38px !important;
+  border: 1px solid #d9e2ec !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+  color: #101828 !important;
+  font-size: 13px !important;
+}
+
+.driver-v70 .driver-main {
+  width: min(1120px, 100%) !important;
+  max-width: 1120px !important;
+  padding: 16px 14px 74px !important;
+}
+
+.driver-v70 .driver-start-pro,
+.driver-v70 .driver-photo-app {
+  gap: 12px !important;
+}
+
+.driver-v70 .driver-hero-card {
+  grid-template-columns: minmax(0, 1fr) 300px !important;
+  gap: 12px !important;
+}
+
+.driver-v70 .driver-hero-copy,
+.driver-v70 .driver-start-metrics article,
+.driver-v70 .driver-entry-card,
+.driver-v70 .driver-process-card,
+.driver-v70 .photo-command-bar,
+.driver-v70 .photo-panel-card {
+  border: 1px solid #d9e2ec !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+.driver-v70 .driver-hero-copy {
+  min-height: 132px !important;
+  padding: 18px !important;
+  border-top: 1px solid #d9e2ec !important;
+  border-left: 4px solid #184e77 !important;
+}
+
+.driver-v70 .driver-kicker,
+.driver-v70 .capture-kicker,
+.driver-v70 .form-heading span {
+  color: #0f766e !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0 !important;
+}
+
+.driver-v70 .driver-hero-copy h2 {
+  margin: 6px 0 8px !important;
+  color: #101828 !important;
+  font-size: clamp(24px, 3vw, 34px) !important;
+  line-height: 1.06 !important;
+}
+
+.driver-v70 .driver-hero-copy p {
+  color: #667085 !important;
+  font-size: 15px !important;
+}
+
+.driver-v70 .driver-start-metrics {
+  grid-template-columns: 1fr !important;
+  gap: 8px !important;
+}
+
+.driver-v70 .driver-start-metrics article {
+  min-height: 0 !important;
+  grid-template-columns: 46px 1fr !important;
+  padding: 11px !important;
+}
+
+.driver-v70 .driver-start-metrics strong {
+  display: grid !important;
+  min-height: 36px !important;
+  place-items: center !important;
+  border-radius: 8px !important;
+  background: #edf4fa !important;
+  color: #184e77 !important;
+  font-size: 14px !important;
+}
+
+.driver-v70 .driver-start-metrics span {
+  color: #667085 !important;
+  font-size: 12px !important;
+}
+
+.driver-v70 .driver-entry-grid {
+  grid-template-columns: minmax(0, 1fr) 280px !important;
+  gap: 12px !important;
+}
+
+.driver-v70 .driver-login-card {
+  padding: 16px !important;
+}
+
+.driver-v70 .form-heading strong {
+  color: #101828 !important;
+  font-size: 20px !important;
+}
+
+.driver-v70 .driver-form-fields {
+  grid-template-columns: 180px minmax(180px, 1fr) 210px !important;
+  gap: 10px !important;
+}
+
+.driver-v70 label {
+  gap: 6px !important;
+  color: #526173 !important;
+  font-size: 12px !important;
+}
+
+.driver-v70 input,
+.driver-v70 select,
+.driver-v70 textarea {
+  min-height: 44px !important;
+  border: 1px solid #cfd9e5 !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+  color: #101828 !important;
+  padding: 10px 12px !important;
+  font-size: 14px !important;
+  box-shadow: none !important;
+}
+
+.driver-v70 input:focus,
+.driver-v70 select:focus,
+.driver-v70 textarea:focus {
+  outline: 0 !important;
+  border-color: #184e77 !important;
+  box-shadow: 0 0 0 3px rgba(24, 78, 119, 0.14) !important;
+}
+
+.driver-v70 .driver-primary-action,
+.driver-v70 .photo-main-action {
+  min-height: 48px !important;
+  border-radius: 8px !important;
+  background: #184e77 !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+.driver-v70 .driver-help-card {
+  gap: 8px !important;
+  padding: 12px !important;
+  background: #172334 !important;
+  color: #fff !important;
+}
+
+.driver-v70 .driver-help-card div {
+  border: 0 !important;
+  border-left: 3px solid #f08a00 !important;
+  border-radius: 6px !important;
+  background: rgba(255, 255, 255, 0.07) !important;
+  padding: 11px !important;
+}
+
+.driver-v70 .driver-help-card div:last-child {
+  border-left-color: #0f766e !important;
+}
+
+.driver-v70 .photo-command-bar {
+  top: 72px !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  padding: 12px 14px !important;
+}
+
+.driver-v70 .photo-command-bar h2 {
+  color: #101828 !important;
+  font-size: 22px !important;
+}
+
+.driver-v70 .photo-command-bar p,
+.driver-v70 .step-help {
+  color: #667085 !important;
+  font-size: 12px !important;
+}
+
+.driver-v70 .photo-counter {
+  border-radius: 999px !important;
+  background: #edf4fa !important;
+  color: #184e77 !important;
+}
+
+.driver-v70 .photo-command-bar .ghost,
+.driver-v70 .photo-small-action,
+.driver-v70 .secondary {
+  border: 1px solid #cfd9e5 !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+  color: #101828 !important;
+  box-shadow: none !important;
+}
+
+.driver-v70 .photo-progress-rail {
+  height: 7px !important;
+  background: #dce6ef !important;
+}
+
+.driver-v70 .photo-progress-rail span {
+  background: #0f766e !important;
+}
+
+.driver-v70 .photo-workspace {
+  grid-template-columns: minmax(0, 1fr) 292px !important;
+  gap: 12px !important;
+}
+
+.driver-v70 .photo-stage {
+  gap: 10px !important;
+  padding: 10px !important;
+  border: 1px solid #111827 !important;
+  border-radius: 8px !important;
+  background: #0b1220 !important;
+  box-shadow: none !important;
+}
+
+.driver-v70 .photo-guide-card {
+  grid-template-columns: 42px minmax(0, 1fr) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 8px !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  padding: 10px !important;
+}
+
+.driver-v70 .photo-guide-card > span {
+  height: 38px !important;
+  border-radius: 8px !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #fff !important;
+}
+
+.driver-v70 .photo-guide-card strong {
+  color: #fff !important;
+}
+
+.driver-v70 .photo-guide-card p {
+  color: #cbd5e1 !important;
+  font-size: 12px !important;
+}
+
+.driver-v70 .photo-camera-frame {
+  min-height: min(63vh, 620px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border-radius: 8px !important;
+  background: #030712 !important;
+  box-shadow: none !important;
+}
+
+.driver-v70 .photo-action-dock {
+  grid-template-columns: 0.8fr 1.35fr 0.9fr 0.9fr !important;
+  gap: 8px !important;
+}
+
+.driver-v70 .photo-action-dock button {
+  min-height: 48px !important;
+  font-size: 14px !important;
+}
+
+.driver-v70 .photo-control-panel {
+  top: 146px !important;
+  gap: 8px !important;
+}
+
+.driver-v70 .photo-panel-card {
+  padding: 11px !important;
+}
+
+.driver-v70 .photo-session-card {
+  border-left: 4px solid #184e77 !important;
+}
+
+.driver-v70 .photo-status-card {
+  border-left: 4px solid #f08a00 !important;
+}
+
+.driver-v70 .photo-quality-card {
+  border-left: 4px solid #2563eb !important;
+}
+
+.driver-v70 .photo-sync-card {
+  border-left: 4px solid #0f766e !important;
+}
+
+.driver-v70 .photo-panel-card strong {
+  color: #101828 !important;
+  font-size: 13px !important;
+}
+
+.driver-v70 .photo-panel-card span,
+.driver-v70 .photo-panel-card small,
+.driver-v70 .photo-panel-card p {
+  color: #667085 !important;
+  font-size: 12px !important;
+}
+
+.driver-v70 .photo-step-list {
+  max-height: 280px !important;
+  gap: 6px !important;
+}
+
+.driver-v70 .photo-step-list .progress-item {
+  min-height: 42px !important;
+  border-radius: 8px !important;
+  background: #f8fafc !important;
+  padding: 9px 10px !important;
+  font-size: 13px !important;
+}
+
+.driver-v70 .photo-step-list .progress-item.active {
+  border-color: #184e77 !important;
+  background: #edf4fa !important;
+  box-shadow: inset 4px 0 0 #184e77 !important;
+}
+
+.driver-v70 .photo-step-list .progress-item.done {
+  border-color: #9fd2c8 !important;
+  background: #ecfdf7 !important;
+}
+
+@media (max-width: 900px) {
+  .driver-v70 .driver-hero-card,
+  .driver-v70 .driver-entry-grid,
+  .driver-v70 .driver-form-fields,
+  .driver-v70 .photo-workspace {
+    grid-template-columns: 1fr !important;
+  }
+
+  .driver-v70 .driver-start-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .driver-v70 .photo-control-panel {
+    position: static !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .driver-v70 .driver-app-header {
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+    padding: 8px 10px !important;
+  }
+
+  .driver-v70 .brand-logo {
+    width: 92px !important;
+    max-width: 28vw !important;
+    height: 36px !important;
+  }
+
+  .driver-v70 .app-header h1 {
+    font-size: 15px !important;
+  }
+
+  .driver-v70 .app-header p {
+    display: none !important;
+  }
+
+  .driver-v70 .header-actions {
+    width: auto !important;
+  }
+
+  .driver-v70 .driver-main {
+    padding: 12px 10px 72px !important;
+  }
+
+  .driver-v70 .driver-hero-copy {
+    padding: 14px !important;
+  }
+
+  .driver-v70 .driver-hero-copy h2 {
+    font-size: 24px !important;
+  }
+
+  .driver-v70 .driver-start-metrics {
+    grid-template-columns: 1fr !important;
+  }
+
+  .driver-v70 .photo-command-bar {
+    position: static !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  .driver-v70 .photo-camera-frame {
+    min-height: 54vh !important;
+  }
+
+  .driver-v70 .photo-action-dock {
+    position: sticky !important;
+    bottom: max(8px, env(safe-area-inset-bottom)) !important;
+    z-index: 18 !important;
+    grid-template-columns: 1fr 1fr !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 8px !important;
+    background: rgba(8, 17, 31, 0.92) !important;
+    padding: 8px !important;
+  }
+}
