@@ -1,0 +1,427 @@
+@import url("/driver-v72.css?v=72");
+
+@media (max-width: 759px) {
+  html,
+  body.driver-v74 {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden !important;
+    overscroll-behavior-x: none;
+  }
+
+  .driver-v74,
+  .driver-v74 * {
+    max-width: 100%;
+  }
+
+  .driver-v74 .driver-shell,
+  .driver-v74 .driver-home,
+  .driver-v74 #startScreen,
+  .driver-v74 .driver-home-header,
+  .driver-v74 .driver-start-layout,
+  .driver-v74 .driver-start-card {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    transform: none !important;
+  }
+
+  .driver-v74 .driver-shell {
+    display: block !important;
+    padding: 12px 12px 38px !important;
+  }
+
+  .driver-v74 .driver-home {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  .driver-v74 .driver-start-layout {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    overflow: visible !important;
+  }
+
+  .driver-v74 .driver-start-card {
+    position: static !important;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 13px !important;
+    padding: 14px !important;
+  }
+
+  .driver-v74 .driver-workflow-card {
+    display: none !important;
+  }
+
+  .driver-v74 .driver-form-fields {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .driver-v74 .driver-form-fields label,
+  .driver-v74 .driver-form-fields input,
+  .driver-v74 .driver-form-fields select,
+  .driver-v74 #startPhotosButton {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .driver-v74 #startPhotosButton {
+    position: static !important;
+    display: block !important;
+    margin: 2px 0 0 !important;
+    transform: none !important;
+  }
+
+  .driver-v74:has(#captureScreen:not(.hidden)) {
+    height: 100svh !important;
+    overflow: hidden !important;
+    background: #020617 !important;
+  }
+
+  .driver-v74:has(#captureScreen:not(.hidden)) .driver-topbar {
+    display: none !important;
+  }
+
+  .driver-v74:has(#captureScreen:not(.hidden)) .driver-shell {
+    width: 100% !important;
+    height: 100svh !important;
+    padding: 0 !important;
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 1000 !important;
+    display: block !important;
+    width: 100vw !important;
+    height: 100svh !important;
+    overflow: hidden !important;
+    background: #020617 !important;
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) .driver-capture-app,
+  .driver-v74 #captureScreen:not(.hidden) .capture-layout,
+  .driver-v74 #captureScreen:not(.hidden) .camera-card {
+    position: absolute !important;
+    inset: 0 !important;
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: #020617 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) .photo-camera-frame {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100svh !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: #020617 !important;
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) .camera-frame video,
+  .driver-v74 #captureScreen:not(.hidden) .camera-frame img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) .capture-header {
+    position: absolute !important;
+    top: max(7px, env(safe-area-inset-top)) !important;
+    left: 10px !important;
+    right: 10px !important;
+    z-index: 30 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    min-height: 42px !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    border-radius: 999px !important;
+    background: rgba(2, 6, 23, 0.58) !important;
+    padding: 6px 8px 6px 14px !important;
+    color: #fff !important;
+    backdrop-filter: blur(18px);
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) .capture-kicker,
+  .driver-v74 #captureScreen:not(.hidden) #sessionMeta,
+  .driver-v74 #captureScreen:not(.hidden) #stepHelp,
+  .driver-v74 #captureScreen:not(.hidden) #resetSession {
+    display: none !important;
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) .capture-header h2 {
+    margin: 0 !important;
+    max-width: 62vw !important;
+    overflow: hidden !important;
+    color: #fff !important;
+    font-size: 16px !important;
+    line-height: 1 !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) .photo-counter {
+    min-width: 46px !important;
+    border-radius: 999px !important;
+    background: rgba(255, 255, 255, 0.14) !important;
+    color: #fff !important;
+    padding: 6px 9px !important;
+    font-size: 12px !important;
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) .photo-progress-rail {
+    position: absolute !important;
+    top: calc(max(7px, env(safe-area-inset-top)) + 50px) !important;
+    left: 18px !important;
+    right: 18px !important;
+    z-index: 31 !important;
+    height: 3px !important;
+    border-radius: 999px !important;
+    background: rgba(255, 255, 255, 0.22) !important;
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) .photo-progress-rail span {
+    background: #ff9500 !important;
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) .camera-toolbar {
+    position: static !important;
+    display: contents !important;
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) .camera-picker-control {
+    position: absolute !important;
+    top: calc(max(7px, env(safe-area-inset-top)) + 60px) !important;
+    left: 12px !important;
+    right: 12px !important;
+    z-index: 29 !important;
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr) !important;
+    align-items: center !important;
+    min-height: 36px !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 999px !important;
+    background: rgba(2, 6, 23, 0.54) !important;
+    padding: 5px 8px !important;
+    backdrop-filter: blur(16px);
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) .camera-picker-control.hidden {
+    display: none !important;
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) .camera-picker-control select {
+    min-height: 30px !important;
+    border: 0 !important;
+    border-radius: 999px !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    font-size: 12px !important;
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) .photo-guide-card {
+    position: absolute !important;
+    left: 12px !important;
+    right: 12px !important;
+    bottom: 92px !important;
+    z-index: 24 !important;
+    display: grid !important;
+    grid-template-columns: 34px minmax(0, 1fr) !important;
+    min-height: 48px !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 16px !important;
+    background: rgba(2, 6, 23, 0.58) !important;
+    padding: 7px 9px !important;
+    backdrop-filter: blur(18px);
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) .photo-guide-card > span {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 11px !important;
+    background: rgba(255, 255, 255, 0.14) !important;
+    font-size: 12px !important;
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) .photo-guide-card strong {
+    overflow: hidden !important;
+    color: #fff !important;
+    font-size: 15px !important;
+    line-height: 1.2 !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) .photo-guide-card p {
+    display: none !important;
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) .camera-zoom-control {
+    position: absolute !important;
+    top: calc(max(7px, env(safe-area-inset-top)) + 60px) !important;
+    left: 12px !important;
+    right: 12px !important;
+    bottom: auto !important;
+    z-index: 28 !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    gap: 8px !important;
+    align-items: center !important;
+    min-height: 36px !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 999px !important;
+    background: rgba(2, 6, 23, 0.55) !important;
+    padding: 5px 9px !important;
+    color: #fff !important;
+    backdrop-filter: blur(16px);
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) .camera-zoom-control.hidden {
+    display: none !important;
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) .camera-zoom-control > span {
+    display: none !important;
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) .camera-zoom-control strong {
+    min-width: 38px !important;
+    color: #fff !important;
+    font-size: 12px !important;
+    text-align: right !important;
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) .camera-zoom-slider {
+    min-height: 26px !important;
+    border-radius: 999px !important;
+    background: rgba(255, 255, 255, 0.24) !important;
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) .camera-zoom-slider i {
+    width: 28px !important;
+    height: 28px !important;
+    border: 3px solid #fff !important;
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) .photo-camera-frame::before {
+    inset: calc(max(7px, env(safe-area-inset-top)) + 106px) 10px 146px 10px !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    border-radius: 18px !important;
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) .photo-camera-frame::after {
+    content: "";
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 146px;
+    z-index: 5;
+    height: 34px;
+    border-right: 5px solid #ff9500;
+    border-bottom: 5px solid #ff9500;
+    border-radius: 0 0 16px 0;
+    pointer-events: none;
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) .photo-action-dock {
+    position: absolute !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 32 !important;
+    display: grid !important;
+    grid-template-columns: 80px minmax(0, 1fr) 80px !important;
+    align-items: center !important;
+    gap: 8px !important;
+    height: 86px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: linear-gradient(180deg, rgba(2, 6, 23, 0), rgba(2, 6, 23, 0.82) 36%, rgba(2, 6, 23, 0.95)) !important;
+    padding: 10px 12px max(10px, env(safe-area-inset-bottom)) !important;
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) .photo-action-dock button {
+    min-width: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) .photo-small-action,
+  .driver-v74 #captureScreen:not(.hidden) .secondary {
+    min-height: 48px !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    border-radius: 999px !important;
+    background: rgba(15, 23, 42, 0.72) !important;
+    color: #fff !important;
+    padding: 0 8px !important;
+    font-size: 12px !important;
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) #previousPhoto {
+    grid-column: 1 !important;
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) #retakePhoto:not(.hidden) {
+    grid-column: 1 !important;
+    display: block !important;
+  }
+
+  .driver-v74 #captureScreen:not(.hidden):has(#retakePhoto:not(.hidden)) #previousPhoto {
+    display: none !important;
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) #capturePhoto {
+    grid-column: 2 !important;
+    justify-self: center !important;
+    width: 72px !important;
+    height: 72px !important;
+    min-height: 72px !important;
+    border: 4px solid rgba(255, 255, 255, 0.9) !important;
+    border-radius: 50% !important;
+    background: #ff9500 !important;
+    color: transparent !important;
+    font-size: 0 !important;
+    padding: 0 !important;
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) #capturePhoto::after {
+    display: none !important;
+  }
+
+  .driver-v74 #captureScreen:not(.hidden)[data-capture-state="review"] #capturePhoto {
+    width: auto !important;
+    min-width: 132px !important;
+    height: 52px !important;
+    min-height: 52px !important;
+    border: 0 !important;
+    border-radius: 999px !important;
+    background: #fff !important;
+    color: #06101f !important;
+    font-size: 14px !important;
+    padding: 0 18px !important;
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) #zoomPhoto:not(.hidden) {
+    grid-column: 3 !important;
+    display: block !important;
+  }
+
+  .driver-v74 #captureScreen:not(.hidden) .inspection-drawer {
+    display: none !important;
+  }
+}
