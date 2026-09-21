@@ -136,6 +136,26 @@ adminJs = adminJs.replace(
 await fs.writeFile(adminPath, adminJs);
 
 let adminHtml = await fs.readFile(adminHtmlPath, "utf8");
+const cleanNavHtml = `    <nav class="fleet-nav" aria-label="Admin navigation">
+     <section class="nav-group">
+      <p>Operación</p>
+      <a class="active" href="/admin" title="Dashboard"><span>▦</span><b data-i18n="dashboard">Dashboard</b><small>Resumen diario</small></a>
+      <a href="#siteOverview" title="Sites"><span>◇</span><b>Sites</b><small>DRP3 / DSU1</small></a>
+      <a href="#dailyVehicleControl" title="Historial"><span>◫</span><b>Historial</b><small>Vehículos inspeccionados</small></a>
+     </section>
+     <section class="nav-group">
+      <p>Gestión</p>
+      <a href="#fleetVehicleManagement" title="Flota driver"><span>▤</span><b>Flota driver</b><small>Añadir o quitar</small></a>
+      <a href="#vehicleSummary" title="Vehículos"><span>◉</span><b data-i18n="vehicles">Vehículos</b><small>Por matrícula</small></a>
+      <a id="userManagementNav" class="hidden" href="#userManagement" title="Usuarios"><span>◎</span><b data-i18n="userManagement">Usuarios</b><small>Roles y permisos</small></a>
+     </section>
+     <section class="nav-group">
+      <p>Reportes</p>
+      <a href="#alertList" title="IA"><span>△</span><b data-i18n="aiAlerts">Alertas IA</b><small>Prioridad</small></a>
+      <a href="#reportList" title="Reportes"><span>▧</span><b data-i18n="reports">Reportes</b><small>PDF y exportación</small></a>
+     </section>
+    </nav>`;
+
 const fleetVehicleManagementHtml = `        <article id="fleetVehicleManagement" class="dashboard-widget wide-widget fleet-vehicle-widget">
          <header>
           <div>
@@ -175,13 +195,64 @@ adminHtml = adminHtml.replace(
   `${fleetVehicleManagementHtml}\n\n        <article class="dashboard-widget status-widget">`
 );
 
+adminHtml = adminHtml.replace(
+  /    <nav class="fleet-nav" aria-label="Admin navigation">[\s\S]*?\n    <\/nav>/,
+  cleanNavHtml
+);
+
+const sidebarScript = `  <script id="admin-sidebar-toggle">
+   (() => {
+    const applySidebarState = () => {
+     const isOpen = localStorage.getItem("fleetinspect_admin_sidebar") === "open";
+     document.body.classList.toggle("admin-sidebar-open", isOpen);
+     document.querySelector(".menu-button")?.setAttribute("aria-expanded", String(isOpen));
+    };
+
+    applySidebarState();
+
+    document.addEventListener("click", (event) => {
+     const menuButton = event.target.closest(".menu-button");
+     if (!menuButton) return;
+     const nextOpen = !document.body.classList.contains("admin-sidebar-open");
+     document.body.classList.toggle("admin-sidebar-open", nextOpen);
+     localStorage.setItem("fleetinspect_admin_sidebar", nextOpen ? "open" : "closed");
+     menuButton.setAttribute("aria-expanded", String(nextOpen));
+    });
+   })();
+  </script>`;
+
+if (!adminHtml.includes('id="admin-sidebar-toggle"')) {
+  adminHtml = adminHtml.replace("\n  <script src=\"/vehicles.js", `\n${sidebarScript}\n  <script src="/vehicles.js`);
+}
+
 const cleanCss = `
   <style id="admin-clean-v77-styles">
-   .admin-body.admin-clean-v77 { --v77-bg:#f4f7fb; --v77-panel:#fff; --v77-line:#d9e4ef; --v77-text:#0f172a; --v77-muted:#64748b; background:var(--v77-bg)!important; color:var(--v77-text)!important; font-size:12px!important; }
-   .admin-body.admin-clean-v77 .admin-shell { grid-template-columns:52px minmax(0,1fr)!important; }
-   .admin-body.admin-clean-v77 .fleet-sidebar { width:52px!important; padding:6px 5px!important; }
-   .admin-body.admin-clean-v77 .fleet-nav a { width:34px!important; height:34px!important; border-radius:9px!important; }
+   .admin-body.admin-clean-v77 { --v77-bg:#eef3f8; --v77-panel:#fff; --v77-soft:#f7fafc; --v77-line:#d9e4ef; --v77-text:#0f172a; --v77-muted:#64748b; --v77-navy:#061420; --v77-blue:#0b4f8a; --v77-orange:#f39200; background:var(--v77-bg)!important; color:var(--v77-text)!important; font-size:12px!important; }
+   .admin-body.admin-clean-v77 .admin-shell { grid-template-columns:58px minmax(0,1fr)!important; transition:grid-template-columns .18s ease!important; }
+   .admin-body.admin-clean-v77.admin-sidebar-open .admin-shell { grid-template-columns:232px minmax(0,1fr)!important; }
+   .admin-body.admin-clean-v77 .fleet-sidebar { position:sticky!important; top:0!important; align-self:start!important; width:auto!important; min-height:100vh!important; padding:10px 8px!important; background:var(--v77-navy)!important; border-right:1px solid #10283b!important; overflow:hidden!important; }
+   .admin-body.admin-clean-v77 .fleet-logo { display:grid!important; grid-template-columns:36px minmax(0,1fr)!important; align-items:center!important; gap:10px!important; min-height:42px!important; margin:0 0 12px!important; padding:4px!important; border-radius:12px!important; background:rgba(255,255,255,.05)!important; }
+   .admin-body.admin-clean-v77 .fleet-logo img { width:32px!important; height:32px!important; object-fit:contain!important; background:#fff!important; border-radius:8px!important; padding:3px!important; }
+   .admin-body.admin-clean-v77 .fleet-logo p { display:block!important; overflow:hidden!important; max-width:0!important; margin:0!important; color:#fff!important; font-size:12px!important; font-weight:900!important; white-space:nowrap!important; opacity:0!important; transition:max-width .18s ease, opacity .18s ease!important; }
+   .admin-body.admin-clean-v77.admin-sidebar-open .fleet-logo p { max-width:160px!important; opacity:1!important; }
+   .admin-body.admin-clean-v77 .fleet-nav { display:grid!important; gap:12px!important; margin:0!important; }
+   .admin-body.admin-clean-v77 .nav-group { display:grid!important; gap:5px!important; padding:0 0 10px!important; border-bottom:1px solid rgba(255,255,255,.08)!important; }
+   .admin-body.admin-clean-v77 .nav-group:last-child { border-bottom:0!important; }
+   .admin-body.admin-clean-v77 .nav-group p { overflow:hidden!important; max-width:0!important; margin:0 0 2px 48px!important; color:#7f93a8!important; font-size:9px!important; font-weight:900!important; letter-spacing:.08em!important; text-transform:uppercase!important; white-space:nowrap!important; opacity:0!important; }
+   .admin-body.admin-clean-v77.admin-sidebar-open .nav-group p { max-width:140px!important; opacity:1!important; }
+   .admin-body.admin-clean-v77 .fleet-nav a { position:relative!important; display:grid!important; grid-template-columns:36px minmax(0,1fr)!important; grid-template-rows:auto auto!important; align-items:center!important; column-gap:10px!important; width:auto!important; min-height:38px!important; padding:3px!important; border-radius:12px!important; color:#b8c7d8!important; text-decoration:none!important; border:1px solid transparent!important; background:transparent!important; }
+   .admin-body.admin-clean-v77 .fleet-nav a span { display:grid!important; grid-row:1 / span 2!important; place-items:center!important; width:36px!important; height:32px!important; border-radius:10px!important; background:rgba(255,255,255,.07)!important; color:#d8e4ef!important; font-size:15px!important; }
+   .admin-body.admin-clean-v77 .fleet-nav a b,
+   .admin-body.admin-clean-v77 .fleet-nav a small { overflow:hidden!important; max-width:0!important; opacity:0!important; white-space:nowrap!important; text-overflow:ellipsis!important; transition:max-width .18s ease, opacity .18s ease!important; }
+   .admin-body.admin-clean-v77 .fleet-nav a b { color:#fff!important; font-size:12px!important; font-weight:900!important; line-height:1.1!important; }
+   .admin-body.admin-clean-v77 .fleet-nav a small { color:#8aa1b8!important; font-size:10px!important; font-weight:700!important; line-height:1.1!important; }
+   .admin-body.admin-clean-v77.admin-sidebar-open .fleet-nav a b,
+   .admin-body.admin-clean-v77.admin-sidebar-open .fleet-nav a small { max-width:150px!important; opacity:1!important; }
+   .admin-body.admin-clean-v77 .fleet-nav a:hover,
+   .admin-body.admin-clean-v77 .fleet-nav a.active { background:#10243a!important; border-color:rgba(255,255,255,.11)!important; color:#fff!important; }
+   .admin-body.admin-clean-v77 .fleet-nav a.active span { background:rgba(243,146,0,.14)!important; color:var(--v77-orange)!important; box-shadow:inset 0 0 0 1px rgba(243,146,0,.55)!important; }
    .admin-body.admin-clean-v77 .fleet-topbar { min-height:44px!important; padding:5px 10px!important; }
+   .admin-body.admin-clean-v77 .menu-button { width:34px!important; height:34px!important; border-radius:10px!important; border:1px solid var(--v77-line)!important; background:#fff!important; color:#123c69!important; font-weight:900!important; }
    .admin-body.admin-clean-v77 .topbar-company-logo { width:68px!important; height:28px!important; }
    .admin-body.admin-clean-v77 .global-search { width:min(390px,34vw)!important; min-height:32px!important; border-radius:8px!important; }
    .admin-body.admin-clean-v77 .sync-chip,
@@ -190,10 +261,12 @@ const cleanCss = `
    .admin-body.admin-clean-v77 .language-select,
    .admin-body.admin-clean-v77 .icon-button,
    .admin-body.admin-clean-v77 .user-admin-link { min-height:30px!important; padding:5px 8px!important; border-radius:8px!important; font-size:11px!important; }
-   .admin-body.admin-clean-v77 .dashboard-main { max-width:none!important; padding:8px 10px 18px!important; gap:8px!important; }
+   .admin-body.admin-clean-v77 .dashboard-main { max-width:none!important; padding:10px 12px 20px!important; gap:10px!important; }
+   .admin-body.admin-clean-v77 .admin-hero { display:none!important; }
+   .admin-body.admin-clean-v77 .hero-dashboard { border-radius:12px!important; border:1px solid var(--v77-line)!important; background:#fff!important; overflow:hidden!important; box-shadow:0 12px 32px rgba(15,23,42,.05)!important; }
    .admin-body.admin-clean-v77 .dashboard-header { min-height:42px!important; padding:8px 10px!important; }
    .admin-body.admin-clean-v77 .dashboard-header h2 { font-size:18px!important; }
-   .admin-body.admin-clean-v77 #dashboardContent { padding:9px 10px 12px!important; }
+   .admin-body.admin-clean-v77 #dashboardContent { display:grid!important; grid-template-columns:1fr!important; gap:10px!important; padding:10px!important; background:#f8fbff!important; }
    .admin-body.admin-clean-v77 .admin-filter-panel { grid-template-columns:190px minmax(260px,1fr) 200px 82px!important; gap:6px!important; margin-bottom:7px!important; }
    .admin-body.admin-clean-v77 .control-room-strip { grid-template-columns:repeat(4,minmax(0,1fr))!important; gap:6px!important; margin-bottom:7px!important; }
    .admin-body.admin-clean-v77 .metrics { grid-template-columns:repeat(5,minmax(0,1fr))!important; gap:6px!important; margin:7px 0!important; }
@@ -208,7 +281,7 @@ const cleanCss = `
    .admin-body.admin-clean-v77 .control-room-strip strong,
    .admin-body.admin-clean-v77 .metrics strong,
    .admin-body.admin-clean-v77 .admin-filter-panel strong { font-size:22px!important; line-height:1!important; }
-   .admin-body.admin-clean-v77 .site-overview-grid { display:grid!important; grid-template-columns:repeat(2,minmax(0,1fr))!important; gap:8px!important; margin:8px 0!important; }
+   .admin-body.admin-clean-v77 .site-overview-grid { display:grid!important; grid-template-columns:repeat(2,minmax(0,1fr))!important; gap:10px!important; margin:0!important; }
    .admin-body.admin-clean-v77 .site-overview-panel { display:grid!important; grid-template-columns:152px minmax(0,1fr)!important; min-height:0!important; padding:0!important; overflow:hidden!important; }
    .admin-body.admin-clean-v77 .site-overview-head { display:grid!important; place-items:center!important; min-height:142px!important; border:0!important; border-right:1px solid var(--v77-line)!important; border-radius:0!important; background:#123c69!important; color:#fff!important; cursor:pointer!important; }
    .admin-body.admin-clean-v77 .site-overview-head span,
@@ -224,7 +297,16 @@ const cleanCss = `
    .admin-body.admin-clean-v77 .site-inspection-row time,
    .admin-body.admin-clean-v77 .site-empty-line { color:var(--v77-muted)!important; font-size:11px!important; font-weight:700!important; }
    .admin-body.admin-clean-v77 .operations-board { display:none!important; }
-   .admin-body.admin-clean-v77 .dashboard-card-grid { grid-template-columns:minmax(340px,.82fr) minmax(520px,1.18fr)!important; gap:8px!important; }
+   .admin-body.admin-clean-v77 .dashboard-card-grid { display:grid!important; grid-template-columns:minmax(320px,.72fr) minmax(560px,1.28fr)!important; gap:10px!important; align-items:start!important; }
+   .admin-body.admin-clean-v77 .dashboard-widget { overflow:hidden!important; }
+   .admin-body.admin-clean-v77 .dashboard-widget > header { min-height:42px!important; padding:9px 11px!important; background:linear-gradient(180deg,#fff,#f8fbff)!important; border-bottom:1px solid #e5edf5!important; }
+   .admin-body.admin-clean-v77 .dashboard-widget h3 { font-size:15px!important; line-height:1.05!important; }
+   .admin-body.admin-clean-v77 .dashboard-widget header span { color:var(--v77-muted)!important; font-size:10px!important; font-weight:800!important; text-transform:uppercase!important; }
+   .admin-body.admin-clean-v77 .primary-widget { border-top:3px solid #e23b2e!important; }
+   .admin-body.admin-clean-v77 .vehicle-control-widget { border-top:3px solid #123c69!important; }
+   .admin-body.admin-clean-v77 .fleet-vehicle-widget { border-top:3px solid var(--v77-orange)!important; }
+   .admin-body.admin-clean-v77 .user-management-widget { border-top:3px solid #7c3aed!important; }
+   .admin-body.admin-clean-v77 .status-widget { border-top:3px solid #16877f!important; }
    .admin-body.admin-clean-v77 .fleet-vehicle-widget { order:0!important; grid-column:1 / -1!important; overflow:hidden!important; }
    .admin-body.admin-clean-v77 .fleet-vehicle-widget > header { min-height:42px!important; padding:8px 10px!important; border-bottom:1px solid var(--v77-line)!important; }
    .admin-body.admin-clean-v77 .fleet-vehicle-widget h3 { font-size:17px!important; line-height:1.05!important; }
@@ -273,6 +355,13 @@ const cleanCss = `
     .admin-body.admin-clean-v77 .fleet-vehicle-tools { grid-template-columns:1fr!important; }
     .admin-body.admin-clean-v77 .site-overview-panel { grid-template-columns:1fr!important; }
     .admin-body.admin-clean-v77 .site-overview-head { min-height:84px!important; border-right:0!important; border-bottom:1px solid var(--v77-line)!important; }
+    .admin-body.admin-clean-v77 .fleet-sidebar { position:relative!important; min-height:auto!important; }
+    .admin-body.admin-clean-v77 .fleet-nav { grid-template-columns:repeat(4,minmax(0,1fr))!important; }
+    .admin-body.admin-clean-v77 .nav-group { border-bottom:0!important; padding:0!important; }
+    .admin-body.admin-clean-v77 .nav-group p,
+    .admin-body.admin-clean-v77 .fleet-logo p,
+    .admin-body.admin-clean-v77 .fleet-nav a b,
+    .admin-body.admin-clean-v77 .fleet-nav a small { display:none!important; }
    }
   </style>
 `;
@@ -291,14 +380,18 @@ adminHtml = adminHtml
   .replaceAll("/styles.css?v=54", "/styles.css?v=77")
   .replaceAll("/styles.css?v=75", "/styles.css?v=77")
   .replaceAll("/styles.css?v=77", "/styles.css?v=78")
+  .replaceAll("/styles.css?v=78", "/styles.css?v=79")
   .replaceAll("/vehicles.js?v=54", "/vehicles.js?v=77")
   .replaceAll("/vehicles.js?v=75", "/vehicles.js?v=77")
   .replaceAll("/vehicles.js?v=77", "/vehicles.js?v=78")
+  .replaceAll("/vehicles.js?v=78", "/vehicles.js?v=79")
   .replaceAll("/i18n.js?v=54", "/i18n.js?v=77")
   .replaceAll("/i18n.js?v=75", "/i18n.js?v=77")
   .replaceAll("/i18n.js?v=77", "/i18n.js?v=78")
+  .replaceAll("/i18n.js?v=78", "/i18n.js?v=79")
   .replaceAll("/admin.js?v=54", "/admin.js?v=77")
   .replaceAll("/admin.js?v=75", "/admin.js?v=77")
   .replaceAll("/admin.js?v=77", "/admin.js?v=78");
+adminHtml = adminHtml.replaceAll("/admin.js?v=78", "/admin.js?v=79");
 
 await fs.writeFile(adminHtmlPath, adminHtml);
