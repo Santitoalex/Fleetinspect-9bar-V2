@@ -6,6 +6,7 @@ const root = process.cwd();
 const appPath = path.join(root, "app.js");
 const adminPath = path.join(root, "admin.js");
 const adminHtmlPath = path.join(root, "admin.html");
+const driverCssPath = path.join(root, "driver-v74.css");
 
 await import(pathToFileURL(path.join(root, "server-speed-v75.js")).href);
 
@@ -87,6 +88,27 @@ appJs = appJs.replace(
   '  if (nodes.photoCounter) nodes.photoCounter.textContent = `${completedCount} / ${STEPS.length}`;'
 );
 
+const cameraMessageWithRetry = [
+  "function showCameraMessage(message) {",
+  "  nodes.cameraFrame.classList.remove(\"is-live\");",
+  "  nodes.cameraEmpty.classList.remove(\"hidden\");",
+  "  const retryLabels = {",
+  "    en: \"Retry camera\",",
+  "    es: \"Reintentar camara\",",
+  "    de: \"Kamera erneut versuchen\",",
+  "    ro: \"Reincearca camera\",",
+  "  };",
+  "  const language = window.FI18N?.getLanguage?.() || \"en\";",
+  "  nodes.cameraEmpty.innerHTML = `<strong>${escapeHtml(t(\"cameraPending\"))}</strong><span>${escapeHtml(message)}</span><button id=\"retryCameraButton\" class=\"camera-retry-button\" type=\"button\">${escapeHtml(retryLabels[language] || retryLabels.en)}</button>`;",
+  "  nodes.cameraEmpty.querySelector(\"#retryCameraButton\")?.addEventListener(\"click\", () => openCamera());",
+  "}",
+].join("\n");
+
+appJs = appJs.replace(
+  /function showCameraMessage\(message\) \{[\s\S]*?\n\}\n\nfunction stopCamera/,
+  `${cameraMessageWithRetry}\n\nfunction stopCamera`
+);
+
 appJs = appJs.replace(
   "    renderVehicleOptions(fleetVehicles, previousValue);\n    updateStartFormState();",
   "    renderVehicleOptions(fleetVehicles, previousValue);\n    updateStartFormState();\n    window.setTimeout(updateStartFormState, 0);"
@@ -104,6 +126,26 @@ appJs = appJs.replace(
 );
 
 await fs.writeFile(appPath, appJs);
+
+let driverCss = await fs.readFile(driverCssPath, "utf8");
+if (!driverCss.includes(".camera-retry-button")) {
+  driverCss += `
+
+.driver-v74 .camera-empty .camera-retry-button {
+  width: auto !important;
+  min-height: 46px !important;
+  margin-top: 14px !important;
+  padding: 10px 20px !important;
+  border: 1px solid rgba(255, 255, 255, .72) !important;
+  border-radius: 10px !important;
+  background: #ffffff !important;
+  color: #101828 !important;
+  font-size: 15px !important;
+  font-weight: 800 !important;
+}
+`;
+}
+await fs.writeFile(driverCssPath, driverCss);
 
 let adminJs = await fs.readFile(adminPath, "utf8");
 const siteOverviewRenderer = [
@@ -519,7 +561,13 @@ indexHtml = indexHtml
   .replaceAll("/i18n.js?v=82", "/i18n.js?v=83")
   .replaceAll("/vehicles.js?v=82", "/vehicles.js?v=83")
   .replaceAll("/app.js?v=82", "/app.js?v=83")
-  .replaceAll("/driver-vehicles-fallback-v76.js?v=82", "/driver-vehicles-fallback-v76.js?v=83");
+  .replaceAll("/driver-vehicles-fallback-v76.js?v=82", "/driver-vehicles-fallback-v76.js?v=83")
+  .replaceAll("/styles.css?v=83", "/styles.css?v=84")
+  .replaceAll("/driver-v74.css?v=83", "/driver-v74.css?v=84")
+  .replaceAll("/i18n.js?v=83", "/i18n.js?v=84")
+  .replaceAll("/vehicles.js?v=83", "/vehicles.js?v=84")
+  .replaceAll("/app.js?v=83", "/app.js?v=84")
+  .replaceAll("/driver-vehicles-fallback-v76.js?v=83", "/driver-vehicles-fallback-v76.js?v=84");
 await fs.writeFile(path.join(root, "index.html"), indexHtml);
 
 let serviceWorker = await fs.readFile(path.join(root, "service-worker.js"), "utf8");
@@ -539,5 +587,9 @@ serviceWorker = serviceWorker
   .replaceAll("fleetinspect-driver-v82", "fleetinspect-driver-v83")
   .replaceAll("/driver-v74.css?v=82", "/driver-v74.css?v=83")
   .replaceAll("/app.js?v=82", "/app.js?v=83")
-  .replaceAll("/vehicles.js?v=82", "/vehicles.js?v=83");
+  .replaceAll("/vehicles.js?v=82", "/vehicles.js?v=83")
+  .replaceAll("fleetinspect-driver-v83", "fleetinspect-driver-v84")
+  .replaceAll("/driver-v74.css?v=83", "/driver-v74.css?v=84")
+  .replaceAll("/app.js?v=83", "/app.js?v=84")
+  .replaceAll("/vehicles.js?v=83", "/vehicles.js?v=84");
 await fs.writeFile(path.join(root, "service-worker.js"), serviceWorker);
