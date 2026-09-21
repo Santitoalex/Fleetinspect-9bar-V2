@@ -12,8 +12,8 @@
   <link rel="manifest" href="/manifest.webmanifest" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="icon" href="/icon-192.png" sizes="192x192" />
-  <link rel="stylesheet" href="/styles.css?v=74" />
-  <link rel="stylesheet" href="/driver-v74.css?v=74" />
+  <link rel="stylesheet" href="/styles.css?v=76" />
+  <link rel="stylesheet" href="/driver-v74.css?v=76" />
  </head>
  <body class="driver-body driver-v72 driver-v74">
   <header class="driver-topbar">
@@ -40,23 +40,23 @@
     </div>
     <div class="install-actions">
      <button id="installAppButton" type="button" data-i18n="installApp">Install</button>
-     <button id="dismissInstallPrompt" class="ghost" type="button" data-i18n="notNow">Not now</button>
+     <button id="dismissInstallPrompt" type="button" class="ghost" data-i18n="notNow">Not now</button>
     </div>
    </section>
 
    <section id="startScreen" class="driver-home">
-    <div class="driver-home-header">
+    <section class="driver-hero">
      <span data-i18n="dailyReport">Daily report</span>
      <h1 data-i18n="driverVehicleId">Driver and vehicle identification</h1>
-     <p data-i18n="enterDetails">Enter the details before opening the camera.</p>
-    </div>
+     <p data-i18n="enterDetailsBeforeCamera">Enter the details before opening the camera.</p>
+    </section>
 
-    <div class="driver-start-layout">
+    <section class="driver-start-layout">
      <form id="startForm" class="driver-start-card">
-      <div class="driver-section-title">
+      <div class="driver-step-card">
        <span>01</span>
        <div>
-        <strong data-i18n="checkIn">Driver check-in</strong>
+        <strong data-i18n="driverCheckIn">Driver check-in</strong>
         <small data-i18n="dailyInspection">Daily vehicle inspection</small>
        </div>
       </div>
@@ -73,143 +73,122 @@
        </label>
        <label>
         <span data-i18n="driverName">Driver name</span>
-        <input id="driverName" name="driverName" autocomplete="name" placeholder="Example: John Smith" data-i18n-placeholder="driverPlaceholder" required />
+        <input id="driverName" name="driverName" type="text" autocomplete="name" placeholder="Alex Marinescu" required />
        </label>
        <label>
-        <span data-i18n="registrationNumber">Registration number</span>
+        <span data-i18n="vehicleRegistration">Vehicle registration</span>
         <select id="vehiclePlate" name="vehiclePlate" required>
          <option value="" data-i18n="selectRegistration">Select registration</option>
         </select>
        </label>
+       <label>
+        <span data-i18n="driverNotes">Driver notes</span>
+        <textarea id="driverNotes" name="driverNotes" rows="3" data-i18n-placeholder="optionalNotes" placeholder="Optional notes before starting"></textarea>
+       </label>
       </div>
 
-      <button id="startPhotosButton" type="submit" class="driver-primary-action" data-i18n="startPhotos" disabled>Start photos</button>
+      <button id="startPhotosButton" type="submit" data-i18n="startPhotos" disabled>Start photos</button>
      </form>
 
-     <aside class="driver-workflow-card" aria-label="Inspection process">
-      <div class="workflow-row">
+     <aside class="driver-workflow-card" aria-label="Workflow">
+      <article>
        <span>01</span>
-       <div>
-        <strong data-i18n="checkIn">Driver check-in</strong>
-        <small>Site, conductor y matrícula</small>
-       </div>
-      </div>
-      <div class="workflow-row">
+       <strong data-i18n="driverCheckIn">Driver check-in</strong>
+       <small data-i18n="siteDriverPlate">Site, driver and registration</small>
+      </article>
+      <article>
        <span>02</span>
-       <div>
-        <strong data-i18n="guidedViews">Guided views</strong>
-        <small>9 fotos obligatorias</small>
-       </div>
-      </div>
-      <div class="workflow-row">
+       <strong data-i18n="guidedViews">Guided views</strong>
+       <small data-i18n="nineMandatoryPhotos">9 mandatory photos</small>
+      </article>
+      <article>
        <span>03</span>
-       <div>
-        <strong data-i18n="cloudSync">Cloud sync</strong>
-        <small>Reporte visible en admin</small>
-       </div>
-      </div>
+       <strong data-i18n="cloudSync">Cloud sync</strong>
+       <small data-i18n="visibleInAdmin">Report visible in admin</small>
+      </article>
      </aside>
-    </div>
+    </section>
    </section>
 
-   <section id="captureScreen" class="capture-screen hidden">
+   <section id="captureScreen" class="capture-screen hidden" aria-live="polite">
     <div class="driver-capture-app">
-     <header class="photo-command-bar capture-header">
+     <header class="capture-header">
       <div>
-       <span class="capture-kicker" data-i18n="captureStep">Capture step</span>
+       <span class="capture-kicker" data-i18n="guidedCapture">Guided capture</span>
        <h2 id="stepTitle">Front</h2>
-       <p id="sessionMeta"></p>
        <small id="stepHelp" class="step-help" data-i18n="placeVehicle">Place the vehicle in frame and press Capture.</small>
       </div>
-      <div class="photo-command-meta">
-       <span id="photoCounter" class="photo-counter">0 / 9</span>
-       <button id="resetSession" class="ghost" type="button" data-i18n="newReport">New report</button>
-      </div>
+      <div class="photo-counter"><span id="currentStepNumber">1</span> / 9</div>
+      <button id="resetSession" type="button" class="ghost" data-i18n="reset">Reset</button>
      </header>
 
-     <div class="photo-progress-rail" aria-label="Inspection photo progress">
-      <span id="stepProgressFill"></span>
-     </div>
+     <div class="photo-progress-rail"><span id="stepProgressFill"></span></div>
+     <p id="sessionMeta" class="session-meta"></p>
 
-     <div class="photo-workspace capture-layout">
-      <section class="photo-stage camera-card">
+     <section class="capture-layout">
+      <article class="camera-card">
        <div class="camera-toolbar">
-        <div id="cameraPickerControl" class="camera-picker-control hidden">
-         <span data-i18n="cameraLens">Camera</span>
-         <select id="cameraPicker" aria-label="Camera lens"></select>
-        </div>
-        <div class="photo-guide-card">
-         <span id="currentStepNumber">01</span>
-         <div>
-          <strong id="photoGuideTitle">Front</strong>
-          <p id="photoGuideText" data-i18n="placeVehicle">Place the vehicle in frame and press Capture.</p>
-         </div>
-        </div>
-       </div>
-
-       <div class="camera-frame photo-camera-frame">
-        <video id="cameraVideo" playsinline autoplay muted></video>
-        <img id="capturedPreview" alt="Captured photo" data-i18n-aria="capturedPhoto" />
-        <div id="cameraEmpty" class="camera-empty">
-         <strong data-i18n="cameraPending">Camera pending</strong>
-         <span data-i18n="allowCamera">Allow camera access to start the inspection.</span>
-        </div>
+        <label id="cameraPickerControl" class="camera-picker-control hidden">
+         <span data-i18n="camera">Camera</span>
+         <select id="cameraPicker"></select>
+        </label>
         <div id="cameraZoomControl" class="camera-zoom-control hidden">
-         <span data-i18n="cameraZoom">Zoom</span>
-         <button id="cameraZoom" class="camera-zoom-slider" type="button" aria-label="Camera zoom">
-          <span id="cameraZoomFill"></span>
+         <span>Zoom</span>
+         <div id="cameraZoom" class="camera-zoom-slider" role="slider" aria-valuemin="1" aria-valuemax="1" aria-valuenow="1" tabindex="0">
+          <b id="cameraZoomFill"></b>
           <i id="cameraZoomThumb"></i>
-         </button>
-         <strong id="cameraZoomValue">1.0x</strong>
+         </div>
+         <strong id="cameraZoomValue">1x</strong>
         </div>
-        <div class="camera-corners" aria-hidden="true"></div>
        </div>
-
+       <div class="camera-frame photo-camera-frame">
+        <video id="cameraVideo" autoplay playsinline muted></video>
+        <img id="capturedPreview" class="hidden" alt="Captured inspection preview" />
+        <div id="cameraEmpty" class="camera-empty"><strong data-i18n="cameraPending">Camera pending</strong><span data-i18n="allowCamera">Allow camera access to continue.</span></div>
+       </div>
+       <div class="photo-guide-card">
+        <span id="photoGuideStep">01</span>
+        <div>
+         <strong id="photoGuideTitle">Front</strong>
+         <p id="photoGuideText" data-i18n="placeVehicle">Place the vehicle in frame and press Capture.</p>
+        </div>
+       </div>
        <div class="photo-action-dock">
-        <button id="previousPhoto" class="secondary photo-small-action" type="button" data-i18n="previousPhoto">Back</button>
-        <button id="capturePhoto" class="photo-main-action" type="button" data-i18n="capture">Capture</button>
-        <button id="retakePhoto" class="secondary photo-small-action hidden" type="button" data-i18n="retakePhoto">Retake</button>
-        <button id="zoomPhoto" class="secondary photo-small-action hidden" type="button" data-i18n="zoomPhoto">Zoom</button>
+        <button id="previousPhoto" type="button" class="photo-small-action" data-i18n="back">Back</button>
+        <button id="retakePhoto" type="button" class="photo-small-action hidden" data-i18n="retake">Retake</button>
+        <button id="capturePhoto" type="button" data-i18n="capture">Capture</button>
+        <button id="zoomPhoto" type="button" class="photo-small-action hidden" data-i18n="zoom">Zoom</button>
        </div>
-      </section>
+      </article>
 
-      <aside class="photo-control-panel inspection-drawer">
-       <div class="photo-panel-card session-summary">
-        <span>Vehículo</span>
+      <aside class="inspection-drawer">
+       <article class="session-card">
+        <span data-i18n="vehicle">Vehicle</span>
         <strong id="photoSessionVehicle">--</strong>
         <small id="photoSessionDriver">--</small>
-       </div>
-
-       <div class="photo-panel-card steps-card">
-        <div class="driver-panel-header">
-         <strong data-i18n="guidedViews">Guided views</strong>
-         <span data-i18n="dailyInspection">Daily vehicle inspection</span>
+       </article>
+       <article class="progress-card">
+        <h3 data-i18n="guidedViews">Guided views</h3>
+        <span data-i18n="dailyInspection">Daily vehicle inspection</span>
+        <div id="progressList" class="progress-list"></div>
+       </article>
+       <article class="photo-sync-card">
+        <div>
+         <span data-i18n="photoQuality">Photo quality</span>
+         <strong id="qualityStatus" data-i18n="waiting">Waiting</strong>
         </div>
-        <div id="progressList" class="progress-list photo-step-list"></div>
-       </div>
-
-       <div class="status-grid">
-        <div class="photo-panel-card photo-status-card">
-         <strong data-i18n="inspectionStatus">Inspection status</strong>
-         <p id="aiStatus" data-i18n="aiInitial">Capture all views to save and review the inspection.</p>
+        <div>
+         <span data-i18n="aiDamageDetection">AI damage detection</span>
+         <strong id="aiStatus" data-i18n="readyAfterSave">Ready after save</strong>
         </div>
-        <div class="photo-panel-card photo-quality-card">
-         <strong data-i18n="photoQuality">Photo quality</strong>
-         <p id="qualityStatus" data-i18n="qualityWaiting">Waiting for the first photo.</p>
+        <div>
+         <span data-i18n="syncStatus">Sync status</span>
+         <strong id="syncStatus" data-i18n="online">Online</strong>
         </div>
-        <div class="photo-panel-card photo-sync-card">
-         <strong data-i18n="syncStatus">Sync status</strong>
-         <p id="syncStatus" data-i18n="syncReady">Ready to save online.</p>
-         <button id="retryPending" class="secondary hidden" type="button" data-i18n="retryPending">Retry pending uploads</button>
-        </div>
-       </div>
-
-       <label class="photo-panel-card notes-field photo-notes-card">
-        <span data-i18n="driverNotes">Driver notes</span>
-        <textarea id="driverNotes" placeholder="Visible damage, incidents, mileage..." data-i18n-placeholder="notesPlaceholder"></textarea>
-       </label>
+        <button id="retryPending" type="button" class="ghost hidden" data-i18n="retryPending">Retry pending uploads</button>
+       </article>
       </aside>
-     </div>
+     </section>
     </div>
    </section>
   </main>
@@ -224,8 +203,9 @@
 
   <div id="saveToast" class="save-toast hidden" role="status" aria-live="polite"></div>
 
-  <script src="/i18n.js?v=74"></script>
-  <script src="/vehicles.js?v=74"></script>
-  <script src="/app.js?v=74"></script>
+  <script src="/i18n.js?v=76"></script>
+  <script src="/vehicles.js?v=76"></script>
+  <script src="/app.js?v=76"></script>
+  <script src="/driver-vehicles-fallback-v76.js?v=76"></script>
  </body>
 </html>
