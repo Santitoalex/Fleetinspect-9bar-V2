@@ -56,9 +56,125 @@ adminJs = adminJs.replace(
   /function renderSiteOverview\(\) \{[\s\S]*?\n\}\n\nfunction renderOperationsBoard/,
   `${siteOverviewRenderer}\n\nfunction renderOperationsBoard`
 );
+
+const fleetVehicleRenderer = [
+  "function renderFleetVehicles() {",
+  "  if (!nodes.fleetVehicleList) return;",
+  "  const query = normalizePlate(nodes.fleetVehicleSearch?.value || \"\");",
+  "  const vehicles = fleetVehicles",
+  "    .map((vehicle) => ({",
+  "      plate: normalizeFleetVehiclePlate(vehicle.plate || vehicle),",
+  "      site: normalizeSite(vehicle.site || \"all\"),",
+  "      active: vehicle.active !== false,",
+  "    }))",
+  "    .filter((vehicle) => vehicle.plate && vehicle.active)",
+  "    .filter((vehicle) => !query || normalizePlate(vehicle.plate).includes(query))",
+  "    .sort((a, b) => a.plate.localeCompare(b.plate));",
+  "",
+  "  const activeTotal = fleetVehicles.filter((vehicle) => (vehicle.active !== false) && normalizeFleetVehiclePlate(vehicle.plate || vehicle)).length;",
+  "  if (nodes.fleetVehicleCount) nodes.fleetVehicleCount.textContent = String(query ? vehicles.length : activeTotal);",
+  "",
+  "  if (!vehicles.length) {",
+  "    nodes.fleetVehicleList.innerHTML = `<article class=\"empty-state\">No hay vehículos para este filtro.</article>`;",
+  "    return;",
+  "  }",
+  "",
+  "  const canEdit = canEditOperations();",
+  "  nodes.fleetVehicleList.innerHTML = vehicles.map((vehicle) => `",
+  "    <article class=\"fleet-vehicle-row\">",
+  "      <div>",
+  "        <strong>${escapeHtml(vehicle.plate)}</strong>",
+  "        <span>${escapeHtml(vehicle.site === \"all\" ? \"DRP3 + DSU1\" : siteLabel(vehicle.site))}</span>",
+  "      </div>",
+  "      <button type=\"button\" data-remove-fleet-vehicle=\"${escapeHtml(vehicle.plate)}\" ${canEdit ? \"\" : \"disabled\"}>Quitar</button>",
+  "    </article>",
+  "  `).join(\"\");",
+  "}",
+].join("\n");
+
+adminJs = adminJs.replace(
+  /function renderFleetVehicles\(\) \{[\s\S]*?\n\}\n\nasync function addFleetVehicle/,
+  `${fleetVehicleRenderer}\n\nasync function addFleetVehicle`
+);
+
+adminJs = adminJs.replace(
+  /    renderFleetVehicles\(\);\n  \} catch \(error\) \{/,
+  "    renderFleetVehicles();\n    renderDailyVehicleControl();\n  } catch (error) {"
+);
+
+const fleetVehicleActionHandler = [
+  "async function handleFleetVehicleAction(event) {",
+  "  const button = event.target.closest(\"[data-remove-fleet-vehicle]\");",
+  "  if (!button) return;",
+  "  if (!canEditOperations()) {",
+  "    alert(t(\"readonlyMode\"));",
+  "    return;",
+  "  }",
+  "",
+  "  const plate = button.dataset.removeFleetVehicle;",
+  "  if (!confirm(`Quitar ${plate} de la app del conductor?`)) return;",
+  "",
+  "  button.disabled = true;",
+  "  try {",
+  "    const response = await fetch(`/api/admin/vehicles/${encodeURIComponent(plate)}`, { method: \"DELETE\" });",
+  "    const result = await response.json();",
+  "    if (!response.ok || result.ok === false) throw new Error(result.error || \"No se pudo quitar el vehiculo.\");",
+  "    fleetVehicles = result.vehicles || [];",
+  "    renderFleetVehicles();",
+  "    renderDailyVehicleControl();",
+  "  } catch (error) {",
+  "    alert(error.message || \"No se pudo quitar el vehiculo.\");",
+  "    button.disabled = false;",
+  "  }",
+  "}",
+].join("\n");
+
+adminJs = adminJs.replace(
+  /async function handleFleetVehicleAction\(event\) \{[\s\S]*?\n\}\n\nfunction normalizeFleetVehiclePlate/,
+  `${fleetVehicleActionHandler}\n\nfunction normalizeFleetVehiclePlate`
+);
 await fs.writeFile(adminPath, adminJs);
 
 let adminHtml = await fs.readFile(adminHtmlPath, "utf8");
+const fleetVehicleManagementHtml = `        <article id="fleetVehicleManagement" class="dashboard-widget wide-widget fleet-vehicle-widget">
+         <header>
+          <div>
+           <h3>Gestión de flota driver</h3>
+           <span>Lista real de matrículas visibles en la app del conductor.</span>
+          </div>
+          <div class="fleet-vehicle-total">
+           <small>Activos</small>
+           <strong id="fleetVehicleCount">0</strong>
+          </div>
+         </header>
+         <div class="fleet-vehicle-tools">
+          <label>
+           <span>Site para nuevo vehículo</span>
+           <select id="fleetVehicleSite">
+            <option value="all">DRP3 + DSU1</option>
+            <option value="DRP3">DRP3</option>
+            <option value="DSU1">DSU1</option>
+           </select>
+          </label>
+          <label>
+           <span>Matrícula</span>
+           <input id="fleetVehiclePlate" type="text" placeholder="M AZ 1003" autocomplete="off" />
+          </label>
+          <button id="addFleetVehicle" type="button">Añadir</button>
+          <label>
+           <span>Buscar</span>
+           <input id="fleetVehicleSearch" type="search" placeholder="Buscar matrícula" autocomplete="off" />
+          </label>
+         </div>
+         <p class="fleet-vehicle-note">Los cambios se guardan en Supabase y se reflejan en el selector de vehículos del driver.</p>
+         <div id="fleetVehicleList" class="fleet-vehicle-list"></div>
+        </article>`;
+
+adminHtml = adminHtml.replace(
+  /        <article id="fleetVehicleManagement"[\s\S]*?\n        <\/article>\n\n        <article class="dashboard-widget status-widget">/,
+  `${fleetVehicleManagementHtml}\n\n        <article class="dashboard-widget status-widget">`
+);
+
 const cleanCss = `
   <style id="admin-clean-v77-styles">
    .admin-body.admin-clean-v77 { --v77-bg:#f4f7fb; --v77-panel:#fff; --v77-line:#d9e4ef; --v77-text:#0f172a; --v77-muted:#64748b; background:var(--v77-bg)!important; color:var(--v77-text)!important; font-size:12px!important; }
@@ -109,15 +225,28 @@ const cleanCss = `
    .admin-body.admin-clean-v77 .site-empty-line { color:var(--v77-muted)!important; font-size:11px!important; font-weight:700!important; }
    .admin-body.admin-clean-v77 .operations-board { display:none!important; }
    .admin-body.admin-clean-v77 .dashboard-card-grid { grid-template-columns:minmax(340px,.82fr) minmax(520px,1.18fr)!important; gap:8px!important; }
-   .admin-body.admin-clean-v77 .fleet-vehicle-widget { order:0!important; grid-column:1 / -1!important; }
-   .admin-body.admin-clean-v77 .fleet-vehicle-tools { grid-template-columns:150px 180px 130px minmax(200px,1fr)!important; gap:7px!important; margin:0 0 8px!important; padding:8px!important; }
+   .admin-body.admin-clean-v77 .fleet-vehicle-widget { order:0!important; grid-column:1 / -1!important; overflow:hidden!important; }
+   .admin-body.admin-clean-v77 .fleet-vehicle-widget > header { min-height:42px!important; padding:8px 10px!important; border-bottom:1px solid var(--v77-line)!important; }
+   .admin-body.admin-clean-v77 .fleet-vehicle-widget h3 { font-size:17px!important; line-height:1.05!important; }
+   .admin-body.admin-clean-v77 .fleet-vehicle-total { display:grid!important; justify-items:end!important; gap:1px!important; min-width:74px!important; }
+   .admin-body.admin-clean-v77 .fleet-vehicle-total small { color:var(--v77-muted)!important; font-size:9px!important; text-transform:uppercase!important; font-weight:800!important; }
+   .admin-body.admin-clean-v77 .fleet-vehicle-total strong { color:#0b2447!important; font-size:24px!important; line-height:1!important; }
+   .admin-body.admin-clean-v77 .fleet-vehicle-tools { display:grid!important; grid-template-columns:170px 190px 94px minmax(220px,1fr)!important; align-items:end!important; gap:7px!important; margin:0!important; padding:8px 10px!important; border-bottom:1px solid #edf2f7!important; background:#f8fbff!important; }
+   .admin-body.admin-clean-v77 .fleet-vehicle-tools label { display:grid!important; gap:3px!important; margin:0!important; }
+   .admin-body.admin-clean-v77 .fleet-vehicle-tools span { color:var(--v77-muted)!important; font-size:9px!important; text-transform:uppercase!important; font-weight:900!important; }
    .admin-body.admin-clean-v77 .fleet-vehicle-tools input,
    .admin-body.admin-clean-v77 .fleet-vehicle-tools select,
-   .admin-body.admin-clean-v77 .fleet-vehicle-tools button { min-height:32px!important; border-radius:7px!important; font-size:12px!important; }
-   .admin-body.admin-clean-v77 .fleet-vehicle-list { grid-template-columns:repeat(auto-fill,minmax(150px,1fr))!important; max-height:170px!important; gap:5px!important; padding:0 8px 8px!important; }
-   .admin-body.admin-clean-v77 .fleet-vehicle-row { min-height:36px!important; padding:5px 6px!important; border-radius:7px!important; }
-   .admin-body.admin-clean-v77 .fleet-vehicle-row strong { font-size:12px!important; }
-   .admin-body.admin-clean-v77 .fleet-vehicle-row button { min-height:26px!important; padding:0 8px!important; font-size:11px!important; }
+   .admin-body.admin-clean-v77 .fleet-vehicle-tools button { width:100%!important; min-height:30px!important; border-radius:7px!important; font-size:12px!important; }
+   .admin-body.admin-clean-v77 .fleet-vehicle-tools button { background:#0b4f8a!important; border-color:#0b4f8a!important; color:#fff!important; font-weight:900!important; }
+   .admin-body.admin-clean-v77 .fleet-vehicle-note { margin:0!important; padding:6px 10px!important; border-bottom:1px solid #edf2f7!important; color:var(--v77-muted)!important; font-size:11px!important; font-weight:700!important; }
+   .admin-body.admin-clean-v77 .fleet-vehicle-list { display:grid!important; grid-template-columns:repeat(auto-fill,minmax(190px,1fr))!important; max-height:236px!important; overflow:auto!important; gap:4px!important; padding:8px 10px 10px!important; }
+   .admin-body.admin-clean-v77 .fleet-vehicle-row { display:grid!important; grid-template-columns:minmax(0,1fr) 62px!important; align-items:center!important; min-height:34px!important; gap:6px!important; padding:4px 5px 4px 8px!important; border:1px solid #e5edf5!important; border-radius:7px!important; background:#fff!important; }
+   .admin-body.admin-clean-v77 .fleet-vehicle-row div { min-width:0!important; }
+   .admin-body.admin-clean-v77 .fleet-vehicle-row strong,
+   .admin-body.admin-clean-v77 .fleet-vehicle-row span { display:block!important; overflow:hidden!important; text-overflow:ellipsis!important; white-space:nowrap!important; }
+   .admin-body.admin-clean-v77 .fleet-vehicle-row strong { color:#0f172a!important; font-size:12px!important; font-weight:900!important; }
+   .admin-body.admin-clean-v77 .fleet-vehicle-row span { color:var(--v77-muted)!important; font-size:10px!important; font-weight:700!important; }
+   .admin-body.admin-clean-v77 .fleet-vehicle-row button { min-height:25px!important; padding:0 7px!important; border-radius:6px!important; border:1px solid #fecaca!important; background:#fff7f7!important; color:#b42318!important; font-size:10px!important; font-weight:900!important; }
    .admin-body.admin-clean-v77 .report-list,
    .admin-body.admin-clean-v77 .vehicle-summary,
    .admin-body.admin-clean-v77 .alert-list,
@@ -148,7 +277,9 @@ const cleanCss = `
   </style>
 `;
 
-if (!adminHtml.includes("admin-clean-v77-styles")) {
+if (adminHtml.includes('id="admin-clean-v77-styles"')) {
+  adminHtml = adminHtml.replace(/  <style id="admin-clean-v77-styles">[\s\S]*?<\/style>/, cleanCss.trimEnd());
+} else {
   adminHtml = adminHtml.replace("\n </head>", `${cleanCss}\n </head>`);
 }
 
@@ -159,11 +290,15 @@ adminHtml = adminHtml.replace(/<body class="([^"]*)"/, (_match, className) => {
 adminHtml = adminHtml
   .replaceAll("/styles.css?v=54", "/styles.css?v=77")
   .replaceAll("/styles.css?v=75", "/styles.css?v=77")
+  .replaceAll("/styles.css?v=77", "/styles.css?v=78")
   .replaceAll("/vehicles.js?v=54", "/vehicles.js?v=77")
   .replaceAll("/vehicles.js?v=75", "/vehicles.js?v=77")
+  .replaceAll("/vehicles.js?v=77", "/vehicles.js?v=78")
   .replaceAll("/i18n.js?v=54", "/i18n.js?v=77")
   .replaceAll("/i18n.js?v=75", "/i18n.js?v=77")
+  .replaceAll("/i18n.js?v=77", "/i18n.js?v=78")
   .replaceAll("/admin.js?v=54", "/admin.js?v=77")
-  .replaceAll("/admin.js?v=75", "/admin.js?v=77");
+  .replaceAll("/admin.js?v=75", "/admin.js?v=77")
+  .replaceAll("/admin.js?v=77", "/admin.js?v=78");
 
 await fs.writeFile(adminHtmlPath, adminHtml);
