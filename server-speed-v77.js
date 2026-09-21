@@ -3,10 +3,72 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 
 const root = process.cwd();
+const appPath = path.join(root, "app.js");
 const adminPath = path.join(root, "admin.js");
 const adminHtmlPath = path.join(root, "admin.html");
 
 await import(pathToFileURL(path.join(root, "server-speed-v75.js")).href);
+
+let appJs = await fs.readFile(appPath, "utf8");
+const strongerStartState = [
+  "function updateStartFormState(showErrors = false) {",
+  "  const site = normalizeSite(nodes.siteSelect?.value);",
+  "  const driverName = nodes.driverName?.value.trim();",
+  "  const plate = normalizePlate(nodes.vehiclePlate?.value);",
+  "  const ready = Boolean(site && driverName && plate);",
+  "",
+  "  if (nodes.startPhotosButton) {",
+  "    nodes.startPhotosButton.disabled = !ready;",
+  "    nodes.startPhotosButton.setAttribute(\"aria-disabled\", String(!ready));",
+  "    nodes.startPhotosButton.classList.toggle(\"is-ready\", ready);",
+  "  }",
+  "",
+  "  const siteLabel = nodes.siteSelect?.closest(\"label\");",
+  "  siteLabel?.classList.toggle(\"field-invalid\", Boolean(showErrors && !site));",
+  "  if (nodes.siteError) {",
+  "    nodes.siteError.textContent = showErrors && !site ? siteRequiredMessage() : \"\";",
+  "  }",
+  "}",
+].join("\n");
+
+appJs = appJs.replace(
+  /function updateStartFormState\(showErrors = false\) \{[\s\S]*?\n\}\n\nfunction siteRequiredMessage/,
+  `${strongerStartState}\n\nfunction siteRequiredMessage`
+);
+
+if (!appJs.includes("fleetinspect:force-start-state")) {
+  appJs = appJs.replace(
+    "  bindEvents();\n  updateStartFormState();",
+    [
+      "  bindEvents();",
+      "  updateStartFormState();",
+      "  window.setTimeout(updateStartFormState, 150);",
+      "  window.setTimeout(updateStartFormState, 600);",
+      "  window.setTimeout(updateStartFormState, 1500);",
+      "  document.addEventListener(\"click\", () => window.setTimeout(updateStartFormState, 0));",
+      "  document.addEventListener(\"touchend\", () => window.setTimeout(updateStartFormState, 0));",
+      "  window.addEventListener(\"fleetinspect:force-start-state\", () => updateStartFormState());",
+    ].join("\n")
+  );
+}
+
+appJs = appJs.replace(
+  "    renderVehicleOptions(fleetVehicles, previousValue);\n    updateStartFormState();",
+  "    renderVehicleOptions(fleetVehicles, previousValue);\n    updateStartFormState();\n    window.setTimeout(updateStartFormState, 0);"
+);
+
+appJs = appJs.replace(
+  "  if (normalizedPrevious && uniqueVehicles.includes(normalizedPrevious)) {\n    nodes.vehiclePlate.value = normalizedPrevious;\n  }\n}",
+  [
+    "  if (normalizedPrevious && uniqueVehicles.includes(normalizedPrevious)) {",
+    "    nodes.vehiclePlate.value = normalizedPrevious;",
+    "  }",
+    "  window.setTimeout(() => window.dispatchEvent(new Event(\"fleetinspect:force-start-state\")), 0);",
+    "}",
+  ].join("\n")
+);
+
+await fs.writeFile(appPath, appJs);
 
 let adminJs = await fs.readFile(adminPath, "utf8");
 const siteOverviewRenderer = [
@@ -395,3 +457,21 @@ adminHtml = adminHtml
 adminHtml = adminHtml.replaceAll("/admin.js?v=78", "/admin.js?v=79");
 
 await fs.writeFile(adminHtmlPath, adminHtml);
+
+let indexHtml = await fs.readFile(path.join(root, "index.html"), "utf8");
+indexHtml = indexHtml
+  .replaceAll("/styles.css?v=76", "/styles.css?v=80")
+  .replaceAll("/driver-v74.css?v=76", "/driver-v74.css?v=80")
+  .replaceAll("/i18n.js?v=76", "/i18n.js?v=80")
+  .replaceAll("/vehicles.js?v=76", "/vehicles.js?v=80")
+  .replaceAll("/app.js?v=76", "/app.js?v=80")
+  .replaceAll("/driver-vehicles-fallback-v76.js?v=76", "/driver-vehicles-fallback-v76.js?v=80");
+await fs.writeFile(path.join(root, "index.html"), indexHtml);
+
+let serviceWorker = await fs.readFile(path.join(root, "service-worker.js"), "utf8");
+serviceWorker = serviceWorker
+  .replaceAll("fleetinspect-driver-v75", "fleetinspect-driver-v80")
+  .replaceAll("/driver-v74.css?v=75", "/driver-v74.css?v=80")
+  .replaceAll("/app.js?v=75", "/app.js?v=80")
+  .replaceAll("/vehicles.js?v=75", "/vehicles.js?v=80");
+await fs.writeFile(path.join(root, "service-worker.js"), serviceWorker);
