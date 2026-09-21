@@ -18,8 +18,9 @@ const strongerStartState = [
   "  const ready = Boolean(site && driverName && plate);",
   "",
   "  if (nodes.startPhotosButton) {",
-  "    nodes.startPhotosButton.disabled = !ready;",
-  "    nodes.startPhotosButton.setAttribute(\"aria-disabled\", String(!ready));",
+  "    nodes.startPhotosButton.disabled = false;",
+  "    nodes.startPhotosButton.removeAttribute(\"disabled\");",
+  "    nodes.startPhotosButton.setAttribute(\"aria-disabled\", \"false\");",
   "    nodes.startPhotosButton.classList.toggle(\"is-ready\", ready);",
   "  }",
   "",
@@ -51,6 +52,16 @@ if (!appJs.includes("fleetinspect:force-start-state")) {
     ].join("\n")
   );
 }
+
+appJs = appJs.replace(
+  "  nodes.startPhotosButton.disabled = !ready;",
+  "  nodes.startPhotosButton.disabled = false;"
+);
+
+appJs = appJs.replace(
+  "  nodes.startPhotosButton.setAttribute(\"aria-disabled\", String(!ready));",
+  "  nodes.startPhotosButton.setAttribute(\"aria-disabled\", \"false\");\n    nodes.startPhotosButton.removeAttribute(\"disabled\");"
+);
 
 appJs = appJs.replace(
   "    renderVehicleOptions(fleetVehicles, previousValue);\n    updateStartFormState();",
@@ -460,18 +471,29 @@ await fs.writeFile(adminHtmlPath, adminHtml);
 
 let indexHtml = await fs.readFile(path.join(root, "index.html"), "utf8");
 indexHtml = indexHtml
+  .replace(" data-i18n=\"startPhotos\" disabled>Start photos</button>", " data-i18n=\"startPhotos\">Start photos</button>")
   .replaceAll("/styles.css?v=76", "/styles.css?v=80")
   .replaceAll("/driver-v74.css?v=76", "/driver-v74.css?v=80")
   .replaceAll("/i18n.js?v=76", "/i18n.js?v=80")
   .replaceAll("/vehicles.js?v=76", "/vehicles.js?v=80")
   .replaceAll("/app.js?v=76", "/app.js?v=80")
-  .replaceAll("/driver-vehicles-fallback-v76.js?v=76", "/driver-vehicles-fallback-v76.js?v=80");
+  .replaceAll("/driver-vehicles-fallback-v76.js?v=76", "/driver-vehicles-fallback-v76.js?v=80")
+  .replaceAll("/styles.css?v=80", "/styles.css?v=81")
+  .replaceAll("/driver-v74.css?v=80", "/driver-v74.css?v=81")
+  .replaceAll("/i18n.js?v=80", "/i18n.js?v=81")
+  .replaceAll("/vehicles.js?v=80", "/vehicles.js?v=81")
+  .replaceAll("/app.js?v=80", "/app.js?v=81")
+  .replaceAll("/driver-vehicles-fallback-v76.js?v=80", "/driver-vehicles-fallback-v76.js?v=81");
 await fs.writeFile(path.join(root, "index.html"), indexHtml);
 
 let serviceWorker = await fs.readFile(path.join(root, "service-worker.js"), "utf8");
 serviceWorker = serviceWorker
   .replaceAll("fleetinspect-driver-v75", "fleetinspect-driver-v80")
+  .replaceAll("fleetinspect-driver-v80", "fleetinspect-driver-v81")
   .replaceAll("/driver-v74.css?v=75", "/driver-v74.css?v=80")
   .replaceAll("/app.js?v=75", "/app.js?v=80")
-  .replaceAll("/vehicles.js?v=75", "/vehicles.js?v=80");
+  .replaceAll("/vehicles.js?v=75", "/vehicles.js?v=80")
+  .replaceAll("/driver-v74.css?v=80", "/driver-v74.css?v=81")
+  .replaceAll("/app.js?v=80", "/app.js?v=81")
+  .replaceAll("/vehicles.js?v=80", "/vehicles.js?v=81");
 await fs.writeFile(path.join(root, "service-worker.js"), serviceWorker);
