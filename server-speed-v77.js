@@ -83,6 +83,11 @@ appJs = appJs.replace(
 );
 
 appJs = appJs.replace(
+  '  nodes.photoCounter.textContent = `${completedCount} / ${STEPS.length}`;',
+  '  if (nodes.photoCounter) nodes.photoCounter.textContent = `${completedCount} / ${STEPS.length}`;'
+);
+
+appJs = appJs.replace(
   "    renderVehicleOptions(fleetVehicles, previousValue);\n    updateStartFormState();",
   "    renderVehicleOptions(fleetVehicles, previousValue);\n    updateStartFormState();\n    window.setTimeout(updateStartFormState, 0);"
 );
@@ -508,7 +513,13 @@ indexHtml = indexHtml
   .replaceAll("/i18n.js?v=81", "/i18n.js?v=82")
   .replaceAll("/vehicles.js?v=81", "/vehicles.js?v=82")
   .replaceAll("/app.js?v=81", "/app.js?v=82")
-  .replaceAll("/driver-vehicles-fallback-v76.js?v=81", "/driver-vehicles-fallback-v76.js?v=82");
+  .replaceAll("/driver-vehicles-fallback-v76.js?v=81", "/driver-vehicles-fallback-v76.js?v=82")
+  .replaceAll("/styles.css?v=82", "/styles.css?v=83")
+  .replaceAll("/driver-v74.css?v=82", "/driver-v74.css?v=83")
+  .replaceAll("/i18n.js?v=82", "/i18n.js?v=83")
+  .replaceAll("/vehicles.js?v=82", "/vehicles.js?v=83")
+  .replaceAll("/app.js?v=82", "/app.js?v=83")
+  .replaceAll("/driver-vehicles-fallback-v76.js?v=82", "/driver-vehicles-fallback-v76.js?v=83");
 await fs.writeFile(path.join(root, "index.html"), indexHtml);
 
 let serviceWorker = await fs.readFile(path.join(root, "service-worker.js"), "utf8");
@@ -524,5 +535,9 @@ serviceWorker = serviceWorker
   .replaceAll("fleetinspect-driver-v81", "fleetinspect-driver-v82")
   .replaceAll("/driver-v74.css?v=81", "/driver-v74.css?v=82")
   .replaceAll("/app.js?v=81", "/app.js?v=82")
-  .replaceAll("/vehicles.js?v=81", "/vehicles.js?v=82");
+  .replaceAll("/vehicles.js?v=81", "/vehicles.js?v=82")
+  .replaceAll("fleetinspect-driver-v82", "fleetinspect-driver-v83")
+  .replaceAll("/driver-v74.css?v=82", "/driver-v74.css?v=83")
+  .replaceAll("/app.js?v=82", "/app.js?v=83")
+  .replaceAll("/vehicles.js?v=82", "/vehicles.js?v=83");
 await fs.writeFile(path.join(root, "service-worker.js"), serviceWorker);
