@@ -10,6 +10,25 @@ const adminHtmlPath = path.join(root, "admin.html");
 await import(pathToFileURL(path.join(root, "server-speed-v75.js")).href);
 
 let appJs = await fs.readFile(appPath, "utf8");
+const reliableVehicleOptions = `function renderVehicleOptions(vehicles, previousValue = "") {
+  const uniqueVehicles = [...new Set((vehicles || []).map(normalizePlate).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b));
+  nodes.vehiclePlate.innerHTML = [
+    \`<option value="">\${t("selectRegistration")}</option>\`,
+    ...uniqueVehicles.map((plate) => \`<option value="\${escapeHtml(plate)}">\${escapeHtml(plate)}</option>\`),
+  ].join("");
+  const normalizedPrevious = normalizePlate(previousValue);
+  if (normalizedPrevious && uniqueVehicles.includes(normalizedPrevious)) {
+    nodes.vehiclePlate.value = normalizedPrevious;
+  }
+  window.setTimeout(() => window.dispatchEvent(new Event("fleetinspect:force-start-state")), 0);
+}`;
+
+appJs = appJs.replace(
+  /function renderVehicleOptions\(vehicles, previousValue = ""\) \{[\s\S]*?\n\}\n\nfunction bindEvents/,
+  `${reliableVehicleOptions}\n\nfunction bindEvents`
+);
+
 const strongerStartState = [
   "function updateStartFormState(showErrors = false) {",
   "  const site = normalizeSite(nodes.siteSelect?.value);",
@@ -37,7 +56,7 @@ appJs = appJs.replace(
   `${strongerStartState}\n\nfunction siteRequiredMessage`
 );
 
-if (!appJs.includes("fleetinspect:force-start-state")) {
+if (!appJs.includes('window.addEventListener("fleetinspect:force-start-state"')) {
   appJs = appJs.replace(
     "  bindEvents();\n  updateStartFormState();",
     [
@@ -483,7 +502,13 @@ indexHtml = indexHtml
   .replaceAll("/i18n.js?v=80", "/i18n.js?v=81")
   .replaceAll("/vehicles.js?v=80", "/vehicles.js?v=81")
   .replaceAll("/app.js?v=80", "/app.js?v=81")
-  .replaceAll("/driver-vehicles-fallback-v76.js?v=80", "/driver-vehicles-fallback-v76.js?v=81");
+  .replaceAll("/driver-vehicles-fallback-v76.js?v=80", "/driver-vehicles-fallback-v76.js?v=81")
+  .replaceAll("/styles.css?v=81", "/styles.css?v=82")
+  .replaceAll("/driver-v74.css?v=81", "/driver-v74.css?v=82")
+  .replaceAll("/i18n.js?v=81", "/i18n.js?v=82")
+  .replaceAll("/vehicles.js?v=81", "/vehicles.js?v=82")
+  .replaceAll("/app.js?v=81", "/app.js?v=82")
+  .replaceAll("/driver-vehicles-fallback-v76.js?v=81", "/driver-vehicles-fallback-v76.js?v=82");
 await fs.writeFile(path.join(root, "index.html"), indexHtml);
 
 let serviceWorker = await fs.readFile(path.join(root, "service-worker.js"), "utf8");
@@ -495,5 +520,9 @@ serviceWorker = serviceWorker
   .replaceAll("/vehicles.js?v=75", "/vehicles.js?v=80")
   .replaceAll("/driver-v74.css?v=80", "/driver-v74.css?v=81")
   .replaceAll("/app.js?v=80", "/app.js?v=81")
-  .replaceAll("/vehicles.js?v=80", "/vehicles.js?v=81");
+  .replaceAll("/vehicles.js?v=80", "/vehicles.js?v=81")
+  .replaceAll("fleetinspect-driver-v81", "fleetinspect-driver-v82")
+  .replaceAll("/driver-v74.css?v=81", "/driver-v74.css?v=82")
+  .replaceAll("/app.js?v=81", "/app.js?v=82")
+  .replaceAll("/vehicles.js?v=81", "/vehicles.js?v=82");
 await fs.writeFile(path.join(root, "service-worker.js"), serviceWorker);
