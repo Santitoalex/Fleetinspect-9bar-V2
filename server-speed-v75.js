@@ -425,27 +425,23 @@ if (!adminJs.includes("let fleetVehicles = []")) {
     "admin render fleet"
   );
 
-  adminJs = replaceRequired(
-    adminJs,
-    `  [nodes.saveRoutePlan, nodes.clearRoutePlan, nodes.closeDay].filter(Boolean).forEach((node) => {
-    node.disabled = !canEdit;
-    node.classList.toggle("disabled", !canEdit);
-    node.title = canEdit ? "" : t("readonlyMode");
-  });
-}`,
-    `  [nodes.saveRoutePlan, nodes.clearRoutePlan, nodes.closeDay].filter(Boolean).forEach((node) => {
-    node.disabled = !canEdit;
-    node.classList.toggle("disabled", !canEdit);
-    node.title = canEdit ? "" : t("readonlyMode");
-  });
-  [nodes.fleetVehiclePlate, nodes.fleetVehicleSite, nodes.addFleetVehicle].filter(Boolean).forEach((node) => {
-    node.disabled = !canEdit;
-    node.classList.toggle("disabled", !canEdit);
-    node.title = canEdit ? "" : t("readonlyMode");
-  });
-}`,
-    "admin fleet role ui"
-  );
+  if (!adminJs.includes("[nodes.fleetVehiclePlate, nodes.fleetVehicleSite, nodes.addFleetVehicle]")) {
+    const applyRoleEnd = "\n}\n\nfunction canManageUsers";
+    const applyRoleStart = adminJs.indexOf("function applyRoleUi() {");
+    const applyRoleEndIndex = adminJs.indexOf(applyRoleEnd, applyRoleStart);
+    if (applyRoleStart < 0 || applyRoleEndIndex < 0) {
+      throw new Error("[server-speed-v75] patch not applied: admin fleet role ui");
+    }
+    adminJs = [
+      adminJs.slice(0, applyRoleEndIndex),
+      "\n  [nodes.fleetVehiclePlate, nodes.fleetVehicleSite, nodes.addFleetVehicle].filter(Boolean).forEach((node) => {",
+      "\n    node.disabled = !canEdit;",
+      "\n    node.classList.toggle(\"disabled\", !canEdit);",
+      "\n    node.title = canEdit ? \"\" : t(\"readonlyMode\");",
+      "\n  });",
+      adminJs.slice(applyRoleEndIndex),
+    ].join("");
+  }
 
   adminJs = replaceRequired(
     adminJs,
