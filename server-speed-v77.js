@@ -896,20 +896,19 @@ let adminHtml = await fs.readFile(adminHtmlPath, "utf8");
 const cleanNavHtml = `    <nav class="fleet-nav" aria-label="Admin navigation">
      <section class="nav-group">
       <p>Operación</p>
-      <a class="active" href="/admin" title="Dashboard"><span>▦</span><b data-i18n="dashboard">Dashboard</b><small>Resumen diario</small></a>
-      <a href="#siteOverview" title="Sites"><span>◇</span><b>Sites</b><small>DRP3 / DSU1</small></a>
-      <a href="#dailyVehicleControl" title="Historial"><span>◫</span><b>Historial</b><small>Vehículos inspeccionados</small></a>
+      <a class="active" href="#overview" data-admin-view-target="overview" title="Resumen"><span>⌂</span><b>Resumen</b><small>Actividad de hoy</small></a>
+      <a href="#inspections" data-admin-view-target="inspections" title="Inspecciones"><span>▦</span><b>Inspecciones</b><small>Control e historial</small></a>
+      <a href="#alerts" data-admin-view-target="alerts" title="Alertas IA"><span>△</span><b data-i18n="aiAlerts">Alertas IA</b><small>Revisión prioritaria</small></a>
      </section>
      <section class="nav-group">
       <p>Gestión</p>
-      <a href="#fleetVehicleManagement" title="Flota driver"><span>▤</span><b>Flota driver</b><small>Añadir o quitar</small></a>
-      <a href="#vehicleSummary" title="Vehículos"><span>◉</span><b data-i18n="vehicles">Vehículos</b><small>Por matrícula</small></a>
-      <a id="userManagementNav" class="hidden" href="#userManagement" title="Usuarios"><span>◎</span><b data-i18n="userManagement">Usuarios</b><small>Roles y permisos</small></a>
+      <a href="#fleet" data-admin-view-target="fleet" title="Flota driver"><span>▤</span><b>Flota driver</b><small>Añadir o quitar</small></a>
+      <a id="userManagementNav" class="hidden" href="#users" data-admin-view-target="users" title="Usuarios"><span>◎</span><b data-i18n="userManagement">Usuarios</b><small>Roles y permisos</small></a>
      </section>
      <section class="nav-group">
-      <p>Reportes</p>
-      <a href="#alertList" title="IA"><span>△</span><b data-i18n="aiAlerts">Alertas IA</b><small>Prioridad</small></a>
-      <a href="#reportList" title="Reportes"><span>▧</span><b data-i18n="reports">Reportes</b><small>PDF y exportación</small></a>
+      <p>Administración</p>
+      <a href="#reports" data-admin-view-target="reports" title="Reportes"><span>▧</span><b data-i18n="reports">Reportes</b><small>PDF y exportación</small></a>
+      <a href="#system" data-admin-view-target="system" title="Sistema"><span>◉</span><b>Sistema</b><small>Estado y actividad</small></a>
      </section>
     </nav>`;
 
@@ -959,21 +958,105 @@ adminHtml = adminHtml.replace(
 
 const sidebarScript = `  <script id="admin-sidebar-toggle">
    (() => {
+    const viewContent = {
+     overview: [".admin-filter-panel", ".control-room-strip", "#siteOverview", ".metrics"],
+     inspections: ["#dailyVehicleControl", "#vehicleSummary", "#vehicleHistoryPlate"],
+     fleet: ["#fleetVehicleManagement"],
+     alerts: [".admin-filter-panel", "#alertList", "#aiStatusSummary"],
+     users: ["#userManagement"],
+     reports: [".admin-filter-panel", "#reportList"],
+     system: ["#systemStatus", "#driverSummary", "#recentActivity", "#auditWidget"],
+    };
+    const viewTitles = {
+     overview: ["Resumen operativo", "Estado de la flota y actividad de hoy"],
+     inspections: ["Inspecciones", "Control diario e historial por vehículo"],
+     fleet: ["Flota del conductor", "Vehículos disponibles en la app driver"],
+     alerts: ["Alertas IA", "Inspecciones que necesitan revisión"],
+     users: ["Usuarios y permisos", "Accesos del equipo de operaciones"],
+     reports: ["Reportes", "Consulta, exportación y cierre diario"],
+     system: ["Estado del sistema", "Servicios, actividad y sincronización"],
+    };
+
     const applySidebarState = () => {
-     const isOpen = localStorage.getItem("fleetinspect_admin_sidebar") === "open";
+     const stored = localStorage.getItem("fleetinspect_admin_sidebar");
+     const isOpen = stored !== "closed";
      document.body.classList.toggle("admin-sidebar-open", isOpen);
      document.querySelector(".menu-button")?.setAttribute("aria-expanded", String(isOpen));
     };
 
+    const markViewElements = () => {
+     Object.entries(viewContent).forEach(([view, selectors]) => {
+      selectors.forEach((selector) => {
+       document.querySelectorAll(selector).forEach((node) => {
+        const target = node.matches(".dashboard-widget, .admin-filter-panel, .control-room-strip, .site-overview-grid, .metrics")
+         ? node
+         : node.closest(".dashboard-widget");
+        if (target) {
+         const views = new Set(String(target.dataset.adminView || "").split(" ").filter(Boolean));
+         views.add(view);
+         target.dataset.adminView = [...views].join(" ");
+        }
+       });
+      });
+     });
+    };
+
+    const activateView = (requestedView, updateHash = true) => {
+     const view = viewTitles[requestedView] ? requestedView : "overview";
+     document.body.dataset.adminView = view;
+     document.querySelectorAll("[data-admin-view]").forEach((node) => {
+      const views = String(node.dataset.adminView || "").split(" ");
+      node.classList.toggle("admin-view-hidden", !views.includes(view));
+     });
+     document.querySelectorAll("[data-admin-view-target]").forEach((link) => {
+      const active = link.dataset.adminViewTarget === view;
+      link.classList.toggle("active", active);
+      if (active) link.setAttribute("aria-current", "page");
+      else link.removeAttribute("aria-current");
+     });
+     const [title, subtitle] = viewTitles[view];
+     const titleNode = document.querySelector(".admin-command-header h2");
+     const subtitleNode = document.querySelector(".admin-command-header .eyebrow");
+     if (titleNode) titleNode.textContent = title;
+     if (subtitleNode) subtitleNode.textContent = subtitle;
+     localStorage.setItem("fleetinspect_admin_view", view);
+     if (updateHash) history.replaceState(null, "", "#" + view);
+     window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
     applySidebarState();
+
+    document.addEventListener("DOMContentLoaded", () => {
+     markViewElements();
+     const hashView = location.hash.replace("#", "");
+     activateView(viewTitles[hashView] ? hashView : (localStorage.getItem("fleetinspect_admin_view") || "overview"), false);
+    });
 
     document.addEventListener("click", (event) => {
      const menuButton = event.target.closest(".menu-button");
-     if (!menuButton) return;
-     const nextOpen = !document.body.classList.contains("admin-sidebar-open");
-     document.body.classList.toggle("admin-sidebar-open", nextOpen);
-     localStorage.setItem("fleetinspect_admin_sidebar", nextOpen ? "open" : "closed");
-     menuButton.setAttribute("aria-expanded", String(nextOpen));
+     if (menuButton) {
+      const nextOpen = !document.body.classList.contains("admin-sidebar-open");
+      document.body.classList.toggle("admin-sidebar-open", nextOpen);
+      localStorage.setItem("fleetinspect_admin_sidebar", nextOpen ? "open" : "closed");
+      menuButton.setAttribute("aria-expanded", String(nextOpen));
+      return;
+     }
+
+     const viewLink = event.target.closest("[data-admin-view-target]");
+     if (viewLink) {
+      event.preventDefault();
+      activateView(viewLink.dataset.adminViewTarget);
+      if (window.innerWidth < 900) {
+       document.body.classList.remove("admin-sidebar-open");
+      }
+      return;
+     }
+
+     const usersLink = event.target.closest("#userManagementTopLink");
+     if (usersLink) {
+      event.preventDefault();
+      activateView("users");
+     }
     });
    })();
   </script>`;
@@ -1129,8 +1212,806 @@ if (adminHtml.includes('id="admin-clean-v77-styles"')) {
   adminHtml = adminHtml.replace("\n </head>", `${cleanCss}\n </head>`);
 }
 
+const organizedCss = `
+  <style id="admin-organized-v89-styles">
+   .admin-body.admin-organized-v89 {
+    --admin-bg:#f4f7fa;
+    --admin-panel:#ffffff;
+    --admin-line:#dbe3eb;
+    --admin-line-soft:#e9eef3;
+    --admin-text:#152033;
+    --admin-muted:#637083;
+    --admin-navy:#0b1724;
+    --admin-navy-soft:#14283a;
+    --admin-blue:#155b91;
+    --admin-orange:#ef8b17;
+    background:var(--admin-bg)!important;
+    color:var(--admin-text)!important;
+    font-size:13px!important;
+   }
+
+   .admin-body.admin-organized-v89 .admin-shell {
+    display:grid!important;
+    grid-template-columns:68px minmax(0,1fr)!important;
+    min-height:100vh!important;
+    transition:grid-template-columns .2s ease!important;
+   }
+
+   .admin-body.admin-organized-v89.admin-sidebar-open .admin-shell {
+    grid-template-columns:248px minmax(0,1fr)!important;
+   }
+
+   .admin-body.admin-organized-v89 .fleet-sidebar {
+    position:sticky!important;
+    top:0!important;
+    z-index:120!important;
+    width:auto!important;
+    height:100vh!important;
+    min-height:100vh!important;
+    padding:14px 10px!important;
+    overflow:hidden auto!important;
+    border:0!important;
+    background:var(--admin-navy)!important;
+    box-shadow:none!important;
+   }
+
+   .admin-body.admin-organized-v89 .fleet-logo {
+    display:grid!important;
+    grid-template-columns:40px minmax(0,1fr)!important;
+    align-items:center!important;
+    gap:11px!important;
+    min-height:46px!important;
+    margin:0 0 20px!important;
+    padding:3px!important;
+    border:0!important;
+    background:transparent!important;
+   }
+
+   .admin-body.admin-organized-v89 .fleet-logo img {
+    width:40px!important;
+    height:40px!important;
+    border-radius:8px!important;
+    background:#fff!important;
+    padding:4px!important;
+    object-fit:contain!important;
+   }
+
+   .admin-body.admin-organized-v89 .fleet-logo p {
+    overflow:hidden!important;
+    max-width:0!important;
+    margin:0!important;
+    color:#fff!important;
+    font-size:14px!important;
+    font-weight:800!important;
+    letter-spacing:0!important;
+    white-space:nowrap!important;
+    opacity:0!important;
+    transition:max-width .2s ease,opacity .15s ease!important;
+   }
+
+   .admin-body.admin-organized-v89.admin-sidebar-open .fleet-logo p {
+    max-width:170px!important;
+    opacity:1!important;
+   }
+
+   .admin-body.admin-organized-v89 .fleet-nav {
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    gap:18px!important;
+    margin:0!important;
+   }
+
+   .admin-body.admin-organized-v89 .nav-group {
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    gap:5px!important;
+    padding:0 0 14px!important;
+    border:0!important;
+    border-bottom:1px solid rgba(255,255,255,.08)!important;
+   }
+
+   .admin-body.admin-organized-v89 .nav-group:last-child {
+    border-bottom:0!important;
+   }
+
+   .admin-body.admin-organized-v89 .nav-group > p {
+    display:block!important;
+    overflow:hidden!important;
+    max-width:0!important;
+    height:15px!important;
+    margin:0 0 4px 50px!important;
+    color:#8092a5!important;
+    font-size:10px!important;
+    font-weight:800!important;
+    letter-spacing:.08em!important;
+    text-transform:uppercase!important;
+    white-space:nowrap!important;
+    opacity:0!important;
+   }
+
+   .admin-body.admin-organized-v89.admin-sidebar-open .nav-group > p {
+    max-width:160px!important;
+    opacity:1!important;
+   }
+
+   .admin-body.admin-organized-v89 .fleet-nav a {
+    display:grid!important;
+    grid-template-columns:40px minmax(0,1fr)!important;
+    grid-template-rows:auto auto!important;
+    align-items:center!important;
+    column-gap:10px!important;
+    width:100%!important;
+    min-height:44px!important;
+    padding:3px!important;
+    border:0!important;
+    border-radius:8px!important;
+    background:transparent!important;
+    color:#aebdca!important;
+    text-decoration:none!important;
+   }
+
+   .admin-body.admin-organized-v89 .fleet-nav a > span {
+    display:grid!important;
+    grid-row:1 / span 2!important;
+    width:40px!important;
+    height:38px!important;
+    place-items:center!important;
+    border:0!important;
+    border-radius:7px!important;
+    background:rgba(255,255,255,.055)!important;
+    color:#cfdae4!important;
+    font-size:17px!important;
+   }
+
+   .admin-body.admin-organized-v89 .fleet-nav a b,
+   .admin-body.admin-organized-v89 .fleet-nav a small {
+    display:block!important;
+    overflow:hidden!important;
+    max-width:0!important;
+    opacity:0!important;
+    white-space:nowrap!important;
+    text-overflow:ellipsis!important;
+   }
+
+   .admin-body.admin-organized-v89 .fleet-nav a b {
+    color:#f8fafc!important;
+    font-size:13px!important;
+    font-weight:800!important;
+    line-height:1.2!important;
+   }
+
+   .admin-body.admin-organized-v89 .fleet-nav a small {
+    margin-top:2px!important;
+    color:#8295a8!important;
+    font-size:10px!important;
+    font-weight:600!important;
+    line-height:1.1!important;
+   }
+
+   .admin-body.admin-organized-v89.admin-sidebar-open .fleet-nav a b,
+   .admin-body.admin-organized-v89.admin-sidebar-open .fleet-nav a small {
+    max-width:165px!important;
+    opacity:1!important;
+   }
+
+   .admin-body.admin-organized-v89 .fleet-nav a:hover {
+    background:rgba(255,255,255,.06)!important;
+   }
+
+   .admin-body.admin-organized-v89 .fleet-nav a.active {
+    background:#17314a!important;
+    color:#fff!important;
+   }
+
+   .admin-body.admin-organized-v89 .fleet-nav a.active > span {
+    background:var(--admin-orange)!important;
+    color:#fff!important;
+    box-shadow:none!important;
+   }
+
+   .admin-body.admin-organized-v89 .admin-workspace {
+    min-width:0!important;
+    background:var(--admin-bg)!important;
+   }
+
+   .admin-body.admin-organized-v89 .fleet-topbar {
+    position:sticky!important;
+    top:0!important;
+    z-index:100!important;
+    display:flex!important;
+    min-height:58px!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    gap:14px!important;
+    padding:8px 18px!important;
+    border:0!important;
+    border-bottom:1px solid var(--admin-line)!important;
+    background:rgba(255,255,255,.97)!important;
+    box-shadow:none!important;
+    backdrop-filter:blur(12px)!important;
+   }
+
+   .admin-body.admin-organized-v89 .topbar-left,
+   .admin-body.admin-organized-v89 .topbar-actions {
+    display:flex!important;
+    align-items:center!important;
+    gap:8px!important;
+   }
+
+   .admin-body.admin-organized-v89 .menu-button {
+    display:grid!important;
+    width:38px!important;
+    height:38px!important;
+    min-height:38px!important;
+    place-items:center!important;
+    padding:0!important;
+    border:1px solid var(--admin-line)!important;
+    border-radius:8px!important;
+    background:#fff!important;
+    color:var(--admin-text)!important;
+    font-size:17px!important;
+   }
+
+   .admin-body.admin-organized-v89 .topbar-company-logo {
+    width:78px!important;
+    height:34px!important;
+    object-fit:contain!important;
+   }
+
+   .admin-body.admin-organized-v89 .global-search {
+    width:min(430px,36vw)!important;
+    min-height:38px!important;
+    border:1px solid var(--admin-line)!important;
+    border-radius:8px!important;
+    background:#f8fafc!important;
+    box-shadow:none!important;
+   }
+
+   .admin-body.admin-organized-v89 .global-search input {
+    font-size:13px!important;
+   }
+
+   .admin-body.admin-organized-v89 .sync-chip,
+   .admin-body.admin-organized-v89 .user-chip,
+   .admin-body.admin-organized-v89 .role-chip,
+   .admin-body.admin-organized-v89 .language-select,
+   .admin-body.admin-organized-v89 .icon-button,
+   .admin-body.admin-organized-v89 .user-admin-link {
+    min-height:34px!important;
+    padding:6px 9px!important;
+    border:1px solid var(--admin-line)!important;
+    border-radius:8px!important;
+    background:#fff!important;
+    color:#24415f!important;
+    font-size:11px!important;
+    font-weight:750!important;
+    box-shadow:none!important;
+   }
+
+   .admin-body.admin-organized-v89 .role-chip {
+    border-color:#fed7aa!important;
+    background:#fff8ed!important;
+    color:#9a3412!important;
+   }
+
+   .admin-body.admin-organized-v89 .dashboard-main {
+    display:block!important;
+    width:100%!important;
+    max-width:1640px!important;
+    margin:0 auto!important;
+    padding:22px 24px 40px!important;
+   }
+
+   .admin-body.admin-organized-v89 .admin-hero {
+    display:none!important;
+   }
+
+   .admin-body.admin-organized-v89 .hero-dashboard {
+    overflow:visible!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+   }
+
+   .admin-body.admin-organized-v89 .admin-command-header {
+    display:flex!important;
+    min-height:64px!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    gap:18px!important;
+    margin:0 0 14px!important;
+    padding:0!important;
+    border:0!important;
+    background:transparent!important;
+   }
+
+   .admin-body.admin-organized-v89 .admin-command-header .eyebrow {
+    margin:0 0 3px!important;
+    color:var(--admin-muted)!important;
+    font-size:12px!important;
+    font-weight:600!important;
+    letter-spacing:0!important;
+    text-transform:none!important;
+   }
+
+   .admin-body.admin-organized-v89 .admin-command-header h2 {
+    margin:0!important;
+    color:var(--admin-text)!important;
+    font-size:26px!important;
+    line-height:1.1!important;
+    letter-spacing:0!important;
+   }
+
+   .admin-body.admin-organized-v89 .dashboard-actions {
+    display:none!important;
+    flex-wrap:wrap!important;
+    justify-content:flex-end!important;
+    gap:7px!important;
+   }
+
+   .admin-body.admin-organized-v89[data-admin-view="reports"] .dashboard-actions {
+    display:flex!important;
+   }
+
+   .admin-body.admin-organized-v89 .dashboard-actions button {
+    min-height:34px!important;
+    padding:6px 10px!important;
+    border:1px solid var(--admin-line)!important;
+    border-radius:7px!important;
+    background:#fff!important;
+    color:var(--admin-text)!important;
+    font-size:11px!important;
+    font-weight:750!important;
+    box-shadow:none!important;
+   }
+
+   .admin-body.admin-organized-v89 .dashboard-actions .strong-action {
+    border-color:var(--admin-orange)!important;
+    background:var(--admin-orange)!important;
+    color:#fff!important;
+   }
+
+   .admin-body.admin-organized-v89 #dashboardContent {
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:14px!important;
+    padding:0!important;
+    background:transparent!important;
+   }
+
+   .admin-body.admin-organized-v89 #dashboardContent.hidden,
+   .admin-body.admin-organized-v89 .dashboard-widget.hidden,
+   .admin-body.admin-organized-v89 .admin-view-hidden {
+    display:none!important;
+   }
+
+   .admin-body.admin-organized-v89 .admin-filter-panel {
+    display:grid!important;
+    grid-template-columns:190px minmax(250px,1fr) 210px 90px!important;
+    gap:0!important;
+    margin:0!important;
+    overflow:hidden!important;
+    border:1px solid var(--admin-line)!important;
+    border-radius:10px!important;
+    background:var(--admin-panel)!important;
+    box-shadow:none!important;
+   }
+
+   .admin-body.admin-organized-v89 .admin-filter-panel > label,
+   .admin-body.admin-organized-v89 .admin-filter-panel > article {
+    min-height:64px!important;
+    padding:10px 12px!important;
+    border:0!important;
+    border-right:1px solid var(--admin-line-soft)!important;
+    border-radius:0!important;
+    background:#fff!important;
+    box-shadow:none!important;
+   }
+
+   .admin-body.admin-organized-v89 .admin-filter-panel > *:last-child {
+    border-right:0!important;
+   }
+
+   .admin-body.admin-organized-v89 .admin-filter-panel span,
+   .admin-body.admin-organized-v89 .control-room-strip span,
+   .admin-body.admin-organized-v89 .metrics span {
+    color:var(--admin-muted)!important;
+    font-size:10px!important;
+    font-weight:800!important;
+    letter-spacing:.03em!important;
+    text-transform:uppercase!important;
+   }
+
+   .admin-body.admin-organized-v89 .admin-filter-panel select {
+    min-height:28px!important;
+    border:0!important;
+    background:transparent!important;
+    padding:0!important;
+    color:var(--admin-text)!important;
+    font-size:13px!important;
+    font-weight:750!important;
+   }
+
+   .admin-body.admin-organized-v89 .admin-filter-panel strong {
+    color:var(--admin-text)!important;
+    font-size:22px!important;
+   }
+
+   .admin-body.admin-organized-v89 .control-room-strip,
+   .admin-body.admin-organized-v89 .metrics {
+    display:grid!important;
+    gap:0!important;
+    margin:0!important;
+    overflow:hidden!important;
+    border:1px solid var(--admin-line)!important;
+    border-radius:10px!important;
+    background:#fff!important;
+   }
+
+   .admin-body.admin-organized-v89 .control-room-strip {
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+   }
+
+   .admin-body.admin-organized-v89 .metrics {
+    grid-template-columns:repeat(5,minmax(0,1fr))!important;
+   }
+
+   .admin-body.admin-organized-v89 .control-room-strip article,
+   .admin-body.admin-organized-v89 .metrics article {
+    min-height:76px!important;
+    padding:13px 15px!important;
+    border:0!important;
+    border-right:1px solid var(--admin-line-soft)!important;
+    border-radius:0!important;
+    background:#fff!important;
+    box-shadow:none!important;
+   }
+
+   .admin-body.admin-organized-v89 .control-room-strip article:last-child,
+   .admin-body.admin-organized-v89 .metrics article:last-child {
+    border-right:0!important;
+   }
+
+   .admin-body.admin-organized-v89 .control-room-strip strong,
+   .admin-body.admin-organized-v89 .metrics strong {
+    margin-top:5px!important;
+    color:var(--admin-text)!important;
+    font-size:25px!important;
+    line-height:1!important;
+   }
+
+   .admin-body.admin-organized-v89 .control-room-strip small {
+    margin-top:5px!important;
+    color:var(--admin-muted)!important;
+    font-size:10px!important;
+   }
+
+   .admin-body.admin-organized-v89 .site-overview-grid {
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:14px!important;
+    margin:0!important;
+   }
+
+   .admin-body.admin-organized-v89 .site-overview-panel {
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    min-height:0!important;
+    padding:0!important;
+    overflow:hidden!important;
+    border:1px solid var(--admin-line)!important;
+    border-radius:10px!important;
+    background:#fff!important;
+    box-shadow:none!important;
+   }
+
+   .admin-body.admin-organized-v89 .site-overview-head {
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    grid-template-rows:auto auto!important;
+    align-items:center!important;
+    min-height:68px!important;
+    padding:12px 15px!important;
+    border:0!important;
+    border-bottom:1px solid var(--admin-line-soft)!important;
+    border-radius:0!important;
+    background:#fff!important;
+    color:var(--admin-text)!important;
+    text-align:left!important;
+   }
+
+   .admin-body.admin-organized-v89 .site-overview-head span {
+    color:var(--admin-text)!important;
+    font-size:14px!important;
+    font-weight:850!important;
+   }
+
+   .admin-body.admin-organized-v89 .site-overview-head strong {
+    grid-row:1 / span 2!important;
+    grid-column:2!important;
+    color:var(--admin-blue)!important;
+    font-size:30px!important;
+    line-height:1!important;
+   }
+
+   .admin-body.admin-organized-v89 .site-overview-head small {
+    color:var(--admin-muted)!important;
+    font-size:10px!important;
+    font-weight:650!important;
+   }
+
+   .admin-body.admin-organized-v89 .site-inspection-table {
+    display:grid!important;
+    align-content:start!important;
+    max-height:248px!important;
+    overflow:auto!important;
+    gap:0!important;
+    padding:0!important;
+   }
+
+   .admin-body.admin-organized-v89 .site-inspection-row {
+    display:grid!important;
+    grid-template-columns:120px minmax(0,1fr) 50px!important;
+    align-items:center!important;
+    gap:10px!important;
+    min-height:38px!important;
+    padding:8px 15px!important;
+    border:0!important;
+    border-bottom:1px solid var(--admin-line-soft)!important;
+    border-radius:0!important;
+    background:#fff!important;
+    color:var(--admin-text)!important;
+    text-decoration:none!important;
+   }
+
+   .admin-body.admin-organized-v89 .site-inspection-row:hover {
+    background:#f7fafc!important;
+   }
+
+   .admin-body.admin-organized-v89 .site-inspection-row strong {
+    color:var(--admin-text)!important;
+    font-size:12px!important;
+    font-weight:850!important;
+   }
+
+   .admin-body.admin-organized-v89 .site-inspection-row span,
+   .admin-body.admin-organized-v89 .site-inspection-row time,
+   .admin-body.admin-organized-v89 .site-empty-line {
+    color:var(--admin-muted)!important;
+    font-size:11px!important;
+    font-weight:650!important;
+   }
+
+   .admin-body.admin-organized-v89 .site-empty-line {
+    margin:0!important;
+    padding:24px 15px!important;
+   }
+
+   .admin-body.admin-organized-v89 .operations-board {
+    display:none!important;
+   }
+
+   .admin-body.admin-organized-v89 .dashboard-card-grid {
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:14px!important;
+    align-items:start!important;
+   }
+
+   .admin-body.admin-organized-v89 .dashboard-widget {
+    overflow:hidden!important;
+    border:1px solid var(--admin-line)!important;
+    border-radius:10px!important;
+    background:#fff!important;
+    box-shadow:none!important;
+   }
+
+   .admin-body.admin-organized-v89 .dashboard-widget.wide-widget,
+   .admin-body.admin-organized-v89 #dailyVehicleControl,
+   .admin-body.admin-organized-v89 #fleetVehicleManagement,
+   .admin-body.admin-organized-v89 #userManagement {
+    grid-column:1 / -1!important;
+   }
+
+   .admin-body.admin-organized-v89 .dashboard-widget > header {
+    display:flex!important;
+    min-height:58px!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    gap:14px!important;
+    padding:12px 15px!important;
+    border:0!important;
+    border-bottom:1px solid var(--admin-line-soft)!important;
+    background:#fff!important;
+   }
+
+   .admin-body.admin-organized-v89 .dashboard-widget h3 {
+    margin:0!important;
+    color:var(--admin-text)!important;
+    font-size:16px!important;
+    line-height:1.2!important;
+   }
+
+   .admin-body.admin-organized-v89 .dashboard-widget header span {
+    margin-top:3px!important;
+    color:var(--admin-muted)!important;
+    font-size:10px!important;
+    font-weight:650!important;
+    letter-spacing:0!important;
+    text-transform:none!important;
+   }
+
+   .admin-body.admin-organized-v89 .primary-widget,
+   .admin-body.admin-organized-v89 .vehicle-control-widget,
+   .admin-body.admin-organized-v89 .fleet-vehicle-widget,
+   .admin-body.admin-organized-v89 .user-management-widget,
+   .admin-body.admin-organized-v89 .status-widget {
+    border-top:1px solid var(--admin-line)!important;
+   }
+
+   .admin-body.admin-organized-v89 .vehicle-control-tools,
+   .admin-body.admin-organized-v89 .fleet-vehicle-tools {
+    display:grid!important;
+    grid-template-columns:170px minmax(210px,1fr) 180px!important;
+    align-items:end!important;
+    gap:8px!important;
+    padding:10px 15px!important;
+    border:0!important;
+    border-bottom:1px solid var(--admin-line-soft)!important;
+    background:#f8fafc!important;
+   }
+
+   .admin-body.admin-organized-v89 .fleet-vehicle-tools {
+    grid-template-columns:170px 190px 90px minmax(220px,1fr)!important;
+   }
+
+   .admin-body.admin-organized-v89 .vehicle-control-tools input,
+   .admin-body.admin-organized-v89 .vehicle-control-tools select,
+   .admin-body.admin-organized-v89 .fleet-vehicle-tools input,
+   .admin-body.admin-organized-v89 .fleet-vehicle-tools select,
+   .admin-body.admin-organized-v89 .fleet-vehicle-tools button {
+    min-height:36px!important;
+    border:1px solid var(--admin-line)!important;
+    border-radius:7px!important;
+    background:#fff!important;
+    color:var(--admin-text)!important;
+    font-size:12px!important;
+    box-shadow:none!important;
+   }
+
+   .admin-body.admin-organized-v89 .fleet-vehicle-tools button {
+    border-color:var(--admin-blue)!important;
+    background:var(--admin-blue)!important;
+    color:#fff!important;
+   }
+
+   .admin-body.admin-organized-v89 .vehicle-control-summary {
+    display:grid!important;
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    gap:0!important;
+    margin:0!important;
+    border-bottom:1px solid var(--admin-line-soft)!important;
+   }
+
+   .admin-body.admin-organized-v89 .vehicle-control-summary article {
+    min-height:62px!important;
+    padding:10px 15px!important;
+    border:0!important;
+    border-right:1px solid var(--admin-line-soft)!important;
+    border-radius:0!important;
+    background:#fff!important;
+   }
+
+   .admin-body.admin-organized-v89 .fleet-vehicle-list {
+    display:grid!important;
+    grid-template-columns:repeat(auto-fill,minmax(220px,1fr))!important;
+    max-height:520px!important;
+    overflow:auto!important;
+    gap:7px!important;
+    padding:12px 15px 15px!important;
+   }
+
+   .admin-body.admin-organized-v89 .fleet-vehicle-row {
+    min-height:44px!important;
+    padding:7px 7px 7px 11px!important;
+    border:1px solid var(--admin-line-soft)!important;
+    border-radius:7px!important;
+    background:#fff!important;
+   }
+
+   .admin-body.admin-organized-v89 .report-list,
+   .admin-body.admin-organized-v89 .vehicle-summary,
+   .admin-body.admin-organized-v89 .alert-list,
+   .admin-body.admin-organized-v89 .vehicle-control-list,
+   .admin-body.admin-organized-v89 .status-list,
+   .admin-body.admin-organized-v89 .driver-summary-list,
+   .admin-body.admin-organized-v89 .activity-list,
+   .admin-body.admin-organized-v89 .dispatcher-list,
+   .admin-body.admin-organized-v89 .vehicle-history-list {
+    max-height:620px!important;
+    padding:10px 12px!important;
+    gap:6px!important;
+   }
+
+   .admin-body.admin-organized-v89 .report-card,
+   .admin-body.admin-organized-v89 .vehicle-tile,
+   .admin-body.admin-organized-v89 .alert-card,
+   .admin-body.admin-organized-v89 .dispatcher-row,
+   .admin-body.admin-organized-v89 .activity-row,
+   .admin-body.admin-organized-v89 .status-row,
+   .admin-body.admin-organized-v89 .vehicle-control-row,
+   .admin-body.admin-organized-v89 .history-row {
+    padding:9px 11px!important;
+    border:1px solid var(--admin-line-soft)!important;
+    border-radius:7px!important;
+    background:#fff!important;
+    box-shadow:none!important;
+   }
+
+   @media (max-width:1100px) {
+    .admin-body.admin-organized-v89 .sync-chip,
+    .admin-body.admin-organized-v89 .user-chip,
+    .admin-body.admin-organized-v89 .user-admin-link { display:none!important; }
+    .admin-body.admin-organized-v89 .admin-filter-panel { grid-template-columns:repeat(2,minmax(0,1fr))!important; }
+    .admin-body.admin-organized-v89 .control-room-strip,
+    .admin-body.admin-organized-v89 .metrics { grid-template-columns:repeat(2,minmax(0,1fr))!important; }
+    .admin-body.admin-organized-v89 .site-overview-grid,
+    .admin-body.admin-organized-v89 .dashboard-card-grid { grid-template-columns:1fr!important; }
+   }
+
+   @media (max-width:900px) {
+    .admin-body.admin-organized-v89 .admin-shell,
+    .admin-body.admin-organized-v89.admin-sidebar-open .admin-shell { display:block!important; }
+    .admin-body.admin-organized-v89 .fleet-sidebar {
+     position:fixed!important;
+     inset:0 auto 0 0!important;
+     width:260px!important;
+     height:100dvh!important;
+     transform:translateX(-105%)!important;
+     transition:transform .2s ease!important;
+     box-shadow:0 24px 60px rgba(2,6,23,.28)!important;
+    }
+    .admin-body.admin-organized-v89.admin-sidebar-open .fleet-sidebar { transform:translateX(0)!important; }
+    .admin-body.admin-organized-v89 .fleet-logo p,
+    .admin-body.admin-organized-v89 .nav-group > p,
+    .admin-body.admin-organized-v89 .fleet-nav a b,
+    .admin-body.admin-organized-v89 .fleet-nav a small { max-width:170px!important; opacity:1!important; }
+    .admin-body.admin-organized-v89 .fleet-nav { grid-template-columns:1fr!important; }
+    .admin-body.admin-organized-v89 .fleet-topbar { padding:8px 12px!important; }
+    .admin-body.admin-organized-v89 .topbar-company-logo { display:none!important; }
+    .admin-body.admin-organized-v89 .global-search { width:min(52vw,420px)!important; }
+    .admin-body.admin-organized-v89 .dashboard-main { padding:16px 12px 32px!important; }
+   }
+
+   @media (max-width:640px) {
+    .admin-body.admin-organized-v89 .fleet-topbar { align-items:flex-start!important; }
+    .admin-body.admin-organized-v89 .topbar-left { flex:1!important; min-width:0!important; }
+    .admin-body.admin-organized-v89 .topbar-actions > :not(.language-select):not(.icon-button) { display:none!important; }
+    .admin-body.admin-organized-v89 .global-search { width:100%!important; }
+    .admin-body.admin-organized-v89 .admin-command-header { align-items:flex-start!important; }
+    .admin-body.admin-organized-v89 .admin-command-header h2 { font-size:22px!important; }
+    .admin-body.admin-organized-v89 .admin-filter-panel,
+    .admin-body.admin-organized-v89 .control-room-strip,
+    .admin-body.admin-organized-v89 .metrics,
+    .admin-body.admin-organized-v89 .vehicle-control-summary,
+    .admin-body.admin-organized-v89 .vehicle-control-tools,
+    .admin-body.admin-organized-v89 .fleet-vehicle-tools { grid-template-columns:1fr!important; }
+    .admin-body.admin-organized-v89 .admin-filter-panel > label,
+    .admin-body.admin-organized-v89 .admin-filter-panel > article,
+    .admin-body.admin-organized-v89 .control-room-strip article,
+    .admin-body.admin-organized-v89 .metrics article,
+    .admin-body.admin-organized-v89 .vehicle-control-summary article { border-right:0!important; border-bottom:1px solid var(--admin-line-soft)!important; }
+    .admin-body.admin-organized-v89 .site-inspection-row { grid-template-columns:100px minmax(0,1fr) 45px!important; padding-inline:11px!important; }
+   }
+  </style>
+`;
+
+adminHtml = adminHtml.replace("\n </head>", `${organizedCss}\n </head>`);
+
 adminHtml = adminHtml.replace(/<body class="([^"]*)"/, (_match, className) => {
-  return className.includes("admin-clean-v77") ? `<body class="${className}"` : `<body class="${className} admin-clean-v77"`;
+  const classes = new Set(`${className} admin-clean-v77 admin-organized-v89`.split(/\s+/).filter(Boolean));
+  return `<body class="${[...classes].join(" ")}"`;
 });
 
 adminHtml = adminHtml
@@ -1150,6 +2031,11 @@ adminHtml = adminHtml
   .replaceAll("/admin.js?v=75", "/admin.js?v=77")
   .replaceAll("/admin.js?v=77", "/admin.js?v=78");
 adminHtml = adminHtml.replaceAll("/admin.js?v=78", "/admin.js?v=79");
+adminHtml = adminHtml
+  .replaceAll("/styles.css?v=79", "/styles.css?v=89")
+  .replaceAll("/vehicles.js?v=79", "/vehicles.js?v=89")
+  .replaceAll("/i18n.js?v=79", "/i18n.js?v=89")
+  .replaceAll("/admin.js?v=79", "/admin.js?v=89");
 
 await fs.writeFile(adminHtmlPath, adminHtml);
 
@@ -1261,4 +2147,5 @@ serviceWorker = serviceWorker
   .replaceAll("/driver-v74.css?v=87", "/driver-v74.css?v=88")
   .replaceAll("/app.js?v=87", "/app.js?v=88")
   .replaceAll("/vehicles.js?v=87", "/vehicles.js?v=88");
+serviceWorker = serviceWorker.replaceAll("fleetinspect-driver-v88", "fleetinspect-driver-v89");
 await fs.writeFile(path.join(root, "service-worker.js"), serviceWorker);
