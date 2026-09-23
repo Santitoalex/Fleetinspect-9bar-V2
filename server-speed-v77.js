@@ -110,6 +110,25 @@ appJs = appJs.replace(
 );
 
 appJs = appJs.replace(
+  /function previousStep\(\) \{[\s\S]*?\n\}/,
+  `function previousStep() {
+  if (!session) return;
+  if (stepIndex === 0) {
+    resetSession();
+    return;
+  }
+  stepIndex -= 1;
+  updateCaptureUI();
+  openCamera();
+}`
+);
+
+appJs = appJs.replace(
+  "  nodes.previousPhoto.disabled = stepIndex === 0;",
+  "  nodes.previousPhoto.disabled = false;"
+);
+
+appJs = appJs.replace(
   "    renderVehicleOptions(fleetVehicles, previousValue);\n    updateStartFormState();",
   "    renderVehicleOptions(fleetVehicles, previousValue);\n    updateStartFormState();\n    window.setTimeout(updateStartFormState, 0);"
 );
@@ -142,6 +161,549 @@ if (!driverCss.includes(".camera-retry-button")) {
   color: #101828 !important;
   font-size: 15px !important;
   font-weight: 800 !important;
+}
+`;
+}
+
+if (!driverCss.includes("/* driver-mobile-v85 */")) {
+  driverCss += `
+
+/* driver-mobile-v85 */
+.driver-v85 {
+  --driver-accent: #f57c00;
+  --driver-accent-strong: #d96500;
+  --driver-ink: #172033;
+  --driver-muted: #667085;
+  --driver-line: #d9e0e8;
+  --driver-surface: #ffffff;
+  --driver-canvas: #f3f6f9;
+  min-height: 100svh;
+  background: var(--driver-canvas) !important;
+  color: var(--driver-ink) !important;
+  font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+}
+
+.driver-v85 .driver-topbar {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 100 !important;
+  min-height: 64px !important;
+  border-bottom: 1px solid var(--driver-line) !important;
+  background: rgba(255, 255, 255, .96) !important;
+  padding: 9px max(14px, env(safe-area-inset-right)) 9px max(14px, env(safe-area-inset-left)) !important;
+  box-shadow: none !important;
+  backdrop-filter: blur(16px);
+}
+
+.driver-v85 .driver-brand {
+  gap: 10px !important;
+}
+
+.driver-v85 .driver-brand .brand-logo {
+  width: 82px !important;
+  height: 40px !important;
+  border: 0 !important;
+  border-radius: 6px !important;
+  background: #fff !important;
+  object-fit: contain !important;
+  box-shadow: none !important;
+}
+
+.driver-v85 .driver-brand strong {
+  color: var(--driver-ink) !important;
+  font-size: 18px !important;
+  letter-spacing: 0 !important;
+}
+
+.driver-v85 .driver-brand span {
+  display: none !important;
+}
+
+.driver-v85 .language-select {
+  width: 68px !important;
+  min-height: 42px !important;
+  border: 1px solid var(--driver-line) !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+  color: var(--driver-ink) !important;
+  font-size: 15px !important;
+  font-weight: 800 !important;
+}
+
+.driver-v85 .driver-shell {
+  width: min(100%, 680px) !important;
+  margin: 0 auto !important;
+  padding: 18px 16px max(30px, env(safe-area-inset-bottom)) !important;
+}
+
+.driver-v85 .install-banner {
+  margin: 0 0 14px !important;
+  border: 1px solid var(--driver-line) !important;
+  border-radius: 12px !important;
+  background: #fff !important;
+  padding: 12px !important;
+  box-shadow: none !important;
+}
+
+.driver-v85 .install-banner p {
+  margin: 3px 0 0 !important;
+  color: var(--driver-muted) !important;
+  font-size: 13px !important;
+  line-height: 1.35 !important;
+}
+
+.driver-v85 .install-actions button {
+  min-height: 38px !important;
+  border-radius: 8px !important;
+  padding: 7px 12px !important;
+  font-size: 13px !important;
+}
+
+.driver-v85 .driver-home,
+.driver-v85 .driver-start-layout {
+  display: block !important;
+  width: 100% !important;
+}
+
+.driver-v85 .driver-home-header {
+  margin: 0 0 14px !important;
+  padding: 0 2px !important;
+}
+
+.driver-v85 .driver-home-header > span {
+  display: inline-block !important;
+  margin-bottom: 6px !important;
+  color: var(--driver-accent-strong) !important;
+  font-size: 12px !important;
+  font-weight: 850 !important;
+  letter-spacing: 0 !important;
+  text-transform: uppercase !important;
+}
+
+.driver-v85 .driver-home-header h1 {
+  max-width: 520px !important;
+  margin: 0 !important;
+  color: var(--driver-ink) !important;
+  font-size: 32px !important;
+  line-height: 1.08 !important;
+  letter-spacing: 0 !important;
+}
+
+.driver-v85 .driver-home-header p {
+  margin: 8px 0 0 !important;
+  color: var(--driver-muted) !important;
+  font-size: 15px !important;
+  line-height: 1.45 !important;
+}
+
+.driver-v85 .driver-start-card {
+  display: block !important;
+  width: 100% !important;
+  border: 1px solid var(--driver-line) !important;
+  border-radius: 14px !important;
+  background: var(--driver-surface) !important;
+  padding: 16px !important;
+  box-shadow: 0 8px 28px rgba(15, 23, 42, .06) !important;
+}
+
+.driver-v85 .driver-section-title {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin-bottom: 16px !important;
+  border: 0 !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+.driver-v85 .driver-section-title > span {
+  display: grid !important;
+  width: 36px !important;
+  height: 36px !important;
+  place-items: center !important;
+  border-radius: 8px !important;
+  background: #fff2e5 !important;
+  color: var(--driver-accent-strong) !important;
+  font-size: 13px !important;
+  font-weight: 850 !important;
+}
+
+.driver-v85 .driver-section-title strong {
+  display: block !important;
+  color: var(--driver-ink) !important;
+  font-size: 16px !important;
+  line-height: 1.2 !important;
+}
+
+.driver-v85 .driver-section-title small {
+  display: block !important;
+  margin-top: 2px !important;
+  color: var(--driver-muted) !important;
+  font-size: 12px !important;
+}
+
+.driver-v85 .driver-form-fields {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 14px !important;
+}
+
+.driver-v85 .driver-form-fields label > span {
+  display: block !important;
+  margin: 0 0 6px !important;
+  color: #475467 !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0 !important;
+  text-transform: uppercase !important;
+}
+
+.driver-v85 .driver-form-fields input,
+.driver-v85 .driver-form-fields select {
+  width: 100% !important;
+  min-height: 52px !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 10px !important;
+  background: #fff !important;
+  color: var(--driver-ink) !important;
+  padding: 0 14px !important;
+  font-size: 17px !important;
+  font-weight: 700 !important;
+  box-shadow: none !important;
+}
+
+.driver-v85 .driver-form-fields input:focus,
+.driver-v85 .driver-form-fields select:focus {
+  border-color: var(--driver-accent) !important;
+  outline: 3px solid rgba(245, 124, 0, .14) !important;
+}
+
+.driver-v85 #startPhotosButton {
+  width: 100% !important;
+  min-height: 54px !important;
+  margin-top: 18px !important;
+  border: 0 !important;
+  border-radius: 10px !important;
+  background: var(--driver-accent) !important;
+  color: #fff !important;
+  font-size: 17px !important;
+  font-weight: 850 !important;
+  box-shadow: none !important;
+}
+
+.driver-v85 #startPhotosButton:active {
+  background: var(--driver-accent-strong) !important;
+  transform: translateY(1px) !important;
+}
+
+.driver-v85 .driver-workflow-card {
+  display: none !important;
+}
+
+@media (max-width: 759px) {
+  .driver-v85 .driver-home-header h1 {
+    font-size: 28px !important;
+  }
+
+  .driver-v85:has(#captureScreen:not(.hidden)) {
+    height: 100svh !important;
+    overflow: hidden !important;
+    background: #080b12 !important;
+  }
+
+  .driver-v85:has(#captureScreen:not(.hidden)) .driver-topbar {
+    display: none !important;
+  }
+
+  .driver-v85:has(#captureScreen:not(.hidden)) .driver-shell {
+    width: 100% !important;
+    height: 100svh !important;
+    padding: 0 !important;
+  }
+
+  .driver-v85 #captureScreen:not(.hidden),
+  .driver-v85 #captureScreen:not(.hidden) .driver-capture-app,
+  .driver-v85 #captureScreen:not(.hidden) .capture-layout,
+  .driver-v85 #captureScreen:not(.hidden) .camera-card {
+    position: fixed !important;
+    inset: 0 !important;
+    display: block !important;
+    width: 100% !important;
+    height: 100svh !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: #080b12 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .driver-v85 #captureScreen:not(.hidden) .capture-header {
+    position: absolute !important;
+    top: max(10px, env(safe-area-inset-top)) !important;
+    left: 12px !important;
+    right: 12px !important;
+    z-index: 40 !important;
+    display: flex !important;
+    min-height: 58px !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    border: 0 !important;
+    border-radius: 12px !important;
+    background: rgba(8, 11, 18, .82) !important;
+    padding: 9px 10px 9px 14px !important;
+    color: #fff !important;
+    box-shadow: none !important;
+    backdrop-filter: blur(14px);
+  }
+
+  .driver-v85 #captureScreen:not(.hidden) .capture-kicker,
+  .driver-v85 #captureScreen:not(.hidden) #sessionMeta,
+  .driver-v85 #captureScreen:not(.hidden) #stepHelp,
+  .driver-v85 #captureScreen:not(.hidden) #resetSession {
+    display: none !important;
+  }
+
+  .driver-v85 #captureScreen:not(.hidden) .capture-header h2 {
+    margin: 0 !important;
+    color: #fff !important;
+    font-size: 20px !important;
+    line-height: 1.1 !important;
+    letter-spacing: 0 !important;
+  }
+
+  .driver-v85 #captureScreen:not(.hidden) .photo-counter {
+    min-width: 64px !important;
+    border: 1px solid rgba(255, 255, 255, .22) !important;
+    border-radius: 9px !important;
+    background: rgba(255, 255, 255, .1) !important;
+    color: #fff !important;
+    padding: 9px 10px !important;
+    font-size: 14px !important;
+    text-align: center !important;
+  }
+
+  .driver-v85 #captureScreen:not(.hidden) .photo-progress-rail {
+    position: absolute !important;
+    top: calc(max(10px, env(safe-area-inset-top)) + 64px) !important;
+    left: 16px !important;
+    right: 16px !important;
+    z-index: 41 !important;
+    height: 4px !important;
+    border-radius: 2px !important;
+    background: rgba(255, 255, 255, .2) !important;
+  }
+
+  .driver-v85 #captureScreen:not(.hidden) .photo-progress-rail span {
+    background: var(--driver-accent) !important;
+  }
+
+  .driver-v85 #captureScreen:not(.hidden) .photo-camera-frame {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100svh !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: #080b12 !important;
+  }
+
+  .driver-v85 #captureScreen:not(.hidden) .camera-frame video,
+  .driver-v85 #captureScreen:not(.hidden) .camera-frame img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+
+  .driver-v85 #captureScreen:not(.hidden) .photo-camera-frame::before,
+  .driver-v85 #captureScreen:not(.hidden) .photo-camera-frame::after,
+  .driver-v85 #captureScreen:not(.hidden) .camera-corners {
+    display: none !important;
+  }
+
+  .driver-v85 #captureScreen:not(.hidden) .camera-toolbar {
+    display: contents !important;
+  }
+
+  .driver-v85 #captureScreen:not(.hidden) .camera-picker-control,
+  .driver-v85 #captureScreen:not(.hidden) .camera-zoom-control {
+    top: calc(max(10px, env(safe-area-inset-top)) + 78px) !important;
+    left: 12px !important;
+    right: 12px !important;
+    z-index: 38 !important;
+    border: 0 !important;
+    border-radius: 10px !important;
+    background: rgba(8, 11, 18, .8) !important;
+    box-shadow: none !important;
+  }
+
+  .driver-v85 #captureScreen:not(.hidden) .photo-guide-card {
+    position: absolute !important;
+    left: 12px !important;
+    right: 12px !important;
+    bottom: calc(98px + env(safe-area-inset-bottom)) !important;
+    z-index: 35 !important;
+    display: flex !important;
+    min-height: 50px !important;
+    align-items: center !important;
+    gap: 10px !important;
+    border: 0 !important;
+    border-radius: 10px !important;
+    background: rgba(8, 11, 18, .82) !important;
+    padding: 9px 12px !important;
+    backdrop-filter: blur(14px);
+  }
+
+  .driver-v85 #captureScreen:not(.hidden) .photo-guide-card > span {
+    display: grid !important;
+    width: 34px !important;
+    height: 34px !important;
+    flex: 0 0 34px !important;
+    place-items: center !important;
+    border-radius: 8px !important;
+    background: var(--driver-accent) !important;
+    color: #fff !important;
+    font-size: 12px !important;
+    font-weight: 850 !important;
+  }
+
+  .driver-v85 #captureScreen:not(.hidden) .photo-guide-card strong {
+    display: block !important;
+    color: #fff !important;
+    font-size: 15px !important;
+    line-height: 1.2 !important;
+  }
+
+  .driver-v85 #captureScreen:not(.hidden) .photo-guide-card p {
+    display: block !important;
+    margin: 2px 0 0 !important;
+    overflow: hidden !important;
+    color: rgba(255, 255, 255, .72) !important;
+    font-size: 12px !important;
+    line-height: 1.25 !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .driver-v85 #captureScreen:not(.hidden) .camera-empty {
+    left: 18px !important;
+    right: 18px !important;
+    top: 50% !important;
+    bottom: auto !important;
+    width: auto !important;
+    min-height: 190px !important;
+    transform: translateY(-50%) !important;
+    border: 1px solid rgba(255, 255, 255, .16) !important;
+    border-radius: 14px !important;
+    background: #111722 !important;
+    padding: 24px 18px !important;
+    text-align: center !important;
+  }
+
+  .driver-v85 #captureScreen:not(.hidden) .camera-empty strong {
+    color: #fff !important;
+    font-size: 20px !important;
+  }
+
+  .driver-v85 #captureScreen:not(.hidden) .camera-empty span {
+    max-width: 300px !important;
+    margin-top: 8px !important;
+    color: #b6c0cf !important;
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+  }
+
+  .driver-v85 #captureScreen:not(.hidden) .photo-action-dock {
+    position: absolute !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 42 !important;
+    display: grid !important;
+    grid-template-columns: 76px minmax(0, 1fr) 76px !important;
+    gap: 10px !important;
+    align-items: center !important;
+    min-height: calc(88px + env(safe-area-inset-bottom)) !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: #080b12 !important;
+    padding: 12px 12px max(12px, env(safe-area-inset-bottom)) !important;
+  }
+
+  .driver-v85 #captureScreen:not(.hidden) .photo-action-dock button {
+    min-width: 0 !important;
+    min-height: 54px !important;
+    border-radius: 10px !important;
+    box-shadow: none !important;
+  }
+
+  .driver-v85 #captureScreen:not(.hidden) .photo-small-action,
+  .driver-v85 #captureScreen:not(.hidden) .secondary {
+    border: 1px solid rgba(255, 255, 255, .2) !important;
+    background: #171e2a !important;
+    color: #fff !important;
+    padding: 0 8px !important;
+    font-size: 12px !important;
+  }
+
+  .driver-v85 #captureScreen:not(.hidden) #previousPhoto {
+    grid-column: 1 !important;
+  }
+
+  .driver-v85 #captureScreen:not(.hidden) #capturePhoto {
+    grid-column: 2 !important;
+    width: 100% !important;
+    height: 56px !important;
+    min-height: 56px !important;
+    border: 0 !important;
+    border-radius: 10px !important;
+    background: var(--driver-accent) !important;
+    color: #fff !important;
+    padding: 0 14px !important;
+    font-size: 16px !important;
+    font-weight: 850 !important;
+  }
+
+  .driver-v85 #captureScreen:not(.hidden)[data-capture-state="review"] #capturePhoto {
+    width: 100% !important;
+    min-width: 0 !important;
+    background: #fff !important;
+    color: #101828 !important;
+  }
+
+  .driver-v85 #captureScreen:not(.hidden) #retakePhoto:not(.hidden) {
+    display: block !important;
+    grid-column: 1 !important;
+  }
+
+  .driver-v85 #captureScreen:not(.hidden):has(#retakePhoto:not(.hidden)) #previousPhoto {
+    display: none !important;
+  }
+
+  .driver-v85 #captureScreen:not(.hidden) #zoomPhoto:not(.hidden) {
+    display: block !important;
+    grid-column: 3 !important;
+  }
+
+  .driver-v85 #captureScreen:not(.hidden) .inspection-drawer {
+    display: none !important;
+  }
+}
+
+@media (min-width: 760px) {
+  .driver-v85 .driver-shell {
+    width: min(100%, 1100px) !important;
+    padding-top: 28px !important;
+  }
+
+  .driver-v85 .driver-home {
+    width: min(100%, 680px) !important;
+    margin: 0 auto !important;
+  }
+
+  .driver-v85 .capture-screen:not(.hidden) {
+    width: 100% !important;
+  }
 }
 `;
 }
@@ -537,6 +1099,7 @@ await fs.writeFile(adminHtmlPath, adminHtml);
 
 let indexHtml = await fs.readFile(path.join(root, "index.html"), "utf8");
 indexHtml = indexHtml
+  .replace('class="driver-body driver-v72 driver-v74"', 'class="driver-body driver-v72 driver-v74 driver-v85"')
   .replace(" data-i18n=\"startPhotos\" disabled>Start photos</button>", " data-i18n=\"startPhotos\">Start photos</button>")
   .replaceAll("/styles.css?v=76", "/styles.css?v=80")
   .replaceAll("/driver-v74.css?v=76", "/driver-v74.css?v=80")
@@ -567,7 +1130,13 @@ indexHtml = indexHtml
   .replaceAll("/i18n.js?v=83", "/i18n.js?v=84")
   .replaceAll("/vehicles.js?v=83", "/vehicles.js?v=84")
   .replaceAll("/app.js?v=83", "/app.js?v=84")
-  .replaceAll("/driver-vehicles-fallback-v76.js?v=83", "/driver-vehicles-fallback-v76.js?v=84");
+  .replaceAll("/driver-vehicles-fallback-v76.js?v=83", "/driver-vehicles-fallback-v76.js?v=84")
+  .replaceAll("/styles.css?v=84", "/styles.css?v=85")
+  .replaceAll("/driver-v74.css?v=84", "/driver-v74.css?v=85")
+  .replaceAll("/i18n.js?v=84", "/i18n.js?v=85")
+  .replaceAll("/vehicles.js?v=84", "/vehicles.js?v=85")
+  .replaceAll("/app.js?v=84", "/app.js?v=85")
+  .replaceAll("/driver-vehicles-fallback-v76.js?v=84", "/driver-vehicles-fallback-v76.js?v=85");
 await fs.writeFile(path.join(root, "index.html"), indexHtml);
 
 let serviceWorker = await fs.readFile(path.join(root, "service-worker.js"), "utf8");
@@ -591,5 +1160,9 @@ serviceWorker = serviceWorker
   .replaceAll("fleetinspect-driver-v83", "fleetinspect-driver-v84")
   .replaceAll("/driver-v74.css?v=83", "/driver-v74.css?v=84")
   .replaceAll("/app.js?v=83", "/app.js?v=84")
-  .replaceAll("/vehicles.js?v=83", "/vehicles.js?v=84");
+  .replaceAll("/vehicles.js?v=83", "/vehicles.js?v=84")
+  .replaceAll("fleetinspect-driver-v84", "fleetinspect-driver-v85")
+  .replaceAll("/driver-v74.css?v=84", "/driver-v74.css?v=85")
+  .replaceAll("/app.js?v=84", "/app.js?v=85")
+  .replaceAll("/vehicles.js?v=84", "/vehicles.js?v=85");
 await fs.writeFile(path.join(root, "service-worker.js"), serviceWorker);
