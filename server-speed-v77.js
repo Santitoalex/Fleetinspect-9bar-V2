@@ -237,12 +237,28 @@ if (!driverCss.includes("/* driver-mobile-v85 */")) {
 }
 
 .driver-v85 .install-banner {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: 12px !important;
   margin: 0 0 14px !important;
   border: 1px solid var(--driver-line) !important;
   border-radius: 12px !important;
   background: #fff !important;
   padding: 12px !important;
   box-shadow: none !important;
+}
+
+.driver-v85 .install-banner > div:first-child {
+  min-width: 0 !important;
+}
+
+.driver-v85 .install-actions {
+  display: flex !important;
+  grid-template-columns: none !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
 }
 
 .driver-v85 .install-banner p {
@@ -259,7 +275,7 @@ if (!driverCss.includes("/* driver-mobile-v85 */")) {
   font-size: 13px !important;
 }
 
-.driver-v85 .driver-home,
+.driver-v85 .driver-home:not(.hidden),
 .driver-v85 .driver-start-layout {
   display: block !important;
   width: 100% !important;
@@ -424,6 +440,18 @@ if (!driverCss.includes("/* driver-mobile-v85 */")) {
 }
 
 @media (max-width: 759px) {
+  .driver-v85 .install-banner {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+
+  .driver-v85 .install-banner p {
+    display: -webkit-box !important;
+    overflow: hidden !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 3 !important;
+  }
+
   .driver-v85 .driver-home-header h1,
   .driver-v85 .driver-hero h1 {
     font-size: 28px !important;
@@ -1176,7 +1204,13 @@ indexHtml = indexHtml
   .replaceAll("/i18n.js?v=85", "/i18n.js?v=86")
   .replaceAll("/vehicles.js?v=85", "/vehicles.js?v=86")
   .replaceAll("/app.js?v=85", "/app.js?v=86")
-  .replaceAll("/driver-vehicles-fallback-v76.js?v=85", "/driver-vehicles-fallback-v76.js?v=86");
+  .replaceAll("/driver-vehicles-fallback-v76.js?v=85", "/driver-vehicles-fallback-v76.js?v=86")
+  .replaceAll("/styles.css?v=86", "/styles.css?v=87")
+  .replaceAll("/driver-v74.css?v=86", "/driver-v74.css?v=87")
+  .replaceAll("/i18n.js?v=86", "/i18n.js?v=87")
+  .replaceAll("/vehicles.js?v=86", "/vehicles.js?v=87")
+  .replaceAll("/app.js?v=86", "/app.js?v=87")
+  .replaceAll("/driver-vehicles-fallback-v76.js?v=86", "/driver-vehicles-fallback-v76.js?v=87");
 await fs.writeFile(path.join(root, "index.html"), indexHtml);
 
 let serviceWorker = await fs.readFile(path.join(root, "service-worker.js"), "utf8");
@@ -1208,5 +1242,9 @@ serviceWorker = serviceWorker
   .replaceAll("fleetinspect-driver-v85", "fleetinspect-driver-v86")
   .replaceAll("/driver-v74.css?v=85", "/driver-v74.css?v=86")
   .replaceAll("/app.js?v=85", "/app.js?v=86")
-  .replaceAll("/vehicles.js?v=85", "/vehicles.js?v=86");
+  .replaceAll("/vehicles.js?v=85", "/vehicles.js?v=86")
+  .replaceAll("fleetinspect-driver-v86", "fleetinspect-driver-v87")
+  .replaceAll("/driver-v74.css?v=86", "/driver-v74.css?v=87")
+  .replaceAll("/app.js?v=86", "/app.js?v=87")
+  .replaceAll("/vehicles.js?v=86", "/vehicles.js?v=87");
 await fs.writeFile(path.join(root, "service-worker.js"), serviceWorker);
