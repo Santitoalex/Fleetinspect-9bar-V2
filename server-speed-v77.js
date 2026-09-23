@@ -14,6 +14,10 @@ const runtimeServiceWorkerPath = path.join(root, ".runtime", "service-worker.js"
 await import(pathToFileURL(path.join(root, "server-speed-v75.js")).href);
 
 let appJs = await fs.readFile(appPath, "utf8");
+appJs = appJs.replace(
+  "    if (!apiVehicles.length) return;\n    fleetVehicles = apiVehicles;",
+  "    fleetVehicles = apiVehicles;"
+);
 const reliableVehicleOptions = `function renderVehicleOptions(vehicles, previousValue = "") {
   const uniqueVehicles = [...new Set((vehicles || []).map(normalizePlate).filter(Boolean))]
     .sort((a, b) => a.localeCompare(b));
@@ -769,6 +773,49 @@ if (!driverCss.includes("/* driver-mobile-v85 */")) {
 await fs.writeFile(driverCssPath, driverCss);
 
 let adminJs = await fs.readFile(runtimeAdminPath, "utf8").catch(() => fs.readFile(adminPath, "utf8"));
+if (!adminJs.includes('const OPERATION_TIME_ZONE = "Europe/Berlin";')) {
+  adminJs = adminJs.replace(
+    'const FALLBACK_SITE = "UNASSIGNED";',
+    'const FALLBACK_SITE = "UNASSIGNED";\nconst OPERATION_TIME_ZONE = "Europe/Berlin";'
+  );
+}
+adminJs = adminJs.replace(
+  "  const todayKey = new Date().toISOString().slice(0, 10);",
+  "  const todayKey = localDateKey(new Date());"
+);
+adminJs = adminJs.replace(
+  /function localDateKey\(value\) \{[\s\S]*?\n\}/,
+  `function localDateKey(value) {
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: OPERATION_TIME_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date).reduce((result, part) => {
+    if (part.type !== "literal") result[part.type] = part.value;
+    return result;
+  }, {});
+  return \`${"${parts.year}-${parts.month}-${parts.day}"}\`;
+}`
+);
+adminJs = adminJs
+  .replace("  const allGroups = groupByPlate(siteItems);", "  const allGroups = groupByPlate(items);")
+  .replace("nodes.metricInspections.textContent = String(siteItems.length);", "nodes.metricInspections.textContent = String(items.length);")
+  .replace("nodes.metricPhotos.textContent = String(siteItems.reduce", "nodes.metricPhotos.textContent = String(items.reduce")
+  .replace("const alertCount = siteItems.filter", "const alertCount = items.filter")
+  .replace(
+    /nodes\.metricToday\.textContent = String\([^\n]+\);/,
+    'nodes.metricToday.textContent = String(items.filter((item) => localDateKey(new Date(item.finishedAt || item.startedAt || 0)) === todayKey).length);'
+  )
+  .replace("  renderControlRoom(siteItems);", "  renderControlRoom(items);")
+  .replace("  renderOperationsBoard(siteItems);", "  renderOperationsBoard(items);")
+  .replace("  renderDataCommandCenter(siteItems);", "  renderDataCommandCenter(items);")
+  .replace("  renderAlerts(items.length ? items : siteItems);", "  renderAlerts(items);")
+  .replace("  renderAiStatusSummary(siteItems);", "  renderAiStatusSummary(items);")
+  .replace("  renderDriverSummary(siteItems);", "  renderDriverSummary(items);")
+  .replace("  renderRecentActivity(siteItems);", "  renderRecentActivity(items);");
 const siteOverviewRenderer = [
   "function renderSiteOverview() {",
   "  if (!nodes.siteOverview) return;",
@@ -2040,6 +2087,11 @@ adminHtml = adminHtml
   .replaceAll("/vehicles.js?v=79", "/vehicles.js?v=89")
   .replaceAll("/i18n.js?v=79", "/i18n.js?v=89")
   .replaceAll("/admin.js?v=79", "/admin.js?v=89");
+adminHtml = adminHtml
+  .replaceAll("/styles.css?v=89", "/styles.css?v=90")
+  .replaceAll("/vehicles.js?v=89", "/vehicles.js?v=90")
+  .replaceAll("/i18n.js?v=89", "/i18n.js?v=90")
+  .replaceAll("/admin.js?v=89", "/admin.js?v=90");
 
 await fs.writeFile(adminHtmlPath, adminHtml);
 await fs.writeFile(runtimeAdminHtmlPath, adminHtml);
@@ -2112,6 +2164,13 @@ indexHtml = indexHtml
   .replaceAll("/vehicles.js?v=87", "/vehicles.js?v=88")
   .replaceAll("/app.js?v=87", "/app.js?v=88")
   .replaceAll("/driver-vehicles-fallback-v76.js?v=87", "/driver-vehicles-fallback-v76.js?v=88");
+indexHtml = indexHtml
+  .replaceAll("/styles.css?v=88", "/styles.css?v=90")
+  .replaceAll("/driver-v74.css?v=88", "/driver-v74.css?v=90")
+  .replaceAll("/i18n.js?v=88", "/i18n.js?v=90")
+  .replaceAll("/vehicles.js?v=88", "/vehicles.js?v=90")
+  .replaceAll("/app.js?v=88", "/app.js?v=90")
+  .replaceAll("/driver-vehicles-fallback-v76.js?v=88", "/driver-vehicles-fallback-v76.js?v=90");
 await fs.writeFile(path.join(root, "index.html"), indexHtml);
 
 let serviceWorker = await fs.readFile(runtimeServiceWorkerPath, "utf8").catch(() => fs.readFile(path.join(root, "service-worker.js"), "utf8"));
@@ -2152,6 +2211,11 @@ serviceWorker = serviceWorker
   .replaceAll("/driver-v74.css?v=87", "/driver-v74.css?v=88")
   .replaceAll("/app.js?v=87", "/app.js?v=88")
   .replaceAll("/vehicles.js?v=87", "/vehicles.js?v=88");
-serviceWorker = serviceWorker.replaceAll("fleetinspect-driver-v88", "fleetinspect-driver-v89");
+serviceWorker = serviceWorker
+  .replaceAll("fleetinspect-driver-v88", "fleetinspect-driver-v90")
+  .replaceAll("fleetinspect-driver-v89", "fleetinspect-driver-v90")
+  .replaceAll("?v=88", "?v=90")
+  .replaceAll("?v=89", "?v=90")
+  .replaceAll("?v=75", "?v=90");
 await fs.writeFile(path.join(root, "service-worker.js"), serviceWorker);
 await fs.writeFile(runtimeServiceWorkerPath, serviceWorker);

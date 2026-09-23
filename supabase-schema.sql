@@ -96,3 +96,5 @@ create index if not exists fleet_vehicles_site_plate_idx
 on public.fleet_vehicles (site, plate);
 
 alter table public.fleet_vehicles enable row level security;
+
+grant select, insert, update, delete on table public.fleet_vehicles to service_role;
