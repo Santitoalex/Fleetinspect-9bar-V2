@@ -265,12 +265,18 @@ if (!driverCss.includes("/* driver-mobile-v85 */")) {
   width: 100% !important;
 }
 
-.driver-v85 .driver-home-header {
+.driver-v85 .driver-home-header,
+.driver-v85 .driver-hero {
   margin: 0 0 14px !important;
   padding: 0 2px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
-.driver-v85 .driver-home-header > span {
+.driver-v85 .driver-home-header > span,
+.driver-v85 .driver-hero > span {
   display: inline-block !important;
   margin-bottom: 6px !important;
   color: var(--driver-accent-strong) !important;
@@ -280,7 +286,8 @@ if (!driverCss.includes("/* driver-mobile-v85 */")) {
   text-transform: uppercase !important;
 }
 
-.driver-v85 .driver-home-header h1 {
+.driver-v85 .driver-home-header h1,
+.driver-v85 .driver-hero h1 {
   max-width: 520px !important;
   margin: 0 !important;
   color: var(--driver-ink) !important;
@@ -289,7 +296,8 @@ if (!driverCss.includes("/* driver-mobile-v85 */")) {
   letter-spacing: 0 !important;
 }
 
-.driver-v85 .driver-home-header p {
+.driver-v85 .driver-home-header p,
+.driver-v85 .driver-hero p {
   margin: 8px 0 0 !important;
   color: var(--driver-muted) !important;
   font-size: 15px !important;
@@ -306,7 +314,8 @@ if (!driverCss.includes("/* driver-mobile-v85 */")) {
   box-shadow: 0 8px 28px rgba(15, 23, 42, .06) !important;
 }
 
-.driver-v85 .driver-section-title {
+.driver-v85 .driver-section-title,
+.driver-v85 .driver-step-card {
   display: flex !important;
   align-items: center !important;
   gap: 10px !important;
@@ -316,7 +325,8 @@ if (!driverCss.includes("/* driver-mobile-v85 */")) {
   padding: 0 !important;
 }
 
-.driver-v85 .driver-section-title > span {
+.driver-v85 .driver-section-title > span,
+.driver-v85 .driver-step-card > span {
   display: grid !important;
   width: 36px !important;
   height: 36px !important;
@@ -328,14 +338,16 @@ if (!driverCss.includes("/* driver-mobile-v85 */")) {
   font-weight: 850 !important;
 }
 
-.driver-v85 .driver-section-title strong {
+.driver-v85 .driver-section-title strong,
+.driver-v85 .driver-step-card strong {
   display: block !important;
   color: var(--driver-ink) !important;
   font-size: 16px !important;
   line-height: 1.2 !important;
 }
 
-.driver-v85 .driver-section-title small {
+.driver-v85 .driver-section-title small,
+.driver-v85 .driver-step-card small {
   display: block !important;
   margin-top: 2px !important;
   color: var(--driver-muted) !important;
@@ -359,7 +371,8 @@ if (!driverCss.includes("/* driver-mobile-v85 */")) {
 }
 
 .driver-v85 .driver-form-fields input,
-.driver-v85 .driver-form-fields select {
+.driver-v85 .driver-form-fields select,
+.driver-v85 .driver-form-fields textarea {
   width: 100% !important;
   min-height: 52px !important;
   border: 1px solid #cbd5e1 !important;
@@ -372,8 +385,18 @@ if (!driverCss.includes("/* driver-mobile-v85 */")) {
   box-shadow: none !important;
 }
 
+.driver-v85 .driver-form-fields textarea {
+  min-height: 78px !important;
+  resize: vertical !important;
+  padding: 12px 14px !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  line-height: 1.35 !important;
+}
+
 .driver-v85 .driver-form-fields input:focus,
-.driver-v85 .driver-form-fields select:focus {
+.driver-v85 .driver-form-fields select:focus,
+.driver-v85 .driver-form-fields textarea:focus {
   border-color: var(--driver-accent) !important;
   outline: 3px solid rgba(245, 124, 0, .14) !important;
 }
@@ -401,7 +424,8 @@ if (!driverCss.includes("/* driver-mobile-v85 */")) {
 }
 
 @media (max-width: 759px) {
-  .driver-v85 .driver-home-header h1 {
+  .driver-v85 .driver-home-header h1,
+  .driver-v85 .driver-hero h1 {
     font-size: 28px !important;
   }
 
@@ -1101,6 +1125,16 @@ let indexHtml = await fs.readFile(path.join(root, "index.html"), "utf8");
 indexHtml = indexHtml
   .replace('class="driver-body driver-v72 driver-v74"', 'class="driver-body driver-v72 driver-v74 driver-v85"')
   .replace(" data-i18n=\"startPhotos\" disabled>Start photos</button>", " data-i18n=\"startPhotos\">Start photos</button>")
+  .replaceAll('data-i18n="enterDetailsBeforeCamera"', 'data-i18n="enterDetails"')
+  .replaceAll('data-i18n="driverCheckIn"', 'data-i18n="checkIn"')
+  .replaceAll('data-i18n="vehicleRegistration"', 'data-i18n="registrationNumber"')
+  .replaceAll('data-i18n-placeholder="optionalNotes"', 'data-i18n-placeholder="notesPlaceholder"')
+  .replaceAll('data-i18n="guidedCapture"', 'data-i18n="captureStep"')
+  .replaceAll('data-i18n="reset"', 'data-i18n="newReport"')
+  .replaceAll('data-i18n="camera"', 'data-i18n="cameraLens"')
+  .replaceAll('data-i18n="back"', 'data-i18n="previousPhoto"')
+  .replaceAll('data-i18n="retake"', 'data-i18n="retakePhoto"')
+  .replaceAll('data-i18n="zoom"', 'data-i18n="zoomPhoto"')
   .replaceAll("/styles.css?v=76", "/styles.css?v=80")
   .replaceAll("/driver-v74.css?v=76", "/driver-v74.css?v=80")
   .replaceAll("/i18n.js?v=76", "/i18n.js?v=80")
@@ -1136,7 +1170,13 @@ indexHtml = indexHtml
   .replaceAll("/i18n.js?v=84", "/i18n.js?v=85")
   .replaceAll("/vehicles.js?v=84", "/vehicles.js?v=85")
   .replaceAll("/app.js?v=84", "/app.js?v=85")
-  .replaceAll("/driver-vehicles-fallback-v76.js?v=84", "/driver-vehicles-fallback-v76.js?v=85");
+  .replaceAll("/driver-vehicles-fallback-v76.js?v=84", "/driver-vehicles-fallback-v76.js?v=85")
+  .replaceAll("/styles.css?v=85", "/styles.css?v=86")
+  .replaceAll("/driver-v74.css?v=85", "/driver-v74.css?v=86")
+  .replaceAll("/i18n.js?v=85", "/i18n.js?v=86")
+  .replaceAll("/vehicles.js?v=85", "/vehicles.js?v=86")
+  .replaceAll("/app.js?v=85", "/app.js?v=86")
+  .replaceAll("/driver-vehicles-fallback-v76.js?v=85", "/driver-vehicles-fallback-v76.js?v=86");
 await fs.writeFile(path.join(root, "index.html"), indexHtml);
 
 let serviceWorker = await fs.readFile(path.join(root, "service-worker.js"), "utf8");
@@ -1164,5 +1204,9 @@ serviceWorker = serviceWorker
   .replaceAll("fleetinspect-driver-v84", "fleetinspect-driver-v85")
   .replaceAll("/driver-v74.css?v=84", "/driver-v74.css?v=85")
   .replaceAll("/app.js?v=84", "/app.js?v=85")
-  .replaceAll("/vehicles.js?v=84", "/vehicles.js?v=85");
+  .replaceAll("/vehicles.js?v=84", "/vehicles.js?v=85")
+  .replaceAll("fleetinspect-driver-v85", "fleetinspect-driver-v86")
+  .replaceAll("/driver-v74.css?v=85", "/driver-v74.css?v=86")
+  .replaceAll("/app.js?v=85", "/app.js?v=86")
+  .replaceAll("/vehicles.js?v=85", "/vehicles.js?v=86");
 await fs.writeFile(path.join(root, "service-worker.js"), serviceWorker);
