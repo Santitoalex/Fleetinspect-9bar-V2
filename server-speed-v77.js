@@ -281,6 +281,10 @@ if (!driverCss.includes("/* driver-mobile-v85 */")) {
   width: 100% !important;
 }
 
+.driver-v85 .driver-home.hidden {
+  display: none !important;
+}
+
 .driver-v85 .driver-home-header,
 .driver-v85 .driver-hero {
   margin: 0 0 14px !important;
@@ -1210,7 +1214,13 @@ indexHtml = indexHtml
   .replaceAll("/i18n.js?v=86", "/i18n.js?v=87")
   .replaceAll("/vehicles.js?v=86", "/vehicles.js?v=87")
   .replaceAll("/app.js?v=86", "/app.js?v=87")
-  .replaceAll("/driver-vehicles-fallback-v76.js?v=86", "/driver-vehicles-fallback-v76.js?v=87");
+  .replaceAll("/driver-vehicles-fallback-v76.js?v=86", "/driver-vehicles-fallback-v76.js?v=87")
+  .replaceAll("/styles.css?v=87", "/styles.css?v=88")
+  .replaceAll("/driver-v74.css?v=87", "/driver-v74.css?v=88")
+  .replaceAll("/i18n.js?v=87", "/i18n.js?v=88")
+  .replaceAll("/vehicles.js?v=87", "/vehicles.js?v=88")
+  .replaceAll("/app.js?v=87", "/app.js?v=88")
+  .replaceAll("/driver-vehicles-fallback-v76.js?v=87", "/driver-vehicles-fallback-v76.js?v=88");
 await fs.writeFile(path.join(root, "index.html"), indexHtml);
 
 let serviceWorker = await fs.readFile(path.join(root, "service-worker.js"), "utf8");
@@ -1246,5 +1256,9 @@ serviceWorker = serviceWorker
   .replaceAll("fleetinspect-driver-v86", "fleetinspect-driver-v87")
   .replaceAll("/driver-v74.css?v=86", "/driver-v74.css?v=87")
   .replaceAll("/app.js?v=86", "/app.js?v=87")
-  .replaceAll("/vehicles.js?v=86", "/vehicles.js?v=87");
+  .replaceAll("/vehicles.js?v=86", "/vehicles.js?v=87")
+  .replaceAll("fleetinspect-driver-v87", "fleetinspect-driver-v88")
+  .replaceAll("/driver-v74.css?v=87", "/driver-v74.css?v=88")
+  .replaceAll("/app.js?v=87", "/app.js?v=88")
+  .replaceAll("/vehicles.js?v=87", "/vehicles.js?v=88");
 await fs.writeFile(path.join(root, "service-worker.js"), serviceWorker);
