@@ -7,6 +7,9 @@ const appPath = path.join(root, "app.js");
 const adminPath = path.join(root, "admin.js");
 const adminHtmlPath = path.join(root, "admin.html");
 const driverCssPath = path.join(root, "driver-v74.css");
+const runtimeAdminPath = path.join(root, ".runtime", "admin.js");
+const runtimeAdminHtmlPath = path.join(root, ".runtime", "admin.html");
+const runtimeServiceWorkerPath = path.join(root, ".runtime", "service-worker.js");
 
 await import(pathToFileURL(path.join(root, "server-speed-v75.js")).href);
 
@@ -765,7 +768,7 @@ if (!driverCss.includes("/* driver-mobile-v85 */")) {
 }
 await fs.writeFile(driverCssPath, driverCss);
 
-let adminJs = await fs.readFile(adminPath, "utf8");
+let adminJs = await fs.readFile(runtimeAdminPath, "utf8").catch(() => fs.readFile(adminPath, "utf8"));
 const siteOverviewRenderer = [
   "function renderSiteOverview() {",
   "  if (!nodes.siteOverview) return;",
@@ -891,8 +894,9 @@ adminJs = adminJs.replace(
   `${fleetVehicleActionHandler}\n\nfunction normalizeFleetVehiclePlate`
 );
 await fs.writeFile(adminPath, adminJs);
+await fs.writeFile(runtimeAdminPath, adminJs);
 
-let adminHtml = await fs.readFile(adminHtmlPath, "utf8");
+let adminHtml = await fs.readFile(runtimeAdminHtmlPath, "utf8").catch(() => fs.readFile(adminHtmlPath, "utf8"));
 const cleanNavHtml = `    <nav class="fleet-nav" aria-label="Admin navigation">
      <section class="nav-group">
       <p>Operación</p>
@@ -2038,6 +2042,7 @@ adminHtml = adminHtml
   .replaceAll("/admin.js?v=79", "/admin.js?v=89");
 
 await fs.writeFile(adminHtmlPath, adminHtml);
+await fs.writeFile(runtimeAdminHtmlPath, adminHtml);
 
 let indexHtml = await fs.readFile(path.join(root, "index.html"), "utf8");
 indexHtml = indexHtml
@@ -2109,7 +2114,7 @@ indexHtml = indexHtml
   .replaceAll("/driver-vehicles-fallback-v76.js?v=87", "/driver-vehicles-fallback-v76.js?v=88");
 await fs.writeFile(path.join(root, "index.html"), indexHtml);
 
-let serviceWorker = await fs.readFile(path.join(root, "service-worker.js"), "utf8");
+let serviceWorker = await fs.readFile(runtimeServiceWorkerPath, "utf8").catch(() => fs.readFile(path.join(root, "service-worker.js"), "utf8"));
 serviceWorker = serviceWorker
   .replaceAll("fleetinspect-driver-v75", "fleetinspect-driver-v80")
   .replaceAll("fleetinspect-driver-v80", "fleetinspect-driver-v81")
@@ -2149,3 +2154,4 @@ serviceWorker = serviceWorker
   .replaceAll("/vehicles.js?v=87", "/vehicles.js?v=88");
 serviceWorker = serviceWorker.replaceAll("fleetinspect-driver-v88", "fleetinspect-driver-v89");
 await fs.writeFile(path.join(root, "service-worker.js"), serviceWorker);
+await fs.writeFile(runtimeServiceWorkerPath, serviceWorker);
