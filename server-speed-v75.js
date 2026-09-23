@@ -253,6 +253,15 @@ async function logAuditEvent(event) {`,
   await fs.writeFile(serverPath, serverSource);
 }
 
+if (!serverSource.includes('response.setHeader("Cache-Control", "no-store, max-age=0");\n    response.json({ ok: true, vehicles: await listFleetVehicles() });')) {
+  serverSource = replaceRequired(
+    serverSource,
+    'app.get("/api/vehicles", async (_request, response) => {\n  try {\n    response.json({ ok: true, vehicles: await listFleetVehicles() });',
+    'app.get("/api/vehicles", async (_request, response) => {\n  try {\n    response.setHeader("Cache-Control", "no-store, max-age=0");\n    response.json({ ok: true, vehicles: await listFleetVehicles() });',
+    "fleet vehicle no-store response"
+  );
+}
+
 const fleetListerV90 = `async function listFleetVehicles() {
   const seedVehicles = await readSeedFleetVehicles();
   let vehicles = null;

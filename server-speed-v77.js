@@ -14,6 +14,12 @@ const runtimeServiceWorkerPath = path.join(root, ".runtime", "service-worker.js"
 await import(pathToFileURL(path.join(root, "server-speed-v75.js")).href);
 
 let appJs = await fs.readFile(appPath, "utf8");
+if (!appJs.includes("let fleetRefreshInFlight = false;")) {
+  appJs = appJs.replace(
+    "let fleetVehicles = Array.isArray(window.FLEET_VEHICLES) ? window.FLEET_VEHICLES : [];",
+    "let fleetVehicles = Array.isArray(window.FLEET_VEHICLES) ? window.FLEET_VEHICLES : [];\nlet fleetRefreshInFlight = false;"
+  );
+}
 appJs = appJs.replace(
   "    if (!apiVehicles.length) return;\n    fleetVehicles = apiVehicles;",
   "    fleetVehicles = apiVehicles;"
@@ -150,6 +156,49 @@ appJs = appJs.replace(
     "}",
   ].join("\n")
 );
+
+const synchronizedDriverFleetLoader = [
+  "async function fetchFleetVehicles(previousValue = nodes.vehiclePlate?.value || \"\") {",
+  "  if (fleetRefreshInFlight) return;",
+  "  fleetRefreshInFlight = true;",
+  "  const selectedPlate = normalizePlate(previousValue || nodes.vehiclePlate?.value || \"\");",
+  "  try {",
+  "    const response = await fetch(\"/api/vehicles?ts=\" + Date.now(), { cache: \"no-store\" });",
+  "    const result = await response.json();",
+  "    if (!response.ok || result.ok === false || !Array.isArray(result.vehicles)) return;",
+  "    fleetVehicles = result.vehicles.map((vehicle) => vehicle.plate || vehicle).filter(Boolean);",
+  "    renderVehicleOptions(fleetVehicles, selectedPlate);",
+  "    updateStartFormState();",
+  "  } catch {",
+  "    // Keep the most recently loaded list when the phone is temporarily offline.",
+  "  } finally {",
+  "    fleetRefreshInFlight = false;",
+  "  }",
+  "}",
+].join("\n");
+
+appJs = appJs.replace(
+  /async function fetchFleetVehicles\(previousValue = nodes\.vehiclePlate\.value\) \{[\s\S]*?\n\}\n\nfunction renderVehicleOptions/,
+  `${synchronizedDriverFleetLoader}\n\nfunction renderVehicleOptions`
+);
+
+if (!appJs.includes("fleetinspect:driver-fleet-sync-v91")) {
+  appJs = appJs.replace(
+    "  loadVehicleOptions();\n  bindEvents();",
+    [
+      "  loadVehicleOptions();",
+      "  document.documentElement.dataset.fleetSync = \"fleetinspect:driver-fleet-sync-v91\";",
+      "  window.setInterval(() => {",
+      "    if (!document.hidden) fetchFleetVehicles();",
+      "  }, 15000);",
+      "  document.addEventListener(\"visibilitychange\", () => {",
+      "    if (!document.hidden) fetchFleetVehicles();",
+      "  });",
+      "  window.addEventListener(\"focus\", () => fetchFleetVehicles());",
+      "  bindEvents();",
+    ].join("\n")
+  );
+}
 
 await fs.writeFile(appPath, appJs);
 
@@ -773,6 +822,30 @@ if (!driverCss.includes("/* driver-mobile-v85 */")) {
 await fs.writeFile(driverCssPath, driverCss);
 
 let adminJs = await fs.readFile(runtimeAdminPath, "utf8").catch(() => fs.readFile(adminPath, "utf8"));
+adminJs = adminJs.replace(
+  "let fleetVehicles = [];",
+  "let fleetVehicles = [];\nlet fleetVehiclesLoading = null;"
+);
+adminJs = adminJs.replace(
+  '  fleetVehicleCount: document.querySelector("#fleetVehicleCount"),',
+  [
+    '  fleetVehicleCount: document.querySelector("#fleetVehicleCount"),',
+    '  fleetVehicleStatus: document.querySelector("#fleetVehicleStatus"),',
+    '  refreshFleetVehicles: document.querySelector("#refreshFleetVehicles"),',
+  ].join("\n")
+);
+adminJs = adminJs.replace(
+  '  nodes.fleetVehicleList?.addEventListener("click", handleFleetVehicleAction);',
+  [
+    '  nodes.fleetVehicleList?.addEventListener("click", handleFleetVehicleAction);',
+    '  nodes.refreshFleetVehicles?.addEventListener("click", loadFleetVehicles);',
+    '  document.addEventListener("fleetinspect:open-fleet", loadFleetVehicles);',
+  ].join("\n")
+);
+adminJs = adminJs.replace(
+  "  applyRoleUi();\n  nodes.dispatcherPassword.value = \"\";",
+  "  applyRoleUi();\n  window.setTimeout(() => loadFleetVehicles(), 0);\n  nodes.dispatcherPassword.value = \"\";"
+);
 if (!adminJs.includes('const OPERATION_TIME_ZONE = "Europe/Berlin";')) {
   adminJs = adminJs.replace(
     'const FALLBACK_SITE = "UNASSIGNED";',
@@ -864,6 +937,62 @@ adminJs = adminJs.replace(
   `${siteOverviewRenderer}\n\nfunction renderOperationsBoard`
 );
 
+const synchronizedAdminFleetLoader = [
+  "async function loadFleetVehicles() {",
+  "  if (!nodes.fleetVehicleList) return [];",
+  "  if (fleetVehiclesLoading) return fleetVehiclesLoading;",
+  "",
+  "  nodes.fleetVehicleList.setAttribute(\"aria-busy\", \"true\");",
+  "  if (!fleetVehicles.length) {",
+  "    nodes.fleetVehicleList.innerHTML = `<article class=\"fleet-loading-state\">Cargando matrículas de Driver...</article>`;",
+  "  }",
+  "  if (nodes.fleetVehicleStatus) {",
+  "    nodes.fleetVehicleStatus.textContent = \"Sincronizando con Driver...\";",
+  "    nodes.fleetVehicleStatus.dataset.state = \"loading\";",
+  "  }",
+  "  if (nodes.refreshFleetVehicles) nodes.refreshFleetVehicles.disabled = true;",
+  "",
+  "  fleetVehiclesLoading = (async () => {",
+  "    try {",
+  "      const response = await fetch(\"/api/vehicles?ts=\" + Date.now(), { cache: \"no-store\" });",
+  "      const result = await response.json();",
+  "      if (!response.ok || result.ok === false || !Array.isArray(result.vehicles)) {",
+  "        throw new Error(result.error || \"No se pudo cargar la flota.\");",
+  "      }",
+  "      fleetVehicles = result.vehicles;",
+  "      renderFleetVehicles();",
+  "      if (nodes.fleetVehicleStatus) {",
+  "        nodes.fleetVehicleStatus.textContent = `${fleetVehicles.length} matrículas visibles en Driver · actualizado ${formatTime(new Date())}`;",
+  "        nodes.fleetVehicleStatus.dataset.state = \"ready\";",
+  "      }",
+  "      return fleetVehicles;",
+  "    } catch (error) {",
+  "      if (nodes.fleetVehicleStatus) {",
+  "        nodes.fleetVehicleStatus.textContent = error.message || \"No se pudo sincronizar la flota.\";",
+  "        nodes.fleetVehicleStatus.dataset.state = \"error\";",
+  "      }",
+  "      if (fleetVehicles.length) renderFleetVehicles();",
+  "      else nodes.fleetVehicleList.innerHTML = `<article class=\"empty-state\">${escapeHtml(error.message || \"No se pudo cargar la flota.\")}</article>`;",
+  "      return fleetVehicles;",
+  "    } finally {",
+  "      nodes.fleetVehicleList.removeAttribute(\"aria-busy\");",
+  "      if (nodes.refreshFleetVehicles) nodes.refreshFleetVehicles.disabled = false;",
+  "    }",
+  "  })();",
+  "",
+  "  try {",
+  "    return await fleetVehiclesLoading;",
+  "  } finally {",
+  "    fleetVehiclesLoading = null;",
+  "  }",
+  "}",
+].join("\n");
+
+adminJs = adminJs.replace(
+  /async function loadFleetVehicles\(\) \{[\s\S]*?\n\}\n\nfunction renderFleetVehicles/,
+  `${synchronizedAdminFleetLoader}\n\nfunction renderFleetVehicles`
+);
+
 const fleetVehicleRenderer = [
   "function renderFleetVehicles() {",
   "  if (!nodes.fleetVehicleList) return;",
@@ -889,10 +1018,8 @@ const fleetVehicleRenderer = [
   "  const canEdit = canEditOperations();",
   "  nodes.fleetVehicleList.innerHTML = vehicles.map((vehicle) => `",
   "    <article class=\"fleet-vehicle-row\">",
-  "      <div>",
-  "        <strong>${escapeHtml(vehicle.plate)}</strong>",
-  "        <span>${escapeHtml(vehicle.site === \"all\" ? \"DRP3 + DSU1\" : siteLabel(vehicle.site))}</span>",
-  "      </div>",
+  "      <strong class=\"fleet-vehicle-plate\">${escapeHtml(vehicle.plate)}</strong>",
+  "      <span class=\"fleet-vehicle-site\">${escapeHtml(vehicle.site === \"all\" ? \"DRP3 + DSU1\" : siteLabel(vehicle.site))}</span>",
   "      <button type=\"button\" data-remove-fleet-vehicle=\"${escapeHtml(vehicle.plate)}\" ${canEdit ? \"\" : \"disabled\"}>Quitar</button>",
   "    </article>",
   "  `).join(\"\");",
@@ -909,6 +1036,56 @@ adminJs = adminJs.replace(
   "    renderFleetVehicles();\n    renderDailyVehicleControl();\n  } catch (error) {"
 );
 
+const fleetVehicleAddHandler = [
+  "async function addFleetVehicle() {",
+  "  if (!canEditOperations()) {",
+  "    alert(t(\"readonlyMode\"));",
+  "    return;",
+  "  }",
+  "",
+  "  const plate = normalizeFleetVehiclePlate(nodes.fleetVehiclePlate?.value || \"\");",
+  "  const site = normalizeSite(nodes.fleetVehicleSite?.value || \"all\");",
+  "  if (!plate) {",
+  "    alert(\"Escribe una matrícula válida.\");",
+  "    nodes.fleetVehiclePlate?.focus();",
+  "    return;",
+  "  }",
+  "",
+  "  nodes.addFleetVehicle.disabled = true;",
+  "  if (nodes.fleetVehicleStatus) {",
+  "    nodes.fleetVehicleStatus.textContent = `Añadiendo ${plate} a Driver...`;",
+  "    nodes.fleetVehicleStatus.dataset.state = \"loading\";",
+  "  }",
+  "  try {",
+  "    const response = await fetch(\"/api/admin/vehicles\", {",
+  "      method: \"POST\",",
+  "      headers: { \"Content-Type\": \"application/json\" },",
+  "      body: JSON.stringify({ plate, site }),",
+  "    });",
+  "    const result = await response.json();",
+  "    if (!response.ok || result.ok === false) throw new Error(result.error || \"No se pudo guardar el vehículo.\");",
+  "    nodes.fleetVehiclePlate.value = \"\";",
+  "    fleetVehicles = Array.isArray(result.vehicles) ? result.vehicles : fleetVehicles;",
+  "    renderFleetVehicles();",
+  "    await loadFleetVehicles();",
+  "    renderDailyVehicleControl();",
+  "  } catch (error) {",
+  "    alert(error.message || \"No se pudo guardar el vehículo.\");",
+  "    if (nodes.fleetVehicleStatus) {",
+  "      nodes.fleetVehicleStatus.textContent = error.message || \"No se pudo guardar el vehículo.\";",
+  "      nodes.fleetVehicleStatus.dataset.state = \"error\";",
+  "    }",
+  "  } finally {",
+  "    nodes.addFleetVehicle.disabled = false;",
+  "  }",
+  "}",
+].join("\n");
+
+adminJs = adminJs.replace(
+  /async function addFleetVehicle\(\) \{[\s\S]*?\n\}\n\nasync function handleFleetVehicleAction/,
+  `${fleetVehicleAddHandler}\n\nasync function handleFleetVehicleAction`
+);
+
 const fleetVehicleActionHandler = [
   "async function handleFleetVehicleAction(event) {",
   "  const button = event.target.closest(\"[data-remove-fleet-vehicle]\");",
@@ -922,15 +1099,24 @@ const fleetVehicleActionHandler = [
   "  if (!confirm(`Quitar ${plate} de la app del conductor?`)) return;",
   "",
   "  button.disabled = true;",
+  "  if (nodes.fleetVehicleStatus) {",
+  "    nodes.fleetVehicleStatus.textContent = `Quitando ${plate} de Driver...`;",
+  "    nodes.fleetVehicleStatus.dataset.state = \"loading\";",
+  "  }",
   "  try {",
   "    const response = await fetch(`/api/admin/vehicles/${encodeURIComponent(plate)}`, { method: \"DELETE\" });",
   "    const result = await response.json();",
   "    if (!response.ok || result.ok === false) throw new Error(result.error || \"No se pudo quitar el vehiculo.\");",
-  "    fleetVehicles = result.vehicles || [];",
+  "    fleetVehicles = Array.isArray(result.vehicles) ? result.vehicles : fleetVehicles;",
   "    renderFleetVehicles();",
+  "    await loadFleetVehicles();",
   "    renderDailyVehicleControl();",
   "  } catch (error) {",
   "    alert(error.message || \"No se pudo quitar el vehiculo.\");",
+  "    if (nodes.fleetVehicleStatus) {",
+  "      nodes.fleetVehicleStatus.textContent = error.message || \"No se pudo quitar el vehículo.\";",
+  "      nodes.fleetVehicleStatus.dataset.state = \"error\";",
+  "    }",
   "    button.disabled = false;",
   "  }",
   "}",
@@ -974,6 +1160,10 @@ const fleetVehicleManagementHtml = `        <article id="fleetVehicleManagement"
            <strong id="fleetVehicleCount">0</strong>
           </div>
          </header>
+         <div class="fleet-vehicle-statusbar">
+          <span id="fleetVehicleStatus" data-state="loading" aria-live="polite">Cargando matrículas de Driver...</span>
+          <button id="refreshFleetVehicles" type="button">Actualizar lista</button>
+         </div>
          <div class="fleet-vehicle-tools">
           <label>
            <span>Site para nuevo vehículo</span>
@@ -993,7 +1183,12 @@ const fleetVehicleManagementHtml = `        <article id="fleetVehicleManagement"
            <input id="fleetVehicleSearch" type="search" placeholder="Buscar matrícula" autocomplete="off" />
           </label>
          </div>
-         <p class="fleet-vehicle-note">Los cambios se guardan en Supabase y se reflejan en el selector de vehículos del driver.</p>
+         <p class="fleet-vehicle-note">Esta es la misma lista que aparece en la app Driver. Añadir o quitar aquí actualiza su selector automáticamente.</p>
+         <div class="fleet-vehicle-list-head" aria-hidden="true">
+          <span>Matrícula</span>
+          <span>Site</span>
+          <span>Acción</span>
+         </div>
          <div id="fleetVehicleList" class="fleet-vehicle-list"></div>
         </article>`;
 
@@ -1072,6 +1267,7 @@ const sidebarScript = `  <script id="admin-sidebar-toggle">
      if (subtitleNode) subtitleNode.textContent = subtitle;
      localStorage.setItem("fleetinspect_admin_view", view);
      if (updateHash) history.replaceState(null, "", "#" + view);
+     if (view === "fleet") document.dispatchEvent(new CustomEvent("fleetinspect:open-fleet"));
      window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
@@ -1937,6 +2133,62 @@ const organizedCss = `
     color:#fff!important;
    }
 
+   .admin-body.admin-organized-v89 .fleet-vehicle-statusbar {
+    display:flex!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    gap:12px!important;
+    min-height:44px!important;
+    padding:8px 15px!important;
+    border-bottom:1px solid var(--admin-line-soft)!important;
+    background:#fff!important;
+   }
+
+   .admin-body.admin-organized-v89 #fleetVehicleStatus {
+    display:flex!important;
+    align-items:center!important;
+    gap:8px!important;
+    color:var(--admin-muted)!important;
+    font-size:11px!important;
+    font-weight:750!important;
+   }
+
+   .admin-body.admin-organized-v89 #fleetVehicleStatus::before {
+    width:8px!important;
+    height:8px!important;
+    border-radius:50%!important;
+    background:#94a3b8!important;
+    content:""!important;
+   }
+
+   .admin-body.admin-organized-v89 #fleetVehicleStatus[data-state="ready"]::before { background:#0f8a72!important; }
+   .admin-body.admin-organized-v89 #fleetVehicleStatus[data-state="error"]::before { background:#dc2626!important; }
+
+   .admin-body.admin-organized-v89 #refreshFleetVehicles {
+    min-height:32px!important;
+    padding:6px 11px!important;
+    border:1px solid var(--admin-line)!important;
+    border-radius:6px!important;
+    background:#fff!important;
+    color:var(--admin-blue)!important;
+    font-size:11px!important;
+    font-weight:800!important;
+   }
+
+   .admin-body.admin-organized-v89 .fleet-vehicle-list-head {
+    display:grid!important;
+    grid-template-columns:minmax(150px,1fr) 150px 74px!important;
+    gap:12px!important;
+    padding:8px 15px!important;
+    border-top:1px solid var(--admin-line-soft)!important;
+    border-bottom:1px solid var(--admin-line-soft)!important;
+    background:#f8fafc!important;
+    color:var(--admin-muted)!important;
+    font-size:9px!important;
+    font-weight:850!important;
+    text-transform:uppercase!important;
+   }
+
    .admin-body.admin-organized-v89 .vehicle-control-summary {
     display:grid!important;
     grid-template-columns:repeat(4,minmax(0,1fr))!important;
@@ -1956,19 +2208,44 @@ const organizedCss = `
 
    .admin-body.admin-organized-v89 .fleet-vehicle-list {
     display:grid!important;
-    grid-template-columns:repeat(auto-fill,minmax(220px,1fr))!important;
+    grid-template-columns:1fr!important;
     max-height:520px!important;
     overflow:auto!important;
-    gap:7px!important;
-    padding:12px 15px 15px!important;
+    gap:0!important;
+    padding:0 15px 12px!important;
    }
 
    .admin-body.admin-organized-v89 .fleet-vehicle-row {
-    min-height:44px!important;
-    padding:7px 7px 7px 11px!important;
-    border:1px solid var(--admin-line-soft)!important;
-    border-radius:7px!important;
+    display:grid!important;
+    grid-template-columns:minmax(150px,1fr) 150px 74px!important;
+    align-items:center!important;
+    gap:12px!important;
+    min-height:40px!important;
+    padding:6px 0!important;
+    border:0!important;
+    border-bottom:1px solid var(--admin-line-soft)!important;
+    border-radius:0!important;
     background:#fff!important;
+   }
+
+   .admin-body.admin-organized-v89 .fleet-vehicle-plate { color:var(--admin-text)!important; font-size:12px!important; }
+   .admin-body.admin-organized-v89 .fleet-vehicle-site { color:var(--admin-muted)!important; font-size:11px!important; font-weight:650!important; }
+   .admin-body.admin-organized-v89 .fleet-vehicle-row button {
+    min-height:28px!important;
+    padding:4px 8px!important;
+    border:1px solid #fecaca!important;
+    border-radius:5px!important;
+    background:#fff!important;
+    color:#b42318!important;
+    font-size:10px!important;
+    font-weight:800!important;
+   }
+
+   .admin-body.admin-organized-v89 .fleet-loading-state {
+    padding:24px 0!important;
+    color:var(--admin-muted)!important;
+    font-size:12px!important;
+    text-align:center!important;
    }
 
    .admin-body.admin-organized-v89 .report-list,
@@ -2054,6 +2331,9 @@ const organizedCss = `
     .admin-body.admin-organized-v89 .metrics article,
     .admin-body.admin-organized-v89 .vehicle-control-summary article { border-right:0!important; border-bottom:1px solid var(--admin-line-soft)!important; }
     .admin-body.admin-organized-v89 .site-inspection-row { grid-template-columns:100px minmax(0,1fr) 45px!important; padding-inline:11px!important; }
+    .admin-body.admin-organized-v89 .fleet-vehicle-list-head,
+    .admin-body.admin-organized-v89 .fleet-vehicle-row { grid-template-columns:minmax(110px,1fr) 82px 62px!important; gap:6px!important; }
+    .admin-body.admin-organized-v89 .fleet-vehicle-statusbar { align-items:flex-start!important; }
    }
   </style>
 `;
@@ -2092,6 +2372,7 @@ adminHtml = adminHtml
   .replaceAll("/vehicles.js?v=89", "/vehicles.js?v=90")
   .replaceAll("/i18n.js?v=89", "/i18n.js?v=90")
   .replaceAll("/admin.js?v=89", "/admin.js?v=90");
+adminHtml = adminHtml.replaceAll("?v=90", "?v=91");
 
 await fs.writeFile(adminHtmlPath, adminHtml);
 await fs.writeFile(runtimeAdminHtmlPath, adminHtml);
@@ -2171,6 +2452,7 @@ indexHtml = indexHtml
   .replaceAll("/vehicles.js?v=88", "/vehicles.js?v=90")
   .replaceAll("/app.js?v=88", "/app.js?v=90")
   .replaceAll("/driver-vehicles-fallback-v76.js?v=88", "/driver-vehicles-fallback-v76.js?v=90");
+indexHtml = indexHtml.replaceAll("?v=90", "?v=91");
 await fs.writeFile(path.join(root, "index.html"), indexHtml);
 
 let serviceWorker = await fs.readFile(runtimeServiceWorkerPath, "utf8").catch(() => fs.readFile(path.join(root, "service-worker.js"), "utf8"));
@@ -2217,5 +2499,8 @@ serviceWorker = serviceWorker
   .replaceAll("?v=88", "?v=90")
   .replaceAll("?v=89", "?v=90")
   .replaceAll("?v=75", "?v=90");
+serviceWorker = serviceWorker
+  .replaceAll("fleetinspect-driver-v90", "fleetinspect-driver-v91")
+  .replaceAll("?v=90", "?v=91");
 await fs.writeFile(path.join(root, "service-worker.js"), serviceWorker);
 await fs.writeFile(runtimeServiceWorkerPath, serviceWorker);
