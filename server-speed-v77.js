@@ -2383,7 +2383,7 @@ if (!adminHtml.includes('href="/admin-v92.css')) {
 if (!adminHtml.includes('href="/admin-v100.css')) {
   adminHtml = adminHtml.replace(
     "\n </head>",
-    '  <link rel="stylesheet" href="/admin-v100.css?v=106" />\n\n </head>'
+    '  <link rel="stylesheet" href="/admin-v100.css?v=107" />\n\n </head>'
   );
 }
 
@@ -2531,14 +2531,14 @@ adminHtml = adminHtml
   .replaceAll("/admin.js?v=89", "/admin.js?v=90");
 adminHtml = adminHtml.replaceAll("?v=90", "?v=91").replaceAll("?v=91", "?v=100").replaceAll("?v=96", "?v=100");
 adminHtml = adminHtml
-  .replaceAll("/admin.js?v=100", "/admin.js?v=106")
-  .replaceAll("/admin-v100.css?v=103", "/admin-v100.css?v=106")
-  .replaceAll("/admin-v100.js?v=103", "/admin-v100.js?v=106");
+  .replaceAll("/admin.js?v=100", "/admin.js?v=107")
+  .replaceAll("/admin-v100.css?v=103", "/admin-v100.css?v=107")
+  .replaceAll("/admin-v100.js?v=103", "/admin-v100.js?v=107");
 
 if (!adminHtml.includes('src="/admin-v100.js')) {
   adminHtml = adminHtml.replace(
     "\n </body>",
-    '  <script src="/admin-v100.js?v=106"></script>\n </body>'
+    '  <script src="/admin-v100.js?v=107"></script>\n </body>'
   );
 }
 
@@ -2676,10 +2676,10 @@ serviceWorker = serviceWorker
   .replaceAll("fleetinspect-driver-v100", "fleetinspect-driver-v103")
   .replaceAll("fleetinspect-driver-v101", "fleetinspect-driver-v103")
   .replaceAll("fleetinspect-driver-v102", "fleetinspect-driver-v103")
-  .replace('"/admin.html",', '"/admin.html",\n  "/admin-v92.css?v=106",\n  "/admin-v100.css?v=106",\n  "/admin-v100.js?v=106",');
+  .replace('"/admin.html",', '"/admin.html",\n  "/admin-v92.css?v=107",\n  "/admin-v100.css?v=107",\n  "/admin-v100.js?v=107",');
 serviceWorker = serviceWorker
-  .replaceAll("fleetinspect-driver-v103", "fleetinspect-driver-v106")
-  .replaceAll("?v=103", "?v=106")
-  .replaceAll("/admin.js?v=100", "/admin.js?v=106");
+  .replaceAll("fleetinspect-driver-v103", "fleetinspect-driver-v107")
+  .replaceAll("?v=103", "?v=107")
+  .replaceAll("/admin.js?v=100", "/admin.js?v=107");
 await fs.writeFile(path.join(root, "service-worker.js"), serviceWorker);
 await fs.writeFile(runtimeServiceWorkerPath, serviceWorker);
