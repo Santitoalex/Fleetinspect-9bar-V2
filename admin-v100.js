@@ -53,6 +53,10 @@
       selectedFilters: "Según los filtros seleccionados",
       siteVehicleAlertSummary: "{vehicles} vehículos · {alerts} alertas hoy",
       noInspectionsToday: "Sin inspecciones hoy",
+      unassignedSite: "Sin site",
+      uniqueVehicles: "{count} vehículos únicos",
+      aiPendingFailed: "IA pendiente/fallo",
+      inspectionsToday: "Inspecciones de hoy",
       moduleInspectionsEyebrow: "REGISTRO OPERATIVO",
       moduleInspectionsTitle: "Inspecciones",
       moduleInspectionsDescription: "Busca una matrícula, revisa el trabajo diario y abre su historial completo.",
@@ -154,6 +158,10 @@
       selectedFilters: "Based on the selected filters",
       siteVehicleAlertSummary: "{vehicles} vehicles · {alerts} alerts today",
       noInspectionsToday: "No inspections today",
+      unassignedSite: "No site",
+      uniqueVehicles: "{count} unique vehicles",
+      aiPendingFailed: "AI pending/failed",
+      inspectionsToday: "Today's inspections",
       moduleInspectionsEyebrow: "OPERATIONS LOG",
       moduleInspectionsTitle: "Inspections",
       moduleInspectionsDescription: "Search a registration, review daily work and open its complete history.",
@@ -255,6 +263,10 @@
       selectedFilters: "Gemäß den ausgewählten Filtern",
       siteVehicleAlertSummary: "{vehicles} Fahrzeuge · {alerts} Warnungen heute",
       noInspectionsToday: "Heute keine Inspektionen",
+      unassignedSite: "Kein Standort",
+      uniqueVehicles: "{count} eindeutige Fahrzeuge",
+      aiPendingFailed: "KI ausstehend/fehlgeschlagen",
+      inspectionsToday: "Heutige Inspektionen",
       moduleInspectionsEyebrow: "BETRIEBSPROTOKOLL",
       moduleInspectionsTitle: "Inspektionen",
       moduleInspectionsDescription: "Kennzeichen suchen, Tagesarbeit prüfen und den vollständigen Verlauf öffnen.",
@@ -356,6 +368,10 @@
       selectedFilters: "Conform filtrelor selectate",
       siteVehicleAlertSummary: "{vehicles} vehicule · {alerts} alerte azi",
       noInspectionsToday: "Nicio inspecție azi",
+      unassignedSite: "Fără site",
+      uniqueVehicles: "{count} vehicule unice",
+      aiPendingFailed: "IA în așteptare/eșuată",
+      inspectionsToday: "Inspecțiile de azi",
       moduleInspectionsEyebrow: "REGISTRU OPERAȚIONAL",
       moduleInspectionsTitle: "Inspecții",
       moduleInspectionsDescription: "Caută un număr, verifică activitatea zilnică și deschide istoricul complet.",
@@ -705,6 +721,31 @@
     });
   };
 
+  const localizeLegacyDashboard = () => {
+    const unassignedOption = document.querySelector('#siteFilter option[value="UNASSIGNED"]');
+    if (unassignedOption && unassignedOption.textContent !== translate("unassignedSite")) {
+      unassignedOption.textContent = translate("unassignedSite");
+    }
+
+    const controlRoom = document.querySelector(".control-room-strip");
+    if (!controlRoom) return;
+    const cards = controlRoom.querySelectorAll(":scope > article");
+    const completionMeta = document.querySelector("#todayCompletionMeta");
+    const count = completionMeta?.textContent.match(/\d+/)?.[0] || "0";
+    const uniqueVehicles = translate("uniqueVehicles", { count });
+    if (completionMeta && completionMeta.textContent !== uniqueVehicles) {
+      completionMeta.textContent = uniqueVehicles;
+    }
+    const pendingLabel = cards[1]?.querySelector("span");
+    const pendingMeta = cards[1]?.querySelector("small");
+    if (pendingLabel && pendingLabel.textContent !== translate("aiPendingFailed")) {
+      pendingLabel.textContent = translate("aiPendingFailed");
+    }
+    if (pendingMeta && pendingMeta.textContent !== translate("inspectionsToday")) {
+      pendingMeta.textContent = translate("inspectionsToday");
+    }
+  };
+
   const applyLocalizedCopy = () => {
     document.documentElement.lang = getLanguage();
     document.querySelectorAll("[data-ops-i18n]").forEach((node) => {
@@ -719,6 +760,7 @@
       if (label?.dataset.opsI18n) link.title = translate(label.dataset.opsI18n);
     });
     localizeFleetManager();
+    localizeLegacyDashboard();
   };
 
   window.FleetInspectAdminCopy.apply = applyLocalizedCopy;
@@ -774,6 +816,14 @@
     const fleetList = document.querySelector("#fleetVehicleList");
     if (fleetList) {
       new MutationObserver(localizeFleetManager).observe(fleetList, { childList: true, subtree: true });
+    }
+    const controlRoom = document.querySelector(".control-room-strip");
+    if (controlRoom) {
+      new MutationObserver(localizeLegacyDashboard).observe(controlRoom, {
+        childList: true,
+        characterData: true,
+        subtree: true,
+      });
     }
     applyLocalizedCopy();
     applyCurrentView();
