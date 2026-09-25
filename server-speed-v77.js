@@ -2341,9 +2341,142 @@ const organizedCss = `
 adminHtml = adminHtml.replace("\n </head>", `${organizedCss}\n </head>`);
 
 adminHtml = adminHtml.replace(/<body class="([^"]*)"/, (_match, className) => {
-  const classes = new Set(`${className} admin-clean-v77 admin-organized-v89`.split(/\s+/).filter(Boolean));
+  const classes = new Set(`${className} admin-clean-v77 admin-organized-v89 admin-redesign-v92 admin-ops-v100`.split(/\s+/).filter(Boolean));
   return `<body class="${[...classes].join(" ")}"`;
 });
+
+adminHtml = adminHtml
+  .replace('<p class="eyebrow" data-i18n="operationsOverview">Operations overview</p>', '<p class="eyebrow">Estado de la flota y actividad de hoy</p>')
+  .replace('<h2 data-i18n="reports">Reports</h2>', '<h2>Resumen operativo</h2>');
+
+if (!adminHtml.includes('href="/admin-v92.css')) {
+  adminHtml = adminHtml.replace(
+    "\n </head>",
+    '  <link rel="stylesheet" href="/admin-v92.css?v=96" />\n\n </head>'
+  );
+}
+
+if (!adminHtml.includes('href="/admin-v100.css')) {
+  adminHtml = adminHtml.replace(
+    "\n </head>",
+    '  <link rel="stylesheet" href="/admin-v100.css?v=100" />\n\n </head>'
+  );
+}
+
+const adminV92Script = `  <script id="admin-v92-ui">
+   (() => {
+    const copy = {
+     es: { ready: "Operativa", error: "Revisar sistema", checking: "Comprobando", dark: "Modo oscuro", light: "Modo claro" },
+     en: { ready: "Operational", error: "Check system", checking: "Checking", dark: "Dark mode", light: "Light mode" },
+     de: { ready: "Betriebsbereit", error: "System prüfen", checking: "Prüfung", dark: "Dunkelmodus", light: "Hellmodus" },
+     ro: { ready: "Operațional", error: "Verifică sistemul", checking: "Se verifică", dark: "Mod întunecat", light: "Mod luminos" },
+    };
+
+    const currentCopy = () => {
+     const language = document.querySelector("[data-language-select]")?.value || "es";
+     return copy[language] || copy.es;
+    };
+
+    const initialize = () => {
+     const body = document.body;
+     const actions = document.querySelector(".topbar-actions");
+     const menuButton = document.querySelector(".menu-button");
+     if (!body || !actions) return;
+
+     let themeButton = document.querySelector("#adminThemeToggle");
+     if (!themeButton) {
+      themeButton = document.createElement("button");
+      themeButton.id = "adminThemeToggle";
+      themeButton.type = "button";
+      themeButton.className = "icon-button";
+      actions.insertBefore(themeButton, document.querySelector("#refreshDashboard"));
+     }
+
+     const setTheme = (theme) => {
+      const dark = theme === "dark";
+      body.classList.toggle("admin-theme-dark", dark);
+      const label = dark ? currentCopy().light : currentCopy().dark;
+      themeButton.textContent = dark ? "☀" : "☾";
+      themeButton.title = label;
+      themeButton.setAttribute("aria-label", label);
+      themeButton.setAttribute("aria-pressed", String(dark));
+     };
+
+     let savedTheme = "light";
+     try {
+      savedTheme = localStorage.getItem("fleetinspect_admin_theme") || "light";
+     } catch (_error) {}
+     setTheme(savedTheme);
+
+     themeButton.addEventListener("click", () => {
+      const nextTheme = body.classList.contains("admin-theme-dark") ? "light" : "dark";
+      try { localStorage.setItem("fleetinspect_admin_theme", nextTheme); } catch (_error) {}
+      setTheme(nextTheme);
+     });
+
+     let health = document.querySelector("#adminSystemHealth");
+     if (!health) {
+      health = document.createElement("span");
+      health.id = "adminSystemHealth";
+      health.className = "system-health";
+      health.innerHTML = '<span class="health-dot" aria-hidden="true"></span><span class="health-label"></span>';
+      actions.insertBefore(health, document.querySelector("#lastSync"));
+     }
+
+     const storage = document.querySelector("#storagePill");
+     const ai = document.querySelector("#aiPill");
+     const syncHealth = () => {
+      const services = [storage, ai].filter(Boolean);
+      const isChecking = services.length < 2 || services.some((node) => !node.classList.contains("ready") && !node.classList.contains("warn"));
+      const isReady = !isChecking && services.every((node) => node.classList.contains("ready"));
+      const state = isChecking ? "checking" : (isReady ? "ready" : "error");
+      health.dataset.state = state;
+      health.querySelector(".health-label").textContent = currentCopy()[state];
+     };
+
+     [storage, ai].filter(Boolean).forEach((node) => {
+      new MutationObserver(syncHealth).observe(node, { attributes: true, childList: true, characterData: true, subtree: true });
+     });
+     syncHealth();
+
+     let backdrop = document.querySelector(".admin-sidebar-backdrop");
+     if (!backdrop) {
+      backdrop = document.createElement("button");
+      backdrop.type = "button";
+      backdrop.className = "admin-sidebar-backdrop";
+      backdrop.tabIndex = -1;
+      backdrop.setAttribute("aria-label", "Cerrar menú");
+      body.appendChild(backdrop);
+     }
+
+     const closeMobileSidebar = () => {
+      if (window.innerWidth > 900) return;
+      body.classList.remove("admin-sidebar-open");
+      menuButton?.setAttribute("aria-expanded", "false");
+     };
+
+     if (window.innerWidth <= 900) closeMobileSidebar();
+     backdrop.addEventListener("click", closeMobileSidebar);
+     window.addEventListener("resize", () => {
+      if (window.innerWidth <= 900 && body.classList.contains("admin-sidebar-open")) closeMobileSidebar();
+     });
+     document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeMobileSidebar();
+     });
+     document.querySelector("[data-language-select]")?.addEventListener("change", () => {
+      setTheme(body.classList.contains("admin-theme-dark") ? "dark" : "light");
+      syncHealth();
+     });
+    };
+
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initialize);
+    else initialize();
+   })();
+  </script>`;
+
+if (!adminHtml.includes('id="admin-v92-ui"')) {
+  adminHtml = adminHtml.replace("\n  <script src=\"/vehicles.js", `\n${adminV92Script}\n  <script src="/vehicles.js`);
+}
 
 adminHtml = adminHtml
   .replaceAll("/styles.css?v=54", "/styles.css?v=77")
@@ -2372,7 +2505,14 @@ adminHtml = adminHtml
   .replaceAll("/vehicles.js?v=89", "/vehicles.js?v=90")
   .replaceAll("/i18n.js?v=89", "/i18n.js?v=90")
   .replaceAll("/admin.js?v=89", "/admin.js?v=90");
-adminHtml = adminHtml.replaceAll("?v=90", "?v=91");
+adminHtml = adminHtml.replaceAll("?v=90", "?v=91").replaceAll("?v=91", "?v=100").replaceAll("?v=96", "?v=100");
+
+if (!adminHtml.includes('src="/admin-v100.js')) {
+  adminHtml = adminHtml.replace(
+    "\n </body>",
+    '  <script src="/admin-v100.js?v=100"></script>\n </body>'
+  );
+}
 
 await fs.writeFile(adminHtmlPath, adminHtml);
 await fs.writeFile(runtimeAdminHtmlPath, adminHtml);
@@ -2502,5 +2642,9 @@ serviceWorker = serviceWorker
 serviceWorker = serviceWorker
   .replaceAll("fleetinspect-driver-v90", "fleetinspect-driver-v91")
   .replaceAll("?v=90", "?v=91");
+serviceWorker = serviceWorker
+  .replaceAll("fleetinspect-driver-v91", "fleetinspect-driver-v100")
+  .replaceAll("fleetinspect-driver-v96", "fleetinspect-driver-v100")
+  .replace('"/admin.html",', '"/admin.html",\n  "/admin-v92.css?v=100",\n  "/admin-v100.css?v=100",\n  "/admin-v100.js?v=100",');
 await fs.writeFile(path.join(root, "service-worker.js"), serviceWorker);
 await fs.writeFile(runtimeServiceWorkerPath, serviceWorker);
