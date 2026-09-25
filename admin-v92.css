@@ -1,0 +1,1411 @@
+/* FleetInspect Admin v92: quiet, task-oriented operations UI */
+.admin-body.admin-redesign-v92 {
+  --admin-bg: #f3f4f6;
+  --admin-panel: #ffffff;
+  --admin-panel-soft: #f8f9fa;
+  --admin-sidebar: #17191c;
+  --admin-sidebar-hover: #25282d;
+  --admin-text: #171a1f;
+  --admin-muted: #68717d;
+  --admin-line: #dfe3e8;
+  --admin-line-soft: #eceff2;
+  --admin-accent: #ee7d00;
+  --admin-accent-soft: #fff3e5;
+  --admin-blue: #185f8d;
+  --admin-green: #16815f;
+  --admin-red: #c7352c;
+  --admin-purple: #6b4fd3;
+  min-height: 100vh !important;
+  margin: 0 !important;
+  background: var(--admin-bg) !important;
+  color: var(--admin-text) !important;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  font-size: 13px !important;
+  letter-spacing: 0 !important;
+}
+
+.admin-body.admin-redesign-v92 *,
+.admin-body.admin-redesign-v92 *::before,
+.admin-body.admin-redesign-v92 *::after {
+  box-sizing: border-box;
+  letter-spacing: 0 !important;
+}
+
+.admin-body.admin-redesign-v92 .admin-shell,
+.admin-body.admin-redesign-v92.admin-sidebar-open .admin-shell {
+  display: grid !important;
+  grid-template-columns: 72px minmax(0, 1fr) !important;
+  min-height: 100vh !important;
+  transition: grid-template-columns 180ms ease !important;
+}
+
+.admin-body.admin-redesign-v92.admin-sidebar-open .admin-shell {
+  grid-template-columns: 248px minmax(0, 1fr) !important;
+}
+
+.admin-body.admin-redesign-v92 .fleet-sidebar {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 210 !important;
+  display: flex !important;
+  width: auto !important;
+  height: 100vh !important;
+  min-height: 100vh !important;
+  flex-direction: column !important;
+  align-self: start !important;
+  padding: 14px 10px !important;
+  overflow: hidden !important;
+  border: 0 !important;
+  border-right: 1px solid #2b2e33 !important;
+  background: var(--admin-sidebar) !important;
+  box-shadow: none !important;
+}
+
+.admin-body.admin-redesign-v92 .fleet-logo {
+  display: grid !important;
+  grid-template-columns: 42px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 11px !important;
+  min-height: 48px !important;
+  margin: 0 0 20px !important;
+  padding: 3px 5px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.admin-body.admin-redesign-v92 .fleet-logo img {
+  width: 42px !important;
+  height: 38px !important;
+  padding: 4px !important;
+  border: 1px solid #393d42 !important;
+  border-radius: 6px !important;
+  background: #fff !important;
+  object-fit: contain !important;
+}
+
+.admin-body.admin-redesign-v92 .fleet-logo p {
+  display: block !important;
+  overflow: hidden !important;
+  max-width: 0 !important;
+  margin: 0 !important;
+  color: #fff !important;
+  font-size: 13px !important;
+  font-weight: 760 !important;
+  line-height: 1.2 !important;
+  opacity: 0 !important;
+  white-space: nowrap !important;
+  transition: max-width 180ms ease, opacity 180ms ease !important;
+}
+
+.admin-body.admin-redesign-v92.admin-sidebar-open .fleet-logo p {
+  max-width: 170px !important;
+  opacity: 1 !important;
+}
+
+.admin-body.admin-redesign-v92 .fleet-nav {
+  display: grid !important;
+  gap: 18px !important;
+  margin: 0 !important;
+}
+
+.admin-body.admin-redesign-v92 .nav-group {
+  display: grid !important;
+  gap: 3px !important;
+  padding: 0 0 16px !important;
+  border: 0 !important;
+  border-bottom: 1px solid #2e3136 !important;
+}
+
+.admin-body.admin-redesign-v92 .nav-group:last-child {
+  border-bottom: 0 !important;
+}
+
+.admin-body.admin-redesign-v92 .nav-group > p {
+  display: block !important;
+  overflow: hidden !important;
+  max-width: 0 !important;
+  height: 19px !important;
+  margin: 0 0 4px 51px !important;
+  color: #8f969f !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  opacity: 0 !important;
+  white-space: nowrap !important;
+}
+
+.admin-body.admin-redesign-v92.admin-sidebar-open .nav-group > p {
+  max-width: 160px !important;
+  opacity: 1 !important;
+}
+
+.admin-body.admin-redesign-v92 .fleet-nav a {
+  display: grid !important;
+  grid-template-columns: 42px minmax(0, 1fr) !important;
+  grid-template-rows: auto auto !important;
+  align-items: center !important;
+  column-gap: 10px !important;
+  width: 100% !important;
+  min-height: 46px !important;
+  padding: 2px 4px !important;
+  border: 0 !important;
+  border-radius: 6px !important;
+  background: transparent !important;
+  color: #c8cdd3 !important;
+  text-decoration: none !important;
+}
+
+.admin-body.admin-redesign-v92 .fleet-nav a:hover {
+  background: var(--admin-sidebar-hover) !important;
+}
+
+.admin-body.admin-redesign-v92 .fleet-nav a > span {
+  display: grid !important;
+  grid-row: 1 / span 2 !important;
+  width: 42px !important;
+  height: 40px !important;
+  place-items: center !important;
+  border: 0 !important;
+  border-radius: 5px !important;
+  background: transparent !important;
+  color: #aeb5bd !important;
+  font-size: 18px !important;
+}
+
+.admin-body.admin-redesign-v92 .fleet-nav a b,
+.admin-body.admin-redesign-v92 .fleet-nav a small {
+  display: block !important;
+  overflow: hidden !important;
+  max-width: 0 !important;
+  opacity: 0 !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.admin-body.admin-redesign-v92 .fleet-nav a b {
+  color: #f6f7f8 !important;
+  font-size: 13px !important;
+  font-weight: 720 !important;
+  line-height: 1.2 !important;
+}
+
+.admin-body.admin-redesign-v92 .fleet-nav a small {
+  margin-top: 2px !important;
+  color: #8f969f !important;
+  font-size: 10px !important;
+  font-weight: 560 !important;
+  line-height: 1.15 !important;
+}
+
+.admin-body.admin-redesign-v92.admin-sidebar-open .fleet-nav a b,
+.admin-body.admin-redesign-v92.admin-sidebar-open .fleet-nav a small {
+  max-width: 170px !important;
+  opacity: 1 !important;
+}
+
+.admin-body.admin-redesign-v92 .fleet-nav a.active {
+  background: #2a2d31 !important;
+  color: #fff !important;
+}
+
+.admin-body.admin-redesign-v92 .fleet-nav a.active::before {
+  position: absolute !important;
+  left: 0 !important;
+  width: 3px !important;
+  height: 28px !important;
+  border-radius: 0 3px 3px 0 !important;
+  background: var(--admin-accent) !important;
+  content: "" !important;
+}
+
+.admin-body.admin-redesign-v92 .fleet-nav a.active > span {
+  background: transparent !important;
+  color: var(--admin-accent) !important;
+  box-shadow: none !important;
+}
+
+.admin-body.admin-redesign-v92 .admin-workspace {
+  min-width: 0 !important;
+  background: var(--admin-bg) !important;
+}
+
+.admin-body.admin-redesign-v92 .fleet-topbar {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 150 !important;
+  display: flex !important;
+  min-height: 62px !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+  padding: 9px 22px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--admin-line) !important;
+  background: color-mix(in srgb, var(--admin-panel) 96%, transparent) !important;
+  box-shadow: none !important;
+  backdrop-filter: blur(14px) !important;
+}
+
+.admin-body.admin-redesign-v92 .topbar-left,
+.admin-body.admin-redesign-v92 .topbar-actions {
+  display: flex !important;
+  min-width: 0 !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.admin-body.admin-redesign-v92 .topbar-left {
+  flex: 1 !important;
+}
+
+.admin-body.admin-redesign-v92 .menu-button,
+.admin-body.admin-redesign-v92 .icon-button,
+.admin-body.admin-redesign-v92 #adminThemeToggle {
+  display: grid !important;
+  width: 38px !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  place-items: center !important;
+  padding: 0 !important;
+  border: 1px solid var(--admin-line) !important;
+  border-radius: 6px !important;
+  background: var(--admin-panel) !important;
+  color: var(--admin-text) !important;
+  font-size: 16px !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+}
+
+.admin-body.admin-redesign-v92 .menu-button:hover,
+.admin-body.admin-redesign-v92 .icon-button:hover,
+.admin-body.admin-redesign-v92 #adminThemeToggle:hover {
+  border-color: #bfc6ce !important;
+  background: var(--admin-panel-soft) !important;
+}
+
+.admin-body.admin-redesign-v92 .topbar-company-logo {
+  display: none !important;
+}
+
+.admin-body.admin-redesign-v92 .global-search {
+  display: flex !important;
+  width: min(520px, 48vw) !important;
+  min-height: 40px !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 0 12px !important;
+  border: 1px solid var(--admin-line) !important;
+  border-radius: 6px !important;
+  background: var(--admin-panel-soft) !important;
+  box-shadow: none !important;
+}
+
+.admin-body.admin-redesign-v92 .global-search > span {
+  color: var(--admin-muted) !important;
+  font-size: 15px !important;
+}
+
+.admin-body.admin-redesign-v92 .global-search input {
+  width: 100% !important;
+  min-height: 38px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  color: var(--admin-text) !important;
+  font-size: 13px !important;
+  box-shadow: none !important;
+}
+
+.admin-body.admin-redesign-v92 .sync-chip,
+.admin-body.admin-redesign-v92 .user-chip,
+.admin-body.admin-redesign-v92 .role-chip,
+.admin-body.admin-redesign-v92 .language-select,
+.admin-body.admin-redesign-v92 .user-admin-link {
+  min-height: 36px !important;
+  padding: 7px 9px !important;
+  border: 1px solid var(--admin-line) !important;
+  border-radius: 6px !important;
+  background: var(--admin-panel) !important;
+  color: var(--admin-text) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  box-shadow: none !important;
+}
+
+.admin-body.admin-redesign-v92 .role-chip {
+  border-color: #f2c48d !important;
+  background: var(--admin-accent-soft) !important;
+  color: #9a4b00 !important;
+}
+
+.admin-body.admin-redesign-v92 .system-health {
+  display: inline-flex !important;
+  min-height: 34px !important;
+  align-items: center !important;
+  gap: 7px !important;
+  padding: 6px 9px !important;
+  border: 1px solid #b9dfd0 !important;
+  border-radius: 6px !important;
+  background: #effaf5 !important;
+  color: #126b50 !important;
+  font-size: 11px !important;
+  font-weight: 760 !important;
+  white-space: nowrap !important;
+}
+
+.admin-body.admin-redesign-v92 .system-health[data-state="checking"] {
+  border-color: var(--admin-line) !important;
+  background: var(--admin-panel-soft) !important;
+  color: var(--admin-muted) !important;
+}
+
+.admin-body.admin-redesign-v92 .system-health[data-state="error"] {
+  border-color: #efc4c1 !important;
+  background: #fff3f2 !important;
+  color: #a72620 !important;
+}
+
+.admin-body.admin-redesign-v92 .health-dot {
+  width: 8px !important;
+  height: 8px !important;
+  border-radius: 50% !important;
+  background: currentColor !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 14%, transparent) !important;
+}
+
+.admin-body.admin-redesign-v92 .dashboard-main {
+  display: block !important;
+  width: 100% !important;
+  max-width: 1680px !important;
+  margin: 0 auto !important;
+  padding: 24px 28px 44px !important;
+}
+
+.admin-body.admin-redesign-v92 .admin-hero {
+  display: none !important;
+}
+
+.admin-body.admin-redesign-v92 .hero-dashboard {
+  overflow: visible !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.admin-body.admin-redesign-v92 .admin-command-header {
+  display: flex !important;
+  min-height: 64px !important;
+  align-items: flex-end !important;
+  justify-content: space-between !important;
+  gap: 18px !important;
+  margin: 0 0 18px !important;
+  padding: 0 0 15px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--admin-line) !important;
+  background: transparent !important;
+}
+
+.admin-body.admin-redesign-v92 .admin-command-header .eyebrow {
+  margin: 0 0 5px !important;
+  color: var(--admin-muted) !important;
+  font-size: 12px !important;
+  font-weight: 580 !important;
+  text-transform: none !important;
+}
+
+.admin-body.admin-redesign-v92 .admin-command-header h2 {
+  margin: 0 !important;
+  color: var(--admin-text) !important;
+  font-size: 28px !important;
+  font-weight: 760 !important;
+  line-height: 1.05 !important;
+}
+
+.admin-body.admin-redesign-v92 .dashboard-actions {
+  display: none !important;
+  flex-wrap: wrap !important;
+  justify-content: flex-end !important;
+  gap: 7px !important;
+}
+
+.admin-body.admin-redesign-v92[data-admin-view="reports"] .dashboard-actions {
+  display: flex !important;
+}
+
+.admin-body.admin-redesign-v92 button,
+.admin-body.admin-redesign-v92 .ghost,
+.admin-body.admin-redesign-v92 select,
+.admin-body.admin-redesign-v92 input,
+.admin-body.admin-redesign-v92 textarea {
+  border-radius: 6px !important;
+  font-family: inherit !important;
+}
+
+.admin-body.admin-redesign-v92 .dashboard-actions button,
+.admin-body.admin-redesign-v92 .ghost {
+  min-height: 36px !important;
+  padding: 7px 11px !important;
+  border: 1px solid var(--admin-line) !important;
+  background: var(--admin-panel) !important;
+  color: var(--admin-text) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  box-shadow: none !important;
+}
+
+.admin-body.admin-redesign-v92 .dashboard-actions .strong-action {
+  border-color: var(--admin-accent) !important;
+  background: var(--admin-accent) !important;
+  color: #fff !important;
+}
+
+.admin-body.admin-redesign-v92 #dashboardContent {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 14px !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+.admin-body.admin-redesign-v92 #dashboardContent.hidden,
+.admin-body.admin-redesign-v92 .dashboard-widget.hidden,
+.admin-body.admin-redesign-v92 .admin-view-hidden {
+  display: none !important;
+}
+
+.admin-body.admin-redesign-v92 #adminLock.hidden,
+.admin-body.admin-redesign-v92 .fleet-nav a.hidden,
+.admin-body.admin-redesign-v92 .topbar-actions .hidden,
+.admin-body.admin-redesign-v92 .admin-install-panel.hidden {
+  display: none !important;
+}
+
+.admin-body.admin-redesign-v92 .admin-auth {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 18px !important;
+  max-width: 980px !important;
+  margin: 54px auto !important;
+  padding: 0 !important;
+}
+
+.admin-body.admin-redesign-v92 .admin-auth-card {
+  padding: 24px !important;
+  border: 1px solid var(--admin-line) !important;
+  border-radius: 7px !important;
+  background: var(--admin-panel) !important;
+  box-shadow: 0 12px 32px rgba(20, 24, 30, .05) !important;
+}
+
+.admin-body.admin-redesign-v92 .admin-auth-card h3 {
+  margin: 4px 0 18px !important;
+  font-size: 22px !important;
+}
+
+.admin-body.admin-redesign-v92 .admin-lock,
+.admin-body.admin-redesign-v92 .admin-signup {
+  display: grid !important;
+  gap: 10px !important;
+}
+
+.admin-body.admin-redesign-v92 .admin-lock input,
+.admin-body.admin-redesign-v92 .admin-signup input {
+  width: 100% !important;
+  min-height: 44px !important;
+  padding: 10px 12px !important;
+  border: 1px solid var(--admin-line) !important;
+  background: var(--admin-panel) !important;
+  color: var(--admin-text) !important;
+}
+
+.admin-body.admin-redesign-v92 .admin-lock button,
+.admin-body.admin-redesign-v92 .admin-signup button {
+  min-height: 44px !important;
+  border: 1px solid var(--admin-accent) !important;
+  background: var(--admin-accent) !important;
+  color: #fff !important;
+  font-weight: 760 !important;
+}
+
+.admin-body.admin-redesign-v92 .admin-filter-panel {
+  display: grid !important;
+  grid-template-columns: 190px minmax(260px, 1fr) 210px 94px !important;
+  gap: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  border: 1px solid var(--admin-line) !important;
+  border-radius: 7px !important;
+  background: var(--admin-panel) !important;
+  box-shadow: none !important;
+}
+
+.admin-body.admin-redesign-v92 .admin-filter-panel > label,
+.admin-body.admin-redesign-v92 .admin-filter-panel > article {
+  display: grid !important;
+  min-height: 66px !important;
+  align-content: center !important;
+  gap: 4px !important;
+  padding: 9px 13px !important;
+  border: 0 !important;
+  border-right: 1px solid var(--admin-line-soft) !important;
+  border-radius: 0 !important;
+  background: var(--admin-panel) !important;
+  box-shadow: none !important;
+}
+
+.admin-body.admin-redesign-v92 .admin-filter-panel > *:last-child {
+  border-right: 0 !important;
+}
+
+.admin-body.admin-redesign-v92 .admin-filter-panel span,
+.admin-body.admin-redesign-v92 .control-room-strip span,
+.admin-body.admin-redesign-v92 .metrics span,
+.admin-body.admin-redesign-v92 .vehicle-control-summary span {
+  color: var(--admin-muted) !important;
+  font-size: 10px !important;
+  font-weight: 720 !important;
+  text-transform: uppercase !important;
+}
+
+.admin-body.admin-redesign-v92 .admin-filter-panel select {
+  min-height: 28px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  color: var(--admin-text) !important;
+  font-size: 13px !important;
+  font-weight: 680 !important;
+  box-shadow: none !important;
+}
+
+.admin-body.admin-redesign-v92 .admin-filter-panel strong {
+  color: var(--admin-text) !important;
+  font-size: 23px !important;
+}
+
+.admin-body.admin-redesign-v92 .control-room-strip,
+.admin-body.admin-redesign-v92 .metrics,
+.admin-body.admin-redesign-v92 .vehicle-control-summary {
+  display: grid !important;
+  gap: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  border: 1px solid var(--admin-line) !important;
+  border-radius: 7px !important;
+  background: var(--admin-panel) !important;
+}
+
+.admin-body.admin-redesign-v92 .control-room-strip {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+}
+
+.admin-body.admin-redesign-v92 .metrics {
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+}
+
+.admin-body.admin-redesign-v92[data-admin-view="overview"] .metrics {
+  display: none !important;
+}
+
+.admin-body.admin-redesign-v92 .vehicle-control-summary {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--admin-line-soft) !important;
+  border-radius: 0 !important;
+}
+
+.admin-body.admin-redesign-v92 .control-room-strip article,
+.admin-body.admin-redesign-v92 .metrics article,
+.admin-body.admin-redesign-v92 .vehicle-control-summary article {
+  min-height: 82px !important;
+  padding: 14px 16px !important;
+  border: 0 !important;
+  border-right: 1px solid var(--admin-line-soft) !important;
+  border-radius: 0 !important;
+  background: var(--admin-panel) !important;
+  box-shadow: none !important;
+}
+
+.admin-body.admin-redesign-v92 .control-room-strip article:last-child,
+.admin-body.admin-redesign-v92 .metrics article:last-child,
+.admin-body.admin-redesign-v92 .vehicle-control-summary article:last-child {
+  border-right: 0 !important;
+}
+
+.admin-body.admin-redesign-v92 .control-room-strip article::before,
+.admin-body.admin-redesign-v92 .metrics article::before {
+  display: none !important;
+}
+
+.admin-body.admin-redesign-v92 .control-room-strip strong,
+.admin-body.admin-redesign-v92 .metrics strong,
+.admin-body.admin-redesign-v92 .vehicle-control-summary strong {
+  margin: 5px 0 0 !important;
+  color: var(--admin-text) !important;
+  font-size: 27px !important;
+  font-weight: 740 !important;
+  line-height: 1 !important;
+}
+
+.admin-body.admin-redesign-v92 .control-room-strip small {
+  margin-top: 5px !important;
+  color: var(--admin-muted) !important;
+  font-size: 10px !important;
+  font-weight: 580 !important;
+}
+
+.admin-body.admin-redesign-v92 .site-overview-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+  margin: 0 !important;
+}
+
+.admin-body.admin-redesign-v92 .site-overview-panel {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border: 1px solid var(--admin-line) !important;
+  border-radius: 7px !important;
+  background: var(--admin-panel) !important;
+  box-shadow: none !important;
+}
+
+.admin-body.admin-redesign-v92 .site-overview-head {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  grid-template-rows: auto auto !important;
+  min-height: 72px !important;
+  align-items: center !important;
+  padding: 13px 16px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--admin-line-soft) !important;
+  border-left: 3px solid var(--admin-accent) !important;
+  border-radius: 0 !important;
+  background: var(--admin-panel) !important;
+  color: var(--admin-text) !important;
+  text-align: left !important;
+  cursor: pointer !important;
+}
+
+.admin-body.admin-redesign-v92 .site-overview-head:hover {
+  background: var(--admin-panel-soft) !important;
+}
+
+.admin-body.admin-redesign-v92 .site-overview-head span {
+  color: var(--admin-text) !important;
+  font-size: 14px !important;
+  font-weight: 760 !important;
+}
+
+.admin-body.admin-redesign-v92 .site-overview-head strong {
+  grid-row: 1 / span 2 !important;
+  grid-column: 2 !important;
+  color: var(--admin-blue) !important;
+  font-size: 31px !important;
+  font-weight: 760 !important;
+  line-height: 1 !important;
+}
+
+.admin-body.admin-redesign-v92 .site-overview-head small {
+  color: var(--admin-muted) !important;
+  font-size: 10px !important;
+  font-weight: 580 !important;
+}
+
+.admin-body.admin-redesign-v92 .site-inspection-table {
+  display: grid !important;
+  align-content: start !important;
+  max-height: 250px !important;
+  overflow: auto !important;
+  gap: 0 !important;
+  padding: 0 !important;
+}
+
+.admin-body.admin-redesign-v92 .site-inspection-row {
+  display: grid !important;
+  grid-template-columns: 120px minmax(0, 1fr) 48px !important;
+  min-height: 39px !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 8px 15px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--admin-line-soft) !important;
+  border-radius: 0 !important;
+  background: var(--admin-panel) !important;
+  color: var(--admin-text) !important;
+  text-decoration: none !important;
+}
+
+.admin-body.admin-redesign-v92 .site-inspection-row:hover {
+  background: var(--admin-panel-soft) !important;
+}
+
+.admin-body.admin-redesign-v92 .site-inspection-row strong,
+.admin-body.admin-redesign-v92 .site-inspection-row span,
+.admin-body.admin-redesign-v92 .site-inspection-row time {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.admin-body.admin-redesign-v92 .site-inspection-row strong {
+  color: var(--admin-text) !important;
+  font-size: 12px !important;
+  font-weight: 760 !important;
+}
+
+.admin-body.admin-redesign-v92 .site-inspection-row span,
+.admin-body.admin-redesign-v92 .site-inspection-row time,
+.admin-body.admin-redesign-v92 .site-empty-line {
+  color: var(--admin-muted) !important;
+  font-size: 11px !important;
+  font-weight: 560 !important;
+}
+
+.admin-body.admin-redesign-v92 .site-empty-line {
+  margin: 0 !important;
+  padding: 26px 16px !important;
+}
+
+.admin-body.admin-redesign-v92 .operations-board,
+.admin-body.admin-redesign-v92 .data-command-center {
+  display: none !important;
+}
+
+.admin-body.admin-redesign-v92 .dashboard-card-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+  align-items: start !important;
+}
+
+.admin-body.admin-redesign-v92 .dashboard-widget {
+  overflow: hidden !important;
+  border: 1px solid var(--admin-line) !important;
+  border-radius: 7px !important;
+  background: var(--admin-panel) !important;
+  box-shadow: none !important;
+}
+
+.admin-body.admin-redesign-v92 .dashboard-widget.wide-widget,
+.admin-body.admin-redesign-v92 #dailyVehicleControl,
+.admin-body.admin-redesign-v92 #fleetVehicleManagement,
+.admin-body.admin-redesign-v92 #userManagement {
+  grid-column: 1 / -1 !important;
+}
+
+.admin-body.admin-redesign-v92 .dashboard-widget > header {
+  display: flex !important;
+  min-height: 58px !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 14px !important;
+  padding: 12px 15px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--admin-line-soft) !important;
+  background: var(--admin-panel) !important;
+}
+
+.admin-body.admin-redesign-v92 .dashboard-widget h3 {
+  margin: 0 !important;
+  color: var(--admin-text) !important;
+  font-size: 16px !important;
+  font-weight: 740 !important;
+  line-height: 1.2 !important;
+}
+
+.admin-body.admin-redesign-v92 .dashboard-widget header span {
+  display: block !important;
+  margin-top: 3px !important;
+  color: var(--admin-muted) !important;
+  font-size: 10px !important;
+  font-weight: 560 !important;
+  text-transform: none !important;
+}
+
+.admin-body.admin-redesign-v92 .primary-widget,
+.admin-body.admin-redesign-v92 .vehicle-control-widget,
+.admin-body.admin-redesign-v92 .fleet-vehicle-widget,
+.admin-body.admin-redesign-v92 .user-management-widget,
+.admin-body.admin-redesign-v92 .status-widget {
+  border-top: 1px solid var(--admin-line) !important;
+}
+
+.admin-body.admin-redesign-v92 .vehicle-control-tools,
+.admin-body.admin-redesign-v92 .fleet-vehicle-tools {
+  display: grid !important;
+  grid-template-columns: 170px minmax(210px, 1fr) 180px !important;
+  align-items: end !important;
+  gap: 9px !important;
+  margin: 0 !important;
+  padding: 11px 15px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--admin-line-soft) !important;
+  background: var(--admin-panel-soft) !important;
+}
+
+.admin-body.admin-redesign-v92 .fleet-vehicle-tools {
+  grid-template-columns: 170px 190px 90px minmax(220px, 1fr) !important;
+}
+
+.admin-body.admin-redesign-v92 .vehicle-control-tools label,
+.admin-body.admin-redesign-v92 .fleet-vehicle-tools label {
+  display: grid !important;
+  gap: 5px !important;
+  margin: 0 !important;
+}
+
+.admin-body.admin-redesign-v92 .vehicle-control-tools label > span,
+.admin-body.admin-redesign-v92 .fleet-vehicle-tools label > span {
+  color: var(--admin-muted) !important;
+  font-size: 9px !important;
+  font-weight: 760 !important;
+  text-transform: uppercase !important;
+}
+
+.admin-body.admin-redesign-v92 .vehicle-control-tools input,
+.admin-body.admin-redesign-v92 .vehicle-control-tools select,
+.admin-body.admin-redesign-v92 .fleet-vehicle-tools input,
+.admin-body.admin-redesign-v92 .fleet-vehicle-tools select,
+.admin-body.admin-redesign-v92 .fleet-vehicle-tools button,
+.admin-body.admin-redesign-v92 .history-selector select {
+  width: 100% !important;
+  min-height: 36px !important;
+  padding: 7px 10px !important;
+  border: 1px solid var(--admin-line) !important;
+  background: var(--admin-panel) !important;
+  color: var(--admin-text) !important;
+  font-size: 12px !important;
+  box-shadow: none !important;
+}
+
+.admin-body.admin-redesign-v92 .fleet-vehicle-tools button {
+  border-color: var(--admin-blue) !important;
+  background: var(--admin-blue) !important;
+  color: #fff !important;
+  font-weight: 730 !important;
+}
+
+.admin-body.admin-redesign-v92 .fleet-vehicle-statusbar {
+  display: flex !important;
+  min-height: 44px !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  padding: 8px 15px !important;
+  border-bottom: 1px solid var(--admin-line-soft) !important;
+  background: var(--admin-panel) !important;
+}
+
+.admin-body.admin-redesign-v92 #fleetVehicleStatus {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  color: var(--admin-muted) !important;
+  font-size: 11px !important;
+  font-weight: 650 !important;
+}
+
+.admin-body.admin-redesign-v92 #fleetVehicleStatus::before {
+  width: 8px !important;
+  height: 8px !important;
+  border-radius: 50% !important;
+  background: #929aa4 !important;
+  content: "" !important;
+}
+
+.admin-body.admin-redesign-v92 #fleetVehicleStatus[data-state="ready"]::before {
+  background: var(--admin-green) !important;
+}
+
+.admin-body.admin-redesign-v92 #fleetVehicleStatus[data-state="error"]::before {
+  background: var(--admin-red) !important;
+}
+
+.admin-body.admin-redesign-v92 #refreshFleetVehicles {
+  min-height: 32px !important;
+  padding: 6px 10px !important;
+  border: 1px solid var(--admin-line) !important;
+  background: var(--admin-panel) !important;
+  color: var(--admin-blue) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+}
+
+.admin-body.admin-redesign-v92 .fleet-vehicle-list-head,
+.admin-body.admin-redesign-v92 .fleet-vehicle-row {
+  display: grid !important;
+  grid-template-columns: minmax(160px, 1fr) 150px 72px !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.admin-body.admin-redesign-v92 .fleet-vehicle-list-head {
+  padding: 8px 15px !important;
+  border-bottom: 1px solid var(--admin-line-soft) !important;
+  background: var(--admin-panel-soft) !important;
+  color: var(--admin-muted) !important;
+  font-size: 9px !important;
+  font-weight: 760 !important;
+  text-transform: uppercase !important;
+}
+
+.admin-body.admin-redesign-v92 .fleet-vehicle-list {
+  display: block !important;
+  max-height: 540px !important;
+  overflow: auto !important;
+  padding: 0 !important;
+}
+
+.admin-body.admin-redesign-v92 .fleet-vehicle-row {
+  min-height: 42px !important;
+  padding: 7px 15px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--admin-line-soft) !important;
+  border-radius: 0 !important;
+  background: var(--admin-panel) !important;
+}
+
+.admin-body.admin-redesign-v92 .fleet-vehicle-row:hover {
+  background: var(--admin-panel-soft) !important;
+}
+
+.admin-body.admin-redesign-v92 .fleet-vehicle-plate {
+  color: var(--admin-text) !important;
+  font-size: 12px !important;
+  font-weight: 760 !important;
+}
+
+.admin-body.admin-redesign-v92 .fleet-vehicle-site {
+  color: var(--admin-muted) !important;
+  font-size: 11px !important;
+  font-weight: 580 !important;
+}
+
+.admin-body.admin-redesign-v92 .fleet-vehicle-row button {
+  min-height: 29px !important;
+  padding: 4px 8px !important;
+  border: 1px solid #e9b5b1 !important;
+  border-radius: 5px !important;
+  background: transparent !important;
+  color: var(--admin-red) !important;
+  font-size: 10px !important;
+  font-weight: 720 !important;
+}
+
+.admin-body.admin-redesign-v92 .fleet-vehicle-note,
+.admin-body.admin-redesign-v92 .daily-control-note {
+  margin: 0 !important;
+  padding: 8px 15px !important;
+  border-bottom: 1px solid var(--admin-line-soft) !important;
+  background: var(--admin-panel) !important;
+  color: var(--admin-muted) !important;
+  font-size: 10px !important;
+}
+
+.admin-body.admin-redesign-v92 .report-list,
+.admin-body.admin-redesign-v92 .vehicle-summary,
+.admin-body.admin-redesign-v92 .alert-list,
+.admin-body.admin-redesign-v92 .vehicle-control-list,
+.admin-body.admin-redesign-v92 .status-list,
+.admin-body.admin-redesign-v92 .driver-summary-list,
+.admin-body.admin-redesign-v92 .activity-list,
+.admin-body.admin-redesign-v92 .dispatcher-list,
+.admin-body.admin-redesign-v92 .vehicle-history-list {
+  display: grid !important;
+  max-height: 540px !important;
+  overflow: auto !important;
+  gap: 0 !important;
+  padding: 0 !important;
+}
+
+.admin-body.admin-redesign-v92 .report-card,
+.admin-body.admin-redesign-v92 .vehicle-tile,
+.admin-body.admin-redesign-v92 .alert-card,
+.admin-body.admin-redesign-v92 .dispatcher-row,
+.admin-body.admin-redesign-v92 .activity-row,
+.admin-body.admin-redesign-v92 .status-row,
+.admin-body.admin-redesign-v92 .vehicle-control-row,
+.admin-body.admin-redesign-v92 .history-row {
+  margin: 0 !important;
+  padding: 10px 14px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--admin-line-soft) !important;
+  border-radius: 0 !important;
+  background: var(--admin-panel) !important;
+  box-shadow: none !important;
+}
+
+.admin-body.admin-redesign-v92 .report-card:hover,
+.admin-body.admin-redesign-v92 .vehicle-tile:hover,
+.admin-body.admin-redesign-v92 .alert-card:hover,
+.admin-body.admin-redesign-v92 .dispatcher-row:hover,
+.admin-body.admin-redesign-v92 .activity-row:hover,
+.admin-body.admin-redesign-v92 .status-row:hover,
+.admin-body.admin-redesign-v92 .vehicle-control-row:hover,
+.admin-body.admin-redesign-v92 .history-row:hover {
+  background: var(--admin-panel-soft) !important;
+}
+
+.admin-body.admin-redesign-v92 .vehicle-group {
+  margin: 0 !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--admin-line) !important;
+  border-radius: 0 !important;
+  background: var(--admin-panel) !important;
+}
+
+.admin-body.admin-redesign-v92 .vehicle-group-header {
+  min-height: 48px !important;
+  padding: 9px 14px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--admin-line-soft) !important;
+  background: var(--admin-panel-soft) !important;
+}
+
+.admin-body.admin-redesign-v92 .vehicle-control-section {
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: var(--admin-panel) !important;
+}
+
+.admin-body.admin-redesign-v92 .vehicle-control-section > header {
+  min-height: 44px !important;
+  padding: 8px 14px !important;
+  border-bottom: 1px solid var(--admin-line-soft) !important;
+  background: var(--admin-panel-soft) !important;
+}
+
+.admin-body.admin-redesign-v92 .vehicle-control-row {
+  display: grid !important;
+  grid-template-columns: 120px 100px minmax(150px, 1fr) 100px 70px 130px 80px !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.admin-body.admin-redesign-v92 .vehicle-control-row > div,
+.admin-body.admin-redesign-v92 .vehicle-control-row > a {
+  min-width: 0 !important;
+}
+
+.admin-body.admin-redesign-v92 .vehicle-control-row strong,
+.admin-body.admin-redesign-v92 .vehicle-control-row span {
+  display: block !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.admin-body.admin-redesign-v92 .role-help-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 0 !important;
+  margin: 0 !important;
+  border-bottom: 1px solid var(--admin-line-soft) !important;
+}
+
+.admin-body.admin-redesign-v92 .role-help-grid article {
+  min-height: 72px !important;
+  padding: 12px 14px !important;
+  border: 0 !important;
+  border-right: 1px solid var(--admin-line-soft) !important;
+  border-radius: 0 !important;
+  background: var(--admin-panel-soft) !important;
+}
+
+.admin-body.admin-redesign-v92 .empty-state,
+.admin-body.admin-redesign-v92 .fleet-loading-state {
+  margin: 0 !important;
+  padding: 28px 16px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: var(--admin-panel) !important;
+  color: var(--admin-muted) !important;
+  text-align: center !important;
+}
+
+.admin-body.admin-redesign-v92 .admin-install-panel {
+  margin: 0 0 16px !important;
+  padding: 13px 15px !important;
+  border: 1px solid #f0cfaa !important;
+  border-radius: 7px !important;
+  background: var(--admin-accent-soft) !important;
+  box-shadow: none !important;
+}
+
+.admin-body.admin-redesign-v92 .admin-sidebar-backdrop {
+  display: none;
+}
+
+/* Dark mode keeps the same hierarchy instead of becoming a second design. */
+.admin-body.admin-redesign-v92.admin-theme-dark {
+  --admin-bg: #111315;
+  --admin-panel: #191c1f;
+  --admin-panel-soft: #202429;
+  --admin-sidebar: #0b0d0f;
+  --admin-sidebar-hover: #1d2024;
+  --admin-text: #f1f3f5;
+  --admin-muted: #9ba3ad;
+  --admin-line: #34383e;
+  --admin-line-soft: #2a2e33;
+  --admin-accent-soft: #332416;
+  --admin-blue: #62a8d5;
+  --admin-green: #54bd96;
+  --admin-red: #ef7770;
+}
+
+.admin-body.admin-redesign-v92.admin-theme-dark .fleet-topbar {
+  background: rgba(25, 28, 31, .96) !important;
+}
+
+.admin-body.admin-redesign-v92.admin-theme-dark .role-chip {
+  border-color: #684d2f !important;
+  color: #ffb767 !important;
+}
+
+.admin-body.admin-redesign-v92.admin-theme-dark .system-health {
+  border-color: #285a49 !important;
+  background: #162a23 !important;
+  color: #72d4ae !important;
+}
+
+.admin-body.admin-redesign-v92.admin-theme-dark .system-health[data-state="error"] {
+  border-color: #633632 !important;
+  background: #2d1d1c !important;
+  color: #ff8f88 !important;
+}
+
+.admin-body.admin-redesign-v92.admin-theme-dark .fleet-vehicle-row strong,
+.admin-body.admin-redesign-v92.admin-theme-dark .fleet-vehicle-row .fleet-vehicle-plate,
+.admin-body.admin-redesign-v92.admin-theme-dark .report-card strong,
+.admin-body.admin-redesign-v92.admin-theme-dark .history-row strong,
+.admin-body.admin-redesign-v92.admin-theme-dark .vehicle-control-row strong {
+  color: var(--admin-text) !important;
+}
+
+.admin-body.admin-redesign-v92.admin-theme-dark .fleet-vehicle-row span,
+.admin-body.admin-redesign-v92.admin-theme-dark .fleet-vehicle-row .fleet-vehicle-site {
+  color: var(--admin-muted) !important;
+}
+
+.admin-body.admin-redesign-v92.admin-theme-dark .fleet-vehicle-total {
+  border-color: var(--admin-line) !important;
+  background: var(--admin-panel-soft) !important;
+}
+
+.admin-body.admin-redesign-v92.admin-theme-dark .fleet-vehicle-total strong {
+  background: transparent !important;
+  color: var(--admin-text) !important;
+}
+
+.admin-body.admin-redesign-v92.admin-theme-dark input::placeholder,
+.admin-body.admin-redesign-v92.admin-theme-dark textarea::placeholder {
+  color: #707983 !important;
+}
+
+@media (max-width: 1180px) {
+  .admin-body.admin-redesign-v92 .sync-chip,
+  .admin-body.admin-redesign-v92 .user-chip,
+  .admin-body.admin-redesign-v92 .user-admin-link {
+    display: none !important;
+  }
+
+  .admin-body.admin-redesign-v92 .admin-filter-panel {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .admin-body.admin-redesign-v92 .admin-filter-panel > :nth-child(2) {
+    border-right: 0 !important;
+  }
+
+  .admin-body.admin-redesign-v92 .admin-filter-panel > :nth-child(-n+2) {
+    border-bottom: 1px solid var(--admin-line-soft) !important;
+  }
+
+  .admin-body.admin-redesign-v92 .dashboard-card-grid,
+  .admin-body.admin-redesign-v92 .site-overview-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .admin-body.admin-redesign-v92 .admin-shell,
+  .admin-body.admin-redesign-v92.admin-sidebar-open .admin-shell {
+    display: block !important;
+  }
+
+  .admin-body.admin-redesign-v92 .fleet-sidebar {
+    position: fixed !important;
+    inset: 0 auto 0 0 !important;
+    width: min(280px, 86vw) !important;
+    transform: translateX(-105%) !important;
+    transition: transform 180ms ease !important;
+  }
+
+  .admin-body.admin-redesign-v92.admin-sidebar-open .fleet-sidebar {
+    transform: translateX(0) !important;
+  }
+
+  .admin-body.admin-redesign-v92 .fleet-logo p,
+  .admin-body.admin-redesign-v92 .nav-group > p,
+  .admin-body.admin-redesign-v92 .fleet-nav a b,
+  .admin-body.admin-redesign-v92 .fleet-nav a small {
+    max-width: 180px !important;
+    opacity: 1 !important;
+  }
+
+  .admin-body.admin-redesign-v92 .admin-sidebar-backdrop {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 200 !important;
+    display: block !important;
+    visibility: hidden !important;
+    border: 0 !important;
+    background: rgba(5, 7, 9, .52) !important;
+    opacity: 0 !important;
+    transition: opacity 180ms ease, visibility 180ms ease !important;
+  }
+
+  .admin-body.admin-redesign-v92.admin-sidebar-open .admin-sidebar-backdrop {
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  .admin-body.admin-redesign-v92 .fleet-topbar {
+    padding: 8px 12px !important;
+  }
+
+  .admin-body.admin-redesign-v92 .global-search {
+    width: min(54vw, 430px) !important;
+  }
+
+  .admin-body.admin-redesign-v92 .dashboard-main {
+    padding: 18px 14px 34px !important;
+  }
+
+  .admin-body.admin-redesign-v92 .control-room-strip,
+  .admin-body.admin-redesign-v92 .metrics,
+  .admin-body.admin-redesign-v92 .vehicle-control-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .admin-body.admin-redesign-v92 .control-room-strip article:nth-child(2n),
+  .admin-body.admin-redesign-v92 .metrics article:nth-child(2n),
+  .admin-body.admin-redesign-v92 .vehicle-control-summary article:nth-child(2n) {
+    border-right: 0 !important;
+  }
+
+  .admin-body.admin-redesign-v92 .vehicle-control-tools,
+  .admin-body.admin-redesign-v92 .fleet-vehicle-tools {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .admin-body.admin-redesign-v92 .vehicle-control-row {
+    grid-template-columns: repeat(3, minmax(110px, 1fr)) !important;
+  }
+
+  .admin-body.admin-redesign-v92 .role-help-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-body.admin-redesign-v92 .fleet-topbar {
+    align-items: center !important;
+  }
+
+  .admin-body.admin-redesign-v92 .topbar-left {
+    flex: 1 !important;
+  }
+
+  .admin-body.admin-redesign-v92 .topbar-actions > :not(.language-select):not(.icon-button):not(#adminThemeToggle) {
+    display: none !important;
+  }
+
+  .admin-body.admin-redesign-v92 .global-search {
+    width: 100% !important;
+  }
+
+  .admin-body.admin-redesign-v92 .admin-command-header {
+    align-items: flex-start !important;
+  }
+
+  .admin-body.admin-redesign-v92 .admin-command-header h2 {
+    font-size: 23px !important;
+  }
+
+  .admin-body.admin-redesign-v92 .admin-auth,
+  .admin-body.admin-redesign-v92 .admin-filter-panel,
+  .admin-body.admin-redesign-v92 .control-room-strip,
+  .admin-body.admin-redesign-v92 .metrics,
+  .admin-body.admin-redesign-v92 .vehicle-control-summary,
+  .admin-body.admin-redesign-v92 .vehicle-control-tools,
+  .admin-body.admin-redesign-v92 .fleet-vehicle-tools,
+  .admin-body.admin-redesign-v92 .role-help-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-body.admin-redesign-v92 .admin-auth {
+    margin: 24px auto !important;
+  }
+
+  .admin-body.admin-redesign-v92 .admin-filter-panel > label,
+  .admin-body.admin-redesign-v92 .admin-filter-panel > article,
+  .admin-body.admin-redesign-v92 .control-room-strip article,
+  .admin-body.admin-redesign-v92 .metrics article,
+  .admin-body.admin-redesign-v92 .vehicle-control-summary article,
+  .admin-body.admin-redesign-v92 .role-help-grid article {
+    border-right: 0 !important;
+    border-bottom: 1px solid var(--admin-line-soft) !important;
+  }
+
+  .admin-body.admin-redesign-v92 .site-inspection-row {
+    grid-template-columns: 100px minmax(0, 1fr) 44px !important;
+    padding-inline: 11px !important;
+  }
+
+  .admin-body.admin-redesign-v92 .fleet-vehicle-list-head,
+  .admin-body.admin-redesign-v92 .fleet-vehicle-row {
+    grid-template-columns: minmax(110px, 1fr) 82px 62px !important;
+    gap: 6px !important;
+  }
+
+  .admin-body.admin-redesign-v92 .vehicle-control-row {
+    grid-template-columns: repeat(2, minmax(110px, 1fr)) !important;
+  }
+
+  .admin-body.admin-redesign-v92 .fleet-vehicle-statusbar {
+    align-items: flex-start !important;
+  }
+}
+
+@media print {
+  .admin-body.admin-redesign-v92 .fleet-sidebar,
+  .admin-body.admin-redesign-v92 .fleet-topbar,
+  .admin-body.admin-redesign-v92 .admin-command-header .dashboard-actions {
+    display: none !important;
+  }
+
+  .admin-body.admin-redesign-v92 .admin-shell,
+  .admin-body.admin-redesign-v92.admin-sidebar-open .admin-shell {
+    display: block !important;
+  }
+
+  .admin-body.admin-redesign-v92 .dashboard-main {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+}
+
+/* Keep task views isolated even when legacy component rules use !important. */
+.admin-body.admin-redesign-v92 [data-admin-view].admin-view-hidden {
+  display: none !important;
+}
