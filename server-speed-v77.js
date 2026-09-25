@@ -822,6 +822,12 @@ if (!driverCss.includes("/* driver-mobile-v85 */")) {
 await fs.writeFile(driverCssPath, driverCss);
 
 let adminJs = await fs.readFile(runtimeAdminPath, "utf8").catch(() => fs.readFile(adminPath, "utf8"));
+if (!adminJs.includes("const SITE_DAILY_DAYS = 7;")) {
+  adminJs = adminJs.replace(
+    'const FALLBACK_SITE = "UNASSIGNED";',
+    'const FALLBACK_SITE = "UNASSIGNED";\nconst SITE_DAILY_DAYS = 7;'
+  );
+}
 adminJs = adminJs.replace(
   "let fleetVehicles = [];",
   "let fleetVehicles = [];\nlet fleetVehiclesLoading = null;"
@@ -2359,7 +2365,7 @@ if (!adminHtml.includes('href="/admin-v92.css')) {
 if (!adminHtml.includes('href="/admin-v100.css')) {
   adminHtml = adminHtml.replace(
     "\n </head>",
-    '  <link rel="stylesheet" href="/admin-v100.css?v=100" />\n\n </head>'
+    '  <link rel="stylesheet" href="/admin-v100.css?v=103" />\n\n </head>'
   );
 }
 
@@ -2510,7 +2516,7 @@ adminHtml = adminHtml.replaceAll("?v=90", "?v=91").replaceAll("?v=91", "?v=100")
 if (!adminHtml.includes('src="/admin-v100.js')) {
   adminHtml = adminHtml.replace(
     "\n </body>",
-    '  <script src="/admin-v100.js?v=100"></script>\n </body>'
+    '  <script src="/admin-v100.js?v=103"></script>\n </body>'
   );
 }
 
@@ -2643,8 +2649,11 @@ serviceWorker = serviceWorker
   .replaceAll("fleetinspect-driver-v90", "fleetinspect-driver-v91")
   .replaceAll("?v=90", "?v=91");
 serviceWorker = serviceWorker
-  .replaceAll("fleetinspect-driver-v91", "fleetinspect-driver-v100")
-  .replaceAll("fleetinspect-driver-v96", "fleetinspect-driver-v100")
-  .replace('"/admin.html",', '"/admin.html",\n  "/admin-v92.css?v=100",\n  "/admin-v100.css?v=100",\n  "/admin-v100.js?v=100",');
+  .replaceAll("fleetinspect-driver-v91", "fleetinspect-driver-v103")
+  .replaceAll("fleetinspect-driver-v96", "fleetinspect-driver-v103")
+  .replaceAll("fleetinspect-driver-v100", "fleetinspect-driver-v103")
+  .replaceAll("fleetinspect-driver-v101", "fleetinspect-driver-v103")
+  .replaceAll("fleetinspect-driver-v102", "fleetinspect-driver-v103")
+  .replace('"/admin.html",', '"/admin.html",\n  "/admin-v92.css?v=103",\n  "/admin-v100.css?v=103",\n  "/admin-v100.js?v=103",');
 await fs.writeFile(path.join(root, "service-worker.js"), serviceWorker);
 await fs.writeFile(runtimeServiceWorkerPath, serviceWorker);
