@@ -828,26 +828,32 @@ if (!adminJs.includes("const SITE_DAILY_DAYS = 7;")) {
     'const FALLBACK_SITE = "UNASSIGNED";\nconst SITE_DAILY_DAYS = 7;'
   );
 }
-adminJs = adminJs.replace(
-  "let fleetVehicles = [];",
-  "let fleetVehicles = [];\nlet fleetVehiclesLoading = null;"
-);
-adminJs = adminJs.replace(
-  '  fleetVehicleCount: document.querySelector("#fleetVehicleCount"),',
-  [
+if (!adminJs.includes("let fleetVehiclesLoading = null;")) {
+  adminJs = adminJs.replace(
+    "let fleetVehicles = [];",
+    "let fleetVehicles = [];\nlet fleetVehiclesLoading = null;"
+  );
+}
+if (!adminJs.includes('fleetVehicleStatus: document.querySelector("#fleetVehicleStatus")')) {
+  adminJs = adminJs.replace(
     '  fleetVehicleCount: document.querySelector("#fleetVehicleCount"),',
-    '  fleetVehicleStatus: document.querySelector("#fleetVehicleStatus"),',
-    '  refreshFleetVehicles: document.querySelector("#refreshFleetVehicles"),',
-  ].join("\n")
-);
-adminJs = adminJs.replace(
-  '  nodes.fleetVehicleList?.addEventListener("click", handleFleetVehicleAction);',
-  [
+    [
+      '  fleetVehicleCount: document.querySelector("#fleetVehicleCount"),',
+      '  fleetVehicleStatus: document.querySelector("#fleetVehicleStatus"),',
+      '  refreshFleetVehicles: document.querySelector("#refreshFleetVehicles"),',
+    ].join("\n")
+  );
+}
+if (!adminJs.includes('nodes.refreshFleetVehicles?.addEventListener("click", loadFleetVehicles)')) {
+  adminJs = adminJs.replace(
     '  nodes.fleetVehicleList?.addEventListener("click", handleFleetVehicleAction);',
-    '  nodes.refreshFleetVehicles?.addEventListener("click", loadFleetVehicles);',
-    '  document.addEventListener("fleetinspect:open-fleet", loadFleetVehicles);',
-  ].join("\n")
-);
+    [
+      '  nodes.fleetVehicleList?.addEventListener("click", handleFleetVehicleAction);',
+      '  nodes.refreshFleetVehicles?.addEventListener("click", loadFleetVehicles);',
+      '  document.addEventListener("fleetinspect:open-fleet", loadFleetVehicles);',
+    ].join("\n")
+  );
+}
 adminJs = adminJs.replace(
   "  applyRoleUi();\n  nodes.dispatcherPassword.value = \"\";",
   "  applyRoleUi();\n  window.setTimeout(() => loadFleetVehicles(), 0);\n  nodes.dispatcherPassword.value = \"\";"
@@ -914,7 +920,7 @@ const siteOverviewRenderer = [
   "        <button class=\"site-overview-head\" type=\"button\" data-site-jump=\"${escapeHtml(site)}\">",
   "          <span>${escapeHtml(siteLabel(site))}</span>",
   "          <strong>${todayItems.length}</strong>",
-  "          <small>${vehicles} vehiculos · ${alerts} alertas hoy</small>",
+  "          <small>${escapeHtml(window.FleetInspectAdminCopy?.t(\"siteVehicleAlertSummary\", { vehicles, alerts }) || `${vehicles} vehicles · ${alerts} alerts today`)}</small>",
   "        </button>",
   "        <div class=\"site-inspection-table\">",
   "          ${rows.length ? rows.map((item) => `",
@@ -923,7 +929,7 @@ const siteOverviewRenderer = [
   "              <span>${escapeHtml(item.driverName || t(\"noDriver\"))}</span>",
   "              <time>${escapeHtml(formatTime(new Date(item.finishedAt || item.startedAt || 0)))}</time>",
   "            </a>",
-  "          `).join(\"\") : `<p class=\"site-empty-line\">Sin inspecciones hoy</p>`}",
+  "          `).join(\"\") : `<p class=\"site-empty-line\">${escapeHtml(window.FleetInspectAdminCopy?.t(\"noInspectionsToday\") || \"No inspections today\")}</p>`}",
   "        </div>",
   "      </article>",
   "    `;",
@@ -950,11 +956,12 @@ const synchronizedAdminFleetLoader = [
   "",
   "  nodes.fleetVehicleList.setAttribute(\"aria-busy\", \"true\");",
   "  if (!fleetVehicles.length) {",
-  "    nodes.fleetVehicleList.innerHTML = `<article class=\"fleet-loading-state\">Cargando matrículas de Driver...</article>`;",
+  "    nodes.fleetVehicleList.innerHTML = `<article class=\"fleet-loading-state\" data-admin-copy-key=\"loadingDriverVehicles\">${escapeHtml(window.FleetInspectAdminCopy?.t(\"loadingDriverVehicles\") || \"Loading Driver registrations...\")}</article>`;",
   "  }",
   "  if (nodes.fleetVehicleStatus) {",
-  "    nodes.fleetVehicleStatus.textContent = \"Sincronizando con Driver...\";",
+  "    nodes.fleetVehicleStatus.textContent = window.FleetInspectAdminCopy?.t(\"syncingDriver\") || \"Synchronizing with Driver...\";",
   "    nodes.fleetVehicleStatus.dataset.state = \"loading\";",
+  "    nodes.fleetVehicleStatus.dataset.adminCopyKey = \"syncingDriver\";",
   "  }",
   "  if (nodes.refreshFleetVehicles) nodes.refreshFleetVehicles.disabled = true;",
   "",
@@ -963,22 +970,27 @@ const synchronizedAdminFleetLoader = [
   "      const response = await fetch(\"/api/vehicles?ts=\" + Date.now(), { cache: \"no-store\" });",
   "      const result = await response.json();",
   "      if (!response.ok || result.ok === false || !Array.isArray(result.vehicles)) {",
-  "        throw new Error(result.error || \"No se pudo cargar la flota.\");",
+  "        throw new Error(result.error || window.FleetInspectAdminCopy?.t(\"fleetLoadError\") || \"The fleet could not be loaded.\");",
   "      }",
   "      fleetVehicles = result.vehicles;",
   "      renderFleetVehicles();",
   "      if (nodes.fleetVehicleStatus) {",
-  "        nodes.fleetVehicleStatus.textContent = `${fleetVehicles.length} matrículas visibles en Driver · actualizado ${formatTime(new Date())}`;",
+  "        const updatedAt = formatTime(new Date());",
+  "        nodes.fleetVehicleStatus.textContent = window.FleetInspectAdminCopy?.t(\"syncedDriver\", { count: fleetVehicles.length, time: updatedAt }) || `${fleetVehicles.length} registrations visible in Driver · updated ${updatedAt}`;",
   "        nodes.fleetVehicleStatus.dataset.state = \"ready\";",
+  "        nodes.fleetVehicleStatus.dataset.adminCopyKey = \"syncedDriver\";",
+  "        nodes.fleetVehicleStatus.dataset.copyCount = String(fleetVehicles.length);",
+  "        nodes.fleetVehicleStatus.dataset.copyTime = updatedAt;",
   "      }",
   "      return fleetVehicles;",
   "    } catch (error) {",
   "      if (nodes.fleetVehicleStatus) {",
-  "        nodes.fleetVehicleStatus.textContent = error.message || \"No se pudo sincronizar la flota.\";",
+  "        nodes.fleetVehicleStatus.textContent = error.message || window.FleetInspectAdminCopy?.t(\"fleetSyncError\") || \"The fleet could not be synchronized.\";",
   "        nodes.fleetVehicleStatus.dataset.state = \"error\";",
+  "        nodes.fleetVehicleStatus.dataset.adminCopyKey = \"fleetSyncError\";",
   "      }",
   "      if (fleetVehicles.length) renderFleetVehicles();",
-  "      else nodes.fleetVehicleList.innerHTML = `<article class=\"empty-state\">${escapeHtml(error.message || \"No se pudo cargar la flota.\")}</article>`;",
+  "      else nodes.fleetVehicleList.innerHTML = `<article class=\"empty-state\" data-admin-copy-key=\"fleetLoadError\">${escapeHtml(error.message || window.FleetInspectAdminCopy?.t(\"fleetLoadError\") || \"The fleet could not be loaded.\")}</article>`;",
   "      return fleetVehicles;",
   "    } finally {",
   "      nodes.fleetVehicleList.removeAttribute(\"aria-busy\");",
@@ -1017,7 +1029,7 @@ const fleetVehicleRenderer = [
   "  if (nodes.fleetVehicleCount) nodes.fleetVehicleCount.textContent = String(query ? vehicles.length : activeTotal);",
   "",
   "  if (!vehicles.length) {",
-  "    nodes.fleetVehicleList.innerHTML = `<article class=\"empty-state\">No hay vehículos para este filtro.</article>`;",
+  "    nodes.fleetVehicleList.innerHTML = `<article class=\"empty-state\" data-admin-copy-key=\"fleetEmpty\">${escapeHtml(window.FleetInspectAdminCopy?.t(\"fleetEmpty\") || \"No vehicles match this filter.\")}</article>`;",
   "    return;",
   "  }",
   "",
@@ -1026,7 +1038,7 @@ const fleetVehicleRenderer = [
   "    <article class=\"fleet-vehicle-row\">",
   "      <strong class=\"fleet-vehicle-plate\">${escapeHtml(vehicle.plate)}</strong>",
   "      <span class=\"fleet-vehicle-site\">${escapeHtml(vehicle.site === \"all\" ? \"DRP3 + DSU1\" : siteLabel(vehicle.site))}</span>",
-  "      <button type=\"button\" data-remove-fleet-vehicle=\"${escapeHtml(vehicle.plate)}\" ${canEdit ? \"\" : \"disabled\"}>Quitar</button>",
+  "      <button type=\"button\" data-remove-fleet-vehicle=\"${escapeHtml(vehicle.plate)}\" ${canEdit ? \"\" : \"disabled\"}>${escapeHtml(window.FleetInspectAdminCopy?.t(\"remove\") || \"Remove\")}</button>",
   "    </article>",
   "  `).join(\"\");",
   "}",
@@ -1052,15 +1064,17 @@ const fleetVehicleAddHandler = [
   "  const plate = normalizeFleetVehiclePlate(nodes.fleetVehiclePlate?.value || \"\");",
   "  const site = normalizeSite(nodes.fleetVehicleSite?.value || \"all\");",
   "  if (!plate) {",
-  "    alert(\"Escribe una matrícula válida.\");",
+  "    alert(window.FleetInspectAdminCopy?.t(\"invalidRegistration\") || \"Enter a valid registration.\");",
   "    nodes.fleetVehiclePlate?.focus();",
   "    return;",
   "  }",
   "",
   "  nodes.addFleetVehicle.disabled = true;",
   "  if (nodes.fleetVehicleStatus) {",
-  "    nodes.fleetVehicleStatus.textContent = `Añadiendo ${plate} a Driver...`;",
+  "    nodes.fleetVehicleStatus.textContent = window.FleetInspectAdminCopy?.t(\"addingVehicle\", { plate }) || `Adding ${plate} to Driver...`;",
   "    nodes.fleetVehicleStatus.dataset.state = \"loading\";",
+  "    nodes.fleetVehicleStatus.dataset.adminCopyKey = \"addingVehicle\";",
+  "    nodes.fleetVehicleStatus.dataset.copyPlate = plate;",
   "  }",
   "  try {",
   "    const response = await fetch(\"/api/admin/vehicles\", {",
@@ -1069,17 +1083,18 @@ const fleetVehicleAddHandler = [
   "      body: JSON.stringify({ plate, site }),",
   "    });",
   "    const result = await response.json();",
-  "    if (!response.ok || result.ok === false) throw new Error(result.error || \"No se pudo guardar el vehículo.\");",
+  "    if (!response.ok || result.ok === false) throw new Error(result.error || window.FleetInspectAdminCopy?.t(\"vehicleSaveError\") || \"The vehicle could not be saved.\");",
   "    nodes.fleetVehiclePlate.value = \"\";",
   "    fleetVehicles = Array.isArray(result.vehicles) ? result.vehicles : fleetVehicles;",
   "    renderFleetVehicles();",
   "    await loadFleetVehicles();",
   "    renderDailyVehicleControl();",
   "  } catch (error) {",
-  "    alert(error.message || \"No se pudo guardar el vehículo.\");",
+  "    alert(error.message || window.FleetInspectAdminCopy?.t(\"vehicleSaveError\") || \"The vehicle could not be saved.\");",
   "    if (nodes.fleetVehicleStatus) {",
-  "      nodes.fleetVehicleStatus.textContent = error.message || \"No se pudo guardar el vehículo.\";",
+  "      nodes.fleetVehicleStatus.textContent = error.message || window.FleetInspectAdminCopy?.t(\"vehicleSaveError\") || \"The vehicle could not be saved.\";",
   "      nodes.fleetVehicleStatus.dataset.state = \"error\";",
+  "      nodes.fleetVehicleStatus.dataset.adminCopyKey = \"vehicleSaveError\";",
   "    }",
   "  } finally {",
   "    nodes.addFleetVehicle.disabled = false;",
@@ -1102,26 +1117,29 @@ const fleetVehicleActionHandler = [
   "  }",
   "",
   "  const plate = button.dataset.removeFleetVehicle;",
-  "  if (!confirm(`Quitar ${plate} de la app del conductor?`)) return;",
+  "  if (!confirm(window.FleetInspectAdminCopy?.t(\"removeConfirm\", { plate }) || `Remove ${plate} from the Driver app?`)) return;",
   "",
   "  button.disabled = true;",
   "  if (nodes.fleetVehicleStatus) {",
-  "    nodes.fleetVehicleStatus.textContent = `Quitando ${plate} de Driver...`;",
+  "    nodes.fleetVehicleStatus.textContent = window.FleetInspectAdminCopy?.t(\"removingVehicle\", { plate }) || `Removing ${plate} from Driver...`;",
   "    nodes.fleetVehicleStatus.dataset.state = \"loading\";",
+  "    nodes.fleetVehicleStatus.dataset.adminCopyKey = \"removingVehicle\";",
+  "    nodes.fleetVehicleStatus.dataset.copyPlate = plate;",
   "  }",
   "  try {",
   "    const response = await fetch(`/api/admin/vehicles/${encodeURIComponent(plate)}`, { method: \"DELETE\" });",
   "    const result = await response.json();",
-  "    if (!response.ok || result.ok === false) throw new Error(result.error || \"No se pudo quitar el vehiculo.\");",
+  "    if (!response.ok || result.ok === false) throw new Error(result.error || window.FleetInspectAdminCopy?.t(\"vehicleRemoveError\") || \"The vehicle could not be removed.\");",
   "    fleetVehicles = Array.isArray(result.vehicles) ? result.vehicles : fleetVehicles;",
   "    renderFleetVehicles();",
   "    await loadFleetVehicles();",
   "    renderDailyVehicleControl();",
   "  } catch (error) {",
-  "    alert(error.message || \"No se pudo quitar el vehiculo.\");",
+  "    alert(error.message || window.FleetInspectAdminCopy?.t(\"vehicleRemoveError\") || \"The vehicle could not be removed.\");",
   "    if (nodes.fleetVehicleStatus) {",
-  "      nodes.fleetVehicleStatus.textContent = error.message || \"No se pudo quitar el vehículo.\";",
+  "      nodes.fleetVehicleStatus.textContent = error.message || window.FleetInspectAdminCopy?.t(\"vehicleRemoveError\") || \"The vehicle could not be removed.\";",
   "      nodes.fleetVehicleStatus.dataset.state = \"error\";",
+  "      nodes.fleetVehicleStatus.dataset.adminCopyKey = \"vehicleRemoveError\";",
   "    }",
   "    button.disabled = false;",
   "  }",
@@ -1167,7 +1185,7 @@ const fleetVehicleManagementHtml = `        <article id="fleetVehicleManagement"
           </div>
          </header>
          <div class="fleet-vehicle-statusbar">
-          <span id="fleetVehicleStatus" data-state="loading" aria-live="polite">Cargando matrículas de Driver...</span>
+          <span id="fleetVehicleStatus" data-state="loading" data-admin-copy-key="loadingDriverVehicles" aria-live="polite">Cargando matrículas de Driver...</span>
           <button id="refreshFleetVehicles" type="button">Actualizar lista</button>
          </div>
          <div class="fleet-vehicle-tools">
@@ -2365,17 +2383,17 @@ if (!adminHtml.includes('href="/admin-v92.css')) {
 if (!adminHtml.includes('href="/admin-v100.css')) {
   adminHtml = adminHtml.replace(
     "\n </head>",
-    '  <link rel="stylesheet" href="/admin-v100.css?v=103" />\n\n </head>'
+    '  <link rel="stylesheet" href="/admin-v100.css?v=106" />\n\n </head>'
   );
 }
 
 const adminV92Script = `  <script id="admin-v92-ui">
    (() => {
     const copy = {
-     es: { ready: "Operativa", error: "Revisar sistema", checking: "Comprobando", dark: "Modo oscuro", light: "Modo claro" },
-     en: { ready: "Operational", error: "Check system", checking: "Checking", dark: "Dark mode", light: "Light mode" },
-     de: { ready: "Betriebsbereit", error: "System prüfen", checking: "Prüfung", dark: "Dunkelmodus", light: "Hellmodus" },
-     ro: { ready: "Operațional", error: "Verifică sistemul", checking: "Se verifică", dark: "Mod întunecat", light: "Mod luminos" },
+     es: { ready: "Operativa", error: "Revisar sistema", checking: "Comprobando", dark: "Modo oscuro", light: "Modo claro", close: "Cerrar menú" },
+     en: { ready: "Operational", error: "Check system", checking: "Checking", dark: "Dark mode", light: "Light mode", close: "Close menu" },
+     de: { ready: "Betriebsbereit", error: "System prüfen", checking: "Prüfung", dark: "Dunkelmodus", light: "Hellmodus", close: "Menü schließen" },
+     ro: { ready: "Operațional", error: "Verifică sistemul", checking: "Se verifică", dark: "Mod întunecat", light: "Mod luminos", close: "Închide meniul" },
     };
 
     const currentCopy = () => {
@@ -2451,7 +2469,7 @@ const adminV92Script = `  <script id="admin-v92-ui">
       backdrop.type = "button";
       backdrop.className = "admin-sidebar-backdrop";
       backdrop.tabIndex = -1;
-      backdrop.setAttribute("aria-label", "Cerrar menú");
+      backdrop.setAttribute("aria-label", currentCopy().close);
       body.appendChild(backdrop);
      }
 
@@ -2512,11 +2530,15 @@ adminHtml = adminHtml
   .replaceAll("/i18n.js?v=89", "/i18n.js?v=90")
   .replaceAll("/admin.js?v=89", "/admin.js?v=90");
 adminHtml = adminHtml.replaceAll("?v=90", "?v=91").replaceAll("?v=91", "?v=100").replaceAll("?v=96", "?v=100");
+adminHtml = adminHtml
+  .replaceAll("/admin.js?v=100", "/admin.js?v=106")
+  .replaceAll("/admin-v100.css?v=103", "/admin-v100.css?v=106")
+  .replaceAll("/admin-v100.js?v=103", "/admin-v100.js?v=106");
 
 if (!adminHtml.includes('src="/admin-v100.js')) {
   adminHtml = adminHtml.replace(
     "\n </body>",
-    '  <script src="/admin-v100.js?v=103"></script>\n </body>'
+    '  <script src="/admin-v100.js?v=106"></script>\n </body>'
   );
 }
 
@@ -2654,6 +2676,10 @@ serviceWorker = serviceWorker
   .replaceAll("fleetinspect-driver-v100", "fleetinspect-driver-v103")
   .replaceAll("fleetinspect-driver-v101", "fleetinspect-driver-v103")
   .replaceAll("fleetinspect-driver-v102", "fleetinspect-driver-v103")
-  .replace('"/admin.html",', '"/admin.html",\n  "/admin-v92.css?v=103",\n  "/admin-v100.css?v=103",\n  "/admin-v100.js?v=103",');
+  .replace('"/admin.html",', '"/admin.html",\n  "/admin-v92.css?v=106",\n  "/admin-v100.css?v=106",\n  "/admin-v100.js?v=106",');
+serviceWorker = serviceWorker
+  .replaceAll("fleetinspect-driver-v103", "fleetinspect-driver-v106")
+  .replaceAll("?v=103", "?v=106")
+  .replaceAll("/admin.js?v=100", "/admin.js?v=106");
 await fs.writeFile(path.join(root, "service-worker.js"), serviceWorker);
 await fs.writeFile(runtimeServiceWorkerPath, serviceWorker);
