@@ -57,6 +57,32 @@
       uniqueVehicles: "{count} vehículos únicos",
       aiPendingFailed: "IA pendiente/fallo",
       inspectionsToday: "Inspecciones de hoy",
+      historyTitle: "Historial por vehículo",
+      historySubtitle: "Busca una matrícula y revisa todo su historial de inspecciones.",
+      date: "Fecha",
+      inspectionsLabel: "Inspecciones",
+      uniqueVehiclesLabel: "Vehículos únicos",
+      viewBasedOnSaved: "Vista basada solo en inspecciones reales guardadas.",
+      enterRegistrationHistory: "Escribe una matrícula para ver todo el historial · {count} vehículos con inspecciones",
+      inspectionsFoundFor: "{count} inspecciones encontradas para {plate} · {site}",
+      noRegistrationHistory: "Sin historial para esa matrícula",
+      vehiclesWithHistory: "Vehículos con historial",
+      history: "Historial",
+      completeHistory: "Historial completo {plate}",
+      savedInspections: "{count} inspecciones guardadas",
+      driver: "Conductor",
+      aiStatus: "Estado IA",
+      report: "Reporte",
+      audit: "Auditoría",
+      latestSystemActions: "Últimas acciones del sistema",
+      noAuditEvents: "Todavía no hay eventos de auditoría.",
+      auditLogin: "Inicio de sesión",
+      auditLoginFailed: "Inicio de sesión fallido",
+      auditAccountCreated: "Cuenta creada",
+      auditRoleUpdated: "Rol actualizado",
+      auditRoutesSaved: "Rutas guardadas",
+      auditRoutesDeleted: "Rutas borradas",
+      auditInspectionSaved: "Inspección guardada",
       moduleInspectionsEyebrow: "REGISTRO OPERATIVO",
       moduleInspectionsTitle: "Inspecciones",
       moduleInspectionsDescription: "Busca una matrícula, revisa el trabajo diario y abre su historial completo.",
@@ -162,6 +188,32 @@
       uniqueVehicles: "{count} unique vehicles",
       aiPendingFailed: "AI pending/failed",
       inspectionsToday: "Today's inspections",
+      historyTitle: "Vehicle history",
+      historySubtitle: "Search a registration and review its complete inspection history.",
+      date: "Date",
+      inspectionsLabel: "Inspections",
+      uniqueVehiclesLabel: "Unique vehicles",
+      viewBasedOnSaved: "Based only on real saved inspections.",
+      enterRegistrationHistory: "Enter a registration to view its full history · {count} vehicles with inspections",
+      inspectionsFoundFor: "{count} inspections found for {plate} · {site}",
+      noRegistrationHistory: "No history for that registration",
+      vehiclesWithHistory: "Vehicles with history",
+      history: "History",
+      completeHistory: "Complete history {plate}",
+      savedInspections: "{count} saved inspections",
+      driver: "Driver",
+      aiStatus: "AI status",
+      report: "Report",
+      audit: "Audit",
+      latestSystemActions: "Latest system actions",
+      noAuditEvents: "No audit events yet.",
+      auditLogin: "Signed in",
+      auditLoginFailed: "Sign-in failed",
+      auditAccountCreated: "Account created",
+      auditRoleUpdated: "Role updated",
+      auditRoutesSaved: "Routes saved",
+      auditRoutesDeleted: "Routes deleted",
+      auditInspectionSaved: "Inspection saved",
       moduleInspectionsEyebrow: "OPERATIONS LOG",
       moduleInspectionsTitle: "Inspections",
       moduleInspectionsDescription: "Search a registration, review daily work and open its complete history.",
@@ -267,6 +319,32 @@
       uniqueVehicles: "{count} eindeutige Fahrzeuge",
       aiPendingFailed: "KI ausstehend/fehlgeschlagen",
       inspectionsToday: "Heutige Inspektionen",
+      historyTitle: "Fahrzeugverlauf",
+      historySubtitle: "Kennzeichen suchen und den vollständigen Inspektionsverlauf prüfen.",
+      date: "Datum",
+      inspectionsLabel: "Inspektionen",
+      uniqueVehiclesLabel: "Eindeutige Fahrzeuge",
+      viewBasedOnSaved: "Nur auf tatsächlich gespeicherten Inspektionen basiert.",
+      enterRegistrationHistory: "Kennzeichen eingeben, um den vollständigen Verlauf zu sehen · {count} Fahrzeuge mit Inspektionen",
+      inspectionsFoundFor: "{count} Inspektionen für {plate} gefunden · {site}",
+      noRegistrationHistory: "Kein Verlauf für dieses Kennzeichen",
+      vehiclesWithHistory: "Fahrzeuge mit Verlauf",
+      history: "Verlauf",
+      completeHistory: "Vollständiger Verlauf {plate}",
+      savedInspections: "{count} gespeicherte Inspektionen",
+      driver: "Fahrer",
+      aiStatus: "KI-Status",
+      report: "Bericht",
+      audit: "Audit",
+      latestSystemActions: "Letzte Systemaktionen",
+      noAuditEvents: "Noch keine Audit-Ereignisse.",
+      auditLogin: "Anmeldung",
+      auditLoginFailed: "Anmeldung fehlgeschlagen",
+      auditAccountCreated: "Konto erstellt",
+      auditRoleUpdated: "Rolle aktualisiert",
+      auditRoutesSaved: "Routen gespeichert",
+      auditRoutesDeleted: "Routen gelöscht",
+      auditInspectionSaved: "Inspektion gespeichert",
       moduleInspectionsEyebrow: "BETRIEBSPROTOKOLL",
       moduleInspectionsTitle: "Inspektionen",
       moduleInspectionsDescription: "Kennzeichen suchen, Tagesarbeit prüfen und den vollständigen Verlauf öffnen.",
@@ -372,6 +450,32 @@
       uniqueVehicles: "{count} vehicule unice",
       aiPendingFailed: "IA în așteptare/eșuată",
       inspectionsToday: "Inspecțiile de azi",
+      historyTitle: "Istoric vehicul",
+      historySubtitle: "Caută un număr și verifică istoricul complet al inspecțiilor.",
+      date: "Data",
+      inspectionsLabel: "Inspecții",
+      uniqueVehiclesLabel: "Vehicule unice",
+      viewBasedOnSaved: "Bazat doar pe inspecțiile reale salvate.",
+      enterRegistrationHistory: "Introdu un număr pentru a vedea istoricul complet · {count} vehicule cu inspecții",
+      inspectionsFoundFor: "{count} inspecții găsite pentru {plate} · {site}",
+      noRegistrationHistory: "Nu există istoric pentru acest număr",
+      vehiclesWithHistory: "Vehicule cu istoric",
+      history: "Istoric",
+      completeHistory: "Istoric complet {plate}",
+      savedInspections: "{count} inspecții salvate",
+      driver: "Șofer",
+      aiStatus: "Stare IA",
+      report: "Raport",
+      audit: "Audit",
+      latestSystemActions: "Ultimele acțiuni ale sistemului",
+      noAuditEvents: "Nu există încă evenimente de audit.",
+      auditLogin: "Autentificare",
+      auditLoginFailed: "Autentificare eșuată",
+      auditAccountCreated: "Cont creat",
+      auditRoleUpdated: "Rol actualizat",
+      auditRoutesSaved: "Rute salvate",
+      auditRoutesDeleted: "Rute șterse",
+      auditInspectionSaved: "Inspecție salvată",
       moduleInspectionsEyebrow: "REGISTRU OPERAȚIONAL",
       moduleInspectionsTitle: "Inspecții",
       moduleInspectionsDescription: "Caută un număr, verifică activitatea zilnică și deschide istoricul complet.",
@@ -746,6 +850,127 @@
     }
   };
 
+  const localizeInspectionHistory = () => {
+    const panel = document.querySelector("#dailyVehicleControl");
+    if (!panel) return;
+    const setText = (node, value) => {
+      if (node && node.textContent !== value) node.textContent = value;
+    };
+    const heading = panel.querySelector(":scope > header > div:first-child h3");
+    const subtitle = panel.querySelector(":scope > header > div:first-child h3 + span");
+    const toolLabels = panel.querySelectorAll(".vehicle-control-tools label > span");
+    const summaryLabels = panel.querySelectorAll(".vehicle-control-summary article > span");
+    const searchInput = panel.querySelector("#vehicleControlSearch");
+    const missingOption = panel.querySelector('#vehicleControlView option[value="missing"]');
+    setText(heading, translate("historyTitle"));
+    setText(subtitle, translate("historySubtitle"));
+    setText(toolLabels[0], translate("date"));
+    setText(toolLabels[1], translate("registration"));
+    setText(missingOption, translate("aiPendingFailed"));
+    setText(summaryLabels[0], translate("inspectionsLabel"));
+    setText(summaryLabels[1], translate("uniqueVehiclesLabel"));
+    setText(summaryLabels[2], translate("aiPendingFailed"));
+    if (searchInput) searchInput.placeholder = translate("searchRegistration");
+
+    const note = panel.querySelector("#routePlanStatus");
+    if (note) {
+      const raw = note.textContent.trim();
+      const promptMatch = raw.match(/Escribe una matricula para ver todo el historial · (\d+) vehiculos con inspecciones/i);
+      const foundMatch = raw.match(/^(\d+) inspecciones encontradas para (.+?) · (.+)$/i);
+      if (promptMatch) {
+        note.dataset.opsCopyKey = "enterRegistrationHistory";
+        note.dataset.copyCount = promptMatch[1];
+      } else if (foundMatch) {
+        note.dataset.opsCopyKey = "inspectionsFoundFor";
+        note.dataset.copyCount = foundMatch[1];
+        note.dataset.copyPlate = foundMatch[2];
+        note.dataset.copySite = foundMatch[3];
+      } else if (/Vista basada solo en inspecciones reales guardadas/i.test(raw)) {
+        note.dataset.opsCopyKey = "viewBasedOnSaved";
+      }
+      if (note.dataset.opsCopyKey) {
+        setText(note, translate(note.dataset.opsCopyKey, {
+          count: note.dataset.copyCount || "0",
+          plate: note.dataset.copyPlate || "",
+          site: note.dataset.copySite || "",
+        }));
+      }
+    }
+
+    panel.querySelectorAll(".vehicle-control-section > header strong").forEach((node) => {
+      const raw = node.textContent.trim();
+      const completeMatch = raw.match(/^Historial completo\s+(.+)$/i);
+      if (/^Vehiculos con historial$/i.test(raw)) node.dataset.opsCopyKey = "vehiclesWithHistory";
+      if (completeMatch) {
+        node.dataset.opsCopyKey = "completeHistory";
+        node.dataset.copyPlate = completeMatch[1];
+      }
+      if (node.dataset.opsCopyKey) {
+        setText(node, translate(node.dataset.opsCopyKey, { plate: node.dataset.copyPlate || "" }));
+      }
+    });
+
+    panel.querySelectorAll(".vehicle-control-section > header span").forEach((node) => {
+      const savedMatch = node.textContent.trim().match(/^(\d+) inspecciones guardadas$/i);
+      if (savedMatch) {
+        node.dataset.opsCopyKey = "savedInspections";
+        node.dataset.copyCount = savedMatch[1];
+      }
+      if (node.dataset.opsCopyKey === "savedInspections") {
+        setText(node, translate("savedInspections", { count: node.dataset.copyCount || "0" }));
+      }
+    });
+
+    const exactKeys = new Map([
+      ["Matricula", "registration"],
+      ["Conductor", "driver"],
+      ["Estado IA", "aiStatus"],
+      ["Reporte", "report"],
+      ["Historial", "history"],
+    ]);
+    panel.querySelectorAll(".vehicle-control-row span, .vehicle-control-row a").forEach((node) => {
+      const key = exactKeys.get(node.textContent.trim());
+      if (key) node.dataset.opsCopyKey = key;
+      if (node.dataset.opsCopyKey) setText(node, translate(node.dataset.opsCopyKey));
+    });
+    panel.querySelectorAll(".empty-state").forEach((node) => {
+      if (/^Sin historial para esa matricula$/i.test(node.textContent.trim())) {
+        node.dataset.opsCopyKey = "noRegistrationHistory";
+      }
+      if (node.dataset.opsCopyKey === "noRegistrationHistory") {
+        setText(node, translate("noRegistrationHistory"));
+      }
+    });
+  };
+
+  const localizeAudit = () => {
+    const panel = document.querySelector("#auditWidget");
+    if (!panel) return;
+    const setText = (node, value) => {
+      if (node && node.textContent !== value) node.textContent = value;
+    };
+    setText(panel.querySelector(":scope > header h3"), translate("audit"));
+    setText(panel.querySelector(":scope > header h3 + span"), translate("latestSystemActions"));
+    const actionKeys = new Map([
+      ["Inicio de sesión", "auditLogin"],
+      ["Login fallido", "auditLoginFailed"],
+      ["Cuenta creada", "auditAccountCreated"],
+      ["Rol actualizado", "auditRoleUpdated"],
+      ["Rutas guardadas", "auditRoutesSaved"],
+      ["Rutas borradas", "auditRoutesDeleted"],
+      ["Inspección guardada", "auditInspectionSaved"],
+    ]);
+    panel.querySelectorAll("#auditTimeline strong").forEach((node) => {
+      const key = actionKeys.get(node.textContent.trim());
+      if (key) node.dataset.opsCopyKey = key;
+      if (node.dataset.opsCopyKey) setText(node, translate(node.dataset.opsCopyKey));
+    });
+    panel.querySelectorAll("#auditTimeline .empty-state").forEach((node) => {
+      if (/Sin eventos de auditoría todavía/i.test(node.textContent)) node.dataset.opsCopyKey = "noAuditEvents";
+      if (node.dataset.opsCopyKey === "noAuditEvents") setText(node, translate("noAuditEvents"));
+    });
+  };
+
   const applyLocalizedCopy = () => {
     document.documentElement.lang = getLanguage();
     document.querySelectorAll("[data-ops-i18n]").forEach((node) => {
@@ -761,6 +986,8 @@
     });
     localizeFleetManager();
     localizeLegacyDashboard();
+    localizeInspectionHistory();
+    localizeAudit();
   };
 
   window.FleetInspectAdminCopy.apply = applyLocalizedCopy;
@@ -820,6 +1047,22 @@
     const controlRoom = document.querySelector(".control-room-strip");
     if (controlRoom) {
       new MutationObserver(localizeLegacyDashboard).observe(controlRoom, {
+        childList: true,
+        characterData: true,
+        subtree: true,
+      });
+    }
+    const inspectionHistory = document.querySelector("#dailyVehicleControl");
+    if (inspectionHistory) {
+      new MutationObserver(localizeInspectionHistory).observe(inspectionHistory, {
+        childList: true,
+        characterData: true,
+        subtree: true,
+      });
+    }
+    const auditPanel = document.querySelector("#auditWidget");
+    if (auditPanel) {
+      new MutationObserver(localizeAudit).observe(auditPanel, {
         childList: true,
         characterData: true,
         subtree: true,
